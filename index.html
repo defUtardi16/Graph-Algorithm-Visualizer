@@ -620,25 +620,6 @@ document.querySelectorAll('.m-card').forEach(function(c){c.classList.remove('on'
 document.getElementById('stConfig').classList.remove('vis');document.getElementById('iterCtrl').style.display='none';document.getElementById('playbackRow').style.display='none';
 document.getElementById('iterDetailPanel').style.display='none';document.getElementById('iterChanges').innerHTML='';document.getElementById('legend').style.display='none';
 document.getElementById('results').classList.remove('vis');gLb();rebuildMtx();compLo('circle');draw();toast('Reset');}
-</script>
-    <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>RadStrix</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}#splash{position:fixed;top:0;left:0;width:100%;height:100%;background:#050505;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden}#splash.fade-out{animation:fadeOut 1.4s cubic-bezier(.4,0,.2,1) forwards}@keyframes fadeOut{0%{opacity:1}100%{opacity:0;pointer-events:none}}canvas#plexus{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.55}
-.brand-wrap{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:14px}
-.made-by{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:300;letter-spacing:10px;color:rgba(255,255,255,.22);text-transform:uppercase;animation:fadeUp 1.2s ease forwards;opacity:0;animation-delay:.5s}
-.brand-name{font-family:'Orbitron',monospace;font-size:clamp(28px,6vw,72px);font-weight:900;letter-spacing:10px;color:#d8d8d8;position:relative;animation:fadeUp 1s ease forwards;opacity:0;animation-delay:.9s;text-shadow:0 0 60px rgba(255,255,255,.08),0 0 120px rgba(255,255,255,.04)}
-.shimmer-layer{position:absolute;inset:0;font-family:'Orbitron',monospace;font-size:clamp(28px,6vw,72px);font-weight:900;letter-spacing:10px;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:300% 100%;animation:shimmer 4s ease-in-out infinite;animation-delay:2s;white-space:nowrap}
-.line-deco{width:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),rgba(180,180,180,.25),transparent);border-radius:2px;animation:lineExpand 1.2s cubic-bezier(.4,0,.2,1) forwards;animation-delay:1.2s}
-.sub-line{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:300;letter-spacing:7px;color:rgba(255,255,255,.15);text-transform:uppercase;animation:fadeUp .8s ease forwards;opacity:0;animation-delay:1.4s}
-.progress-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:6px;animation:fadeUp .8s ease forwards;opacity:0;animation-delay:1.5s}
-.progress-bar{width:180px;height:1px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
-.progress-fill{height:100%;width:0;background:linear-gradient(90deg,rgba(150,150,150,.6),rgba(255,255,255,.7),rgba(150,150,150,.6));border-radius:4px;animation:progressFill 2.5s cubic-bezier(.4,0,.2,1) forwards;animation-delay:1.6s}
-.loading-txt{font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.12);text-transform:uppercase}
-@keyframes fadeUp{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}}
-@keyframes shimmer{0%{background-position:300% 0}100%{background-position:-300% 0}}
-@keyframes lineExpand{0%{width:0;opacity:0}100%{width:220px;opacity:1}}
-@keyframes progressFill{0%{width:0}60%{width:80%}85%{width:93%}100%{width:100%}}
-</style></head><body>
-<div id="splash"><canvas id="plexus"></canvas><div class="brand-wrap"><div class="made-by">Made by</div><div class="brand-name">RadStrix<span class="shimmer-layer">RadStrix</span></div><div class="line-deco"></div><div class="sub-line">Creative Studio</div><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill"></div></div><div class="loading-txt" id="ltxt">Initializing</div></div></div></div>
-<script>
 <script>
 (function(){
 var S=document.createElement('div');S.id='radSplash';S.innerHTML='<canvas id="splashCv"></canvas><div class="splash-content"><div class="logo-wrap"><svg class="logo-icon" viewBox="0 0 100 100"><defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polygon points="50,8 92,75 8,75" fill="none" stroke="url(#logoGrad)" stroke-width="2" filter="url(#glow)"/><circle cx="50" cy="50" r="18" fill="none" stroke="url(#logoGrad)" stroke-width="1.5" filter="url(#glow)"/><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#888"/></linearGradient></svg></div><div class="title-line"><span class="t1">MADE BY</span></div><div class="title-main"><span class="tm">RAD</span><span class="ts">STRIX</span></div><div class="sub-line">GRAPH ALGORITHM VISUALIZER</div><div class="loader"><div class="loader-bar"></div></div><div class="loader-text">INITIALIZING<span class="dots"></span></div></div><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><div class="scan-line"></div>';
@@ -661,6 +642,7 @@ setTimeout(function(){try{playWhoosh()}catch(e){}S.classList.add('hide');setTime
 </script>
 </body>
 </html>
+
 
 
 
