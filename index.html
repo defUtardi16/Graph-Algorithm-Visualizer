@@ -4,217 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RadStrix</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .splash-container {
-            text-align: center;
-            animation: zoomFade 3.5s ease-in-out forwards;
-        }
-
-        /* Teks "Made by" */
-        .made-by {
-            font-family: 'Georgia', serif;
-            font-size: 1.2rem;
-            color: #aaa;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fadeUp 1s 0.3s ease-out forwards;
-        }
-
-        /* Teks "RADSTRIX" - Netflix style */
-        .brand-name {
-            font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
-            font-size: clamp(3rem, 10vw, 7rem);
-            font-weight: 900;
-            color: #e50914;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin-top: 10px;
-            opacity: 0;
-            text-shadow:
-                0 0 20px rgba(229, 9, 20, 0.5),
-                0 0 40px rgba(229, 9, 20, 0.3),
-                0 0 80px rgba(229, 9, 20, 0.15);
-            animation: revealBrand 1.5s 0.8s ease-out forwards;
-        }
-
-        /* Garis bawah animasi */
-        .underline {
-            width: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #e50914, transparent);
-            margin: 15px auto 0;
-            animation: expandLine 1s 1.8s ease-out forwards;
-        }
-
-        /* Loading bar */
-        .loading-bar-container {
-            position: fixed;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 2px;
-            background: #1a1a1a;
-            border-radius: 2px;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeIn 0.5s 2s forwards;
-        }
-
-        .loading-bar {
-            width: 0;
-            height: 100%;
-            background: #e50914;
-            border-radius: 2px;
-            animation: loading 1.5s 2.2s ease-in-out forwards;
-        }
-
-        /* ====== ANIMATIONS ====== */
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes revealBrand {
-            0% {
-                opacity: 0;
-                transform: scale(1.5);
-                filter: blur(10px);
-            }
-            60% {
-                opacity: 1;
-                transform: scale(0.95);
-                filter: blur(0);
-            }
-            80% {
-                transform: scale(1.02);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-                filter: blur(0);
-            }
-        }
-
-        @keyframes expandLine {
-            from { width: 0; }
-            to { width: 120px; }
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        @keyframes loading {
-            0% { width: 0; }
-            40% { width: 60%; }
-            80% { width: 90%; }
-            100% { width: 100%; }
-        }
-
-        /* Fade out seluruh halaman */
-        @keyframes zoomFade {
-            0%, 75% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.1);
-            }
-        }
-
-        /* Particle effect background */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #e50914;
-            border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat 3s ease-in-out infinite;
-        }
-    </style>
+    <link rel="stylesheet" href="splash.css">
 </head>
 <body>
 
-    <!-- Particles Background -->
+    <!-- Background Particles -->
     <div class="particles" id="particles"></div>
 
-    <!-- Splash Content -->
-    <div class="splash-container">
-        <div class="made-by">Made by</div>
-        <div class="brand-name">RadStrix</div>
-        <div class="underline"></div>
+    <!-- Sound Effect (optional) -->
+    <audio id="splash-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Main Splash -->
+    <div class="splash-overlay" id="splashOverlay">
+
+        <!-- Top line decoration -->
+        <div class="top-line"></div>
+
+        <!-- Center content -->
+        <div class="splash-center">
+            <div class="made-by-text">MADE BY</div>
+            <div class="brand-wrapper">
+                <div class="brand-name" id="brandName">
+                    <span class="letter" style="--i:0">R</span>
+                    <span class="letter" style="--i:1">A</span>
+                    <span class="letter" style="--i:2">D</span>
+                    <span class="letter" style="--i:3">S</span>
+                    <span class="letter" style="--i:4">T</span>
+                    <span class="letter" style="--i:5">R</span>
+                    <span class="letter" style="--i:6">I</span>
+                    <span class="letter" style="--i:7">X</span>
+                </div>
+                <div class="brand-glow"></div>
+            </div>
+            <div class="tagline">— PRODUCTION —</div>
+        </div>
+
+        <!-- Loading bar bottom -->
+        <div class="loading-section">
+            <div class="loading-track">
+                <div class="loading-fill" id="loadingFill"></div>
+            </div>
+            <div class="loading-text" id="loadingText">Loading...</div>
+        </div>
+
+        <!-- Bottom line decoration -->
+        <div class="bottom-line"></div>
+
     </div>
 
-    <!-- Loading Bar -->
-    <div class="loading-bar-container">
-        <div class="loading-bar"></div>
-    </div>
+    <!-- Fade to white/black transition -->
+    <div class="transition-screen" id="transitionScreen"></div>
 
-    <script>
-        // Generate particles
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 3 + 's';
-            particle.style.animationDuration = (2 + Math.random() * 3) + 's';
-            particlesContainer.appendChild(particle);
-        }
-
-        // Particle float animation (inject via JS)
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes particleFloat {
-                0% { opacity: 0; transform: translateY(0) scale(0); }
-                50% { opacity: 0.6; transform: translateY(-30px) scale(1); }
-                100% { opacity: 0; transform: translateY(-60px) scale(0); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ✅ Redirect ke index.html setelah animasi selesai
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 3800);
-    </script>
+    <script src="splash.js"></script>
 
 </body>
 </html>
