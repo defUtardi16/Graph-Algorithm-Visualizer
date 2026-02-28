@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Algorithm Visualizer</title>
+
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -22,12 +27,14 @@
             --accent: #333333;
             --accent2: #111111;
             --accent-bg: #e8e8e8;
-            --green: #2d2d2d;
-            --green-bg: #e0e0e0;
-            --red: #555555;
-            --red-bg: #ededed;
-            --amber: #666666;
-            --amber-bg: #efefef;
+            --green: #2d7d46;
+            --green-bg: #e6f4ea;
+            --red: #c0392b;
+            --red-bg: #fdecea;
+            --amber: #e67e22;
+            --amber-bg: #fef5e7;
+            --blue: #2980b9;
+            --blue-bg: #ebf5fb;
             --highlight: #1a1a1a;
             --highlight-soft: rgba(26,26,26,0.08);
             --radius: 10px;
@@ -35,6 +42,43 @@
             --shadow: 0 1px 3px rgba(0,0,0,.06);
             --shadow-md: 0 4px 12px rgba(0,0,0,.07);
             --shadow-lg: 0 8px 24px rgba(0,0,0,.09);
+            --canvas-bg: #fafafa;
+            --canvas-dot: #e0e0e0;
+            --node-fill: #ffffff;
+            --node-stroke: #d0d0d0;
+            --edge-color: #d0d0d0;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0f0f;
+            --bg2: #1a1a1a;
+            --bg3: #252525;
+            --bg4: #333333;
+            --card: #161616;
+            --card2: #1c1c1c;
+            --border: #333333;
+            --border2: #444444;
+            --text: #e8e8e8;
+            --text2: #b0b0b0;
+            --text3: #666666;
+            --accent: #cccccc;
+            --accent2: #ffffff;
+            --accent-bg: #252525;
+            --green: #4caf50;
+            --green-bg: #1b2e1b;
+            --red: #ef5350;
+            --red-bg: #2e1b1b;
+            --amber: #ff9800;
+            --amber-bg: #2e2517;
+            --blue: #42a5f5;
+            --blue-bg: #172535;
+            --highlight: #e8e8e8;
+            --highlight-soft: rgba(232,232,232,0.08);
+            --canvas-bg: #1c1c1c;
+            --canvas-dot: #2a2a2a;
+            --node-fill: #252525;
+            --node-stroke: #444444;
+            --edge-color: #444444;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -46,6 +90,7 @@
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s;
         }
 
         ::-webkit-scrollbar { width:5px; height:5px; }
@@ -54,7 +99,6 @@
 
         .shell { max-width:1100px; margin:0 auto; padding:20px 24px 80px; }
 
-        /* Watermark */
         .watermark {
             position: fixed;
             bottom: 12px;
@@ -67,6 +111,75 @@
             z-index: 900;
             pointer-events: none;
             user-select: none;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar-logo {
+            font-weight: 800;
+            font-size: .85em;
+            color: var(--text);
+            letter-spacing: -.3px;
+        }
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tb-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .7em;
+            font-weight: 600;
+            color: var(--text2);
+            cursor: pointer;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+        .tb-btn:hover { border-color: var(--text); color: var(--text); }
+        .tb-btn svg { width: 14px; height: 14px; }
+        .tb-btn.accent-btn {
+            background: var(--text);
+            color: var(--card);
+            border-color: var(--text);
+        }
+        .tb-btn.accent-btn:hover { background: var(--accent2); }
+
+        /* Keyboard shortcut hint */
+        .kbd {
+            display: inline-block;
+            padding: 1px 5px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .75em;
+            color: var(--text3);
+            line-height: 1.4;
         }
 
         /* Header */
@@ -96,6 +209,7 @@
             padding:22px;
             margin-bottom:14px;
             box-shadow:var(--shadow);
+            transition: background .3s, border-color .3s;
         }
         .section-head {
             display:flex; align-items:center; gap:10px;
@@ -112,7 +226,6 @@
         }
         .section-title { font-size:1em; font-weight:700; color:var(--text); }
 
-        /* Label */
         .lbl {
             font-size:.65em; font-weight:700; letter-spacing:1px;
             text-transform:uppercase; color:var(--text3);
@@ -232,6 +345,13 @@
         .btn-sm { padding:5px 10px; font-size:.72em; }
         .btn-group { display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; }
 
+        .btn-green { background:var(--green); color:#fff; border:none; }
+        .btn-green:hover { filter:brightness(1.1); }
+        .btn-blue { background:var(--blue); color:#fff; border:none; }
+        .btn-blue:hover { filter:brightness(1.1); }
+        .btn-amber { background:var(--amber); color:#fff; border:none; }
+        .btn-amber:hover { filter:brightness(1.1); }
+
         /* Matrix */
         .mtx-wrap {
             overflow-x:auto;
@@ -285,19 +405,21 @@
         .cv-bar button {
             width:28px; height:28px;
             display:grid; place-items:center;
-            background:rgba(255,255,255,.85);
+            background:var(--card);
             border:1px solid var(--border);
             border-radius:5px; color:var(--text2);
             cursor:pointer; font-size:.8em;
             transition:all .1s;
             font-family:'DM Sans',sans-serif; font-weight:700;
+            opacity: .85;
         }
-        .cv-bar button:hover { border-color:var(--text); color:var(--text); }
+        .cv-bar button:hover { border-color:var(--text); color:var(--text); opacity:1; }
         .cv-hint {
             position:absolute; bottom:6px; left:8px;
             font-size:.62em; color:var(--text3);
-            background:rgba(255,255,255,.75);
+            background:var(--card);
             padding:2px 7px; border-radius:3px;
+            opacity:.75;
         }
 
         /* Layout */
@@ -407,6 +529,201 @@
             font-family:'JetBrains Mono',monospace;
             font-size:.85em; font-weight:700;
         }
+
+        /* Playback */
+        .playback-row {
+            display:flex; align-items:center; gap:8px;
+            margin-top:8px;
+        }
+        .play-btn {
+            padding:6px 16px;
+            background:var(--green);
+            color:#fff;
+            border:none;
+            border-radius:5px;
+            font-family:'DM Sans',sans-serif;
+            font-size:.72em; font-weight:700;
+            cursor:pointer;
+            transition:all .15s;
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+        }
+        .play-btn:hover { filter:brightness(1.1); }
+        .play-btn.playing { background:var(--red); }
+        .speed-select {
+            padding:5px 8px;
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:5px;
+            font-family:'DM Sans',sans-serif;
+            font-size:.72em; font-weight:600;
+            color:var(--text2);
+            cursor:pointer;
+        }
+
+        /* Iteration Detail Panel */
+        .iter-detail-panel {
+            margin:12px 0;
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            overflow:hidden;
+            background:var(--card);
+        }
+        .iter-detail-header {
+            background:var(--bg2);
+            padding:12px 16px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            border-bottom:1px solid var(--border);
+        }
+        .iter-detail-header h4 {
+            font-size:.82em;
+            font-weight:700;
+            color:var(--text);
+        }
+        .iter-detail-body {
+            padding:16px;
+        }
+        .detail-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr 1fr;
+            gap:12px;
+        }
+        .detail-card {
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:12px;
+        }
+        .detail-card-title {
+            font-size:.62em;
+            font-weight:700;
+            letter-spacing:.8px;
+            text-transform:uppercase;
+            color:var(--text3);
+            margin-bottom:8px;
+            display:flex;
+            align-items:center;
+            gap:6px;
+        }
+        .detail-card-title .dot {
+            width:8px; height:8px;
+            border-radius:50%;
+            flex-shrink:0;
+        }
+        .detail-card .node-list {
+            display:flex;
+            flex-wrap:wrap;
+            gap:4px;
+        }
+        .detail-card .node-chip {
+            padding:3px 8px;
+            border-radius:4px;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.72em;
+            font-weight:600;
+        }
+        .chip-connected {
+            background:var(--green-bg);
+            color:var(--green);
+            border:1px solid var(--green);
+        }
+        .chip-unconnected {
+            background:var(--red-bg);
+            color:var(--red);
+            border:1px solid var(--red);
+        }
+        .chip-edge {
+            background:var(--blue-bg);
+            color:var(--blue);
+            border:1px solid var(--blue);
+        }
+        .chip-current {
+            background:var(--amber-bg);
+            color:var(--amber);
+            border:1px solid var(--amber);
+        }
+
+        .detail-table {
+            width:100%;
+            border-collapse:collapse;
+            font-size:.75em;
+            margin-top:8px;
+        }
+        .detail-table th {
+            background:var(--bg2);
+            padding:7px 8px;
+            text-align:left;
+            font-weight:700;
+            color:var(--text2);
+            font-size:.8em;
+            letter-spacing:.3px;
+            text-transform:uppercase;
+            border-bottom:1px solid var(--border);
+        }
+        .detail-table td {
+            padding:6px 8px;
+            border-bottom:1px solid var(--border);
+            font-family:'JetBrains Mono',monospace;
+            font-size:.85em;
+        }
+        .detail-table tr:hover td { background:var(--card2); }
+
+        /* All iterations view */
+        .all-iter-section {
+            margin-top:16px;
+        }
+        .all-iter-card {
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            margin-bottom:8px;
+            overflow:hidden;
+            transition:all .2s;
+        }
+        .all-iter-card.expanded .all-iter-body { display:block; }
+        .all-iter-card .all-iter-head {
+            padding:10px 14px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            cursor:pointer;
+            transition:background .15s;
+        }
+        .all-iter-card .all-iter-head:hover { background:var(--bg2); }
+        .all-iter-card .all-iter-head .iter-num {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:22px; height:22px;
+            border-radius:50%;
+            background:var(--text);
+            color:var(--card);
+            font-size:.65em;
+            font-weight:700;
+            margin-right:8px;
+            flex-shrink:0;
+        }
+        .all-iter-card .all-iter-head .iter-title {
+            font-weight:700;
+            font-size:.78em;
+            color:var(--text);
+            flex:1;
+        }
+        .all-iter-card .all-iter-head .chevron {
+            color:var(--text3);
+            font-size:.7em;
+            transition:transform .2s;
+        }
+        .all-iter-card.expanded .all-iter-head .chevron { transform:rotate(180deg); }
+        .all-iter-body {
+            display:none;
+            padding:12px 14px;
+            border-top:1px solid var(--border);
+        }
+
         .iter-changes {
             margin:8px 0;
             padding:10px 14px;
@@ -458,12 +775,14 @@
             background:var(--bg2); padding:3px;
             border-radius:var(--radius-sm); margin-bottom:16px;
             border:1px solid var(--border);
+            overflow-x:auto;
         }
         .tab-btn {
             padding:7px 14px; border:none; background:transparent;
             border-radius:4px; font-family:'DM Sans',sans-serif;
             font-size:.75em; font-weight:600;
             color:var(--text3); cursor:pointer; transition:all .1s;
+            white-space:nowrap;
         }
         .tab-btn:hover { color:var(--text2); }
         .tab-btn.on { background:var(--card); color:var(--text); box-shadow:var(--shadow); }
@@ -483,6 +802,8 @@
             border-radius:var(--radius-sm);
             padding:10px 14px;
             animation:su .25s ease both;
+            cursor:pointer;
+            transition:border-color .15s, box-shadow .15s;
         }
         @keyframes su { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
         .tl-item::before {
@@ -497,6 +818,7 @@
         .tl-item.fin::before { background:var(--text); }
         .tl-item.active { border-color:var(--text); box-shadow:0 0 0 1px var(--text); }
         .tl-item.active::before { background:var(--text); }
+        .tl-item:hover { border-color:var(--text3); }
         .tl-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
         .tl-tag {
             font-family:'JetBrains Mono',monospace;
@@ -568,28 +890,38 @@
             box-shadow:var(--shadow-md);
         }
         .toast.show { transform:translateX(0); }
-        .toast-ok { background:var(--text); color:var(--card); }
-        .toast-err { background:var(--text2); color:var(--card); }
+        .toast-ok { background:var(--green); color:#fff; }
+        .toast-err { background:var(--red); color:#fff; }
         .toast-info { background:var(--text); color:var(--card); }
 
         /* Overlay */
         .ov {
             display:none; position:fixed; inset:0;
-            background:rgba(245,245,245,.85);
+            background:rgba(0,0,0,.4);
             z-index:998; justify-content:center;
             align-items:center; flex-direction:column; gap:10px;
+            backdrop-filter:blur(4px);
         }
         .ov.show { display:flex; }
+        .ov-card {
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:32px;
+            text-align:center;
+            box-shadow:var(--shadow-lg);
+        }
         .spin {
             width:32px; height:32px;
             border:3px solid var(--border);
             border-top-color:var(--text);
             border-radius:50%;
             animation:sp .55s linear infinite;
+            margin:0 auto 12px;
         }
         @keyframes sp { to{transform:rotate(360deg)} }
 
-        /* Bloom legend */
+        /* Legend */
         .legend {
             display:flex; gap:14px; flex-wrap:wrap;
             margin:8px 0; font-size:.7em; color:var(--text2);
@@ -600,6 +932,93 @@
             border:1px solid var(--border);
         }
 
+        /* Share modal */
+        .modal-backdrop {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,.4);
+            z-index:997;
+            backdrop-filter:blur(4px);
+        }
+        .modal-backdrop.show { display:flex; align-items:center; justify-content:center; }
+        .modal {
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:24px;
+            max-width:500px; width:90%;
+            box-shadow:var(--shadow-lg);
+        }
+        .modal h3 { font-size:.95em; font-weight:700; margin-bottom:12px; }
+        .modal-close {
+            float:right; background:none; border:none;
+            font-size:1.2em; cursor:pointer; color:var(--text3);
+            padding:0 4px; line-height:1;
+        }
+        .modal-close:hover { color:var(--text); }
+        .share-url-box {
+            display:flex; gap:6px; margin-top:8px;
+        }
+        .share-url-box input {
+            flex:1;
+            padding:8px 10px;
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            font-family:'JetBrains Mono',monospace;
+            font-size:.75em;
+            color:var(--text);
+            outline:none;
+        }
+
+        /* PDF progress */
+        .pdf-progress {
+            margin-top:12px;
+            display:none;
+        }
+        .pdf-progress.show { display:block; }
+        .pdf-bar-bg {
+            height:6px;
+            background:var(--bg2);
+            border-radius:3px;
+            overflow:hidden;
+            margin-top:6px;
+        }
+        .pdf-bar {
+            height:100%;
+            background:var(--text);
+            border-radius:3px;
+            transition:width .2s;
+            width:0%;
+        }
+        .pdf-status {
+            font-size:.72em;
+            color:var(--text2);
+            font-weight:600;
+            margin-top:4px;
+        }
+
+        /* Shortcut panel */
+        .shortcuts-panel {
+            display:none;
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            z-index:999;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:24px;
+            box-shadow:var(--shadow-lg);
+            min-width:320px;
+        }
+        .shortcuts-panel.show { display:block; }
+        .shortcuts-panel h3 { font-size:.9em; font-weight:700; margin-bottom:14px; }
+        .shortcut-row {
+            display:flex; justify-content:space-between;
+            align-items:center; padding:5px 0;
+            font-size:.78em; color:var(--text2);
+        }
+
         @media(max-width:768px){
             .shell { padding:10px; }
             .section { padding:14px; }
@@ -607,17 +1026,87 @@
             .m-row { grid-template-columns:1fr 1fr; }
             .stats-row { grid-template-columns:1fr 1fr; }
             .iter-controls { flex-direction:column; align-items:stretch; }
+            .detail-grid { grid-template-columns:1fr; }
+            .top-bar { padding:6px 10px; }
+            .top-bar .tb-btn span { display:none; }
         }
     </style>
 </head>
 <body>
 
-<div class="watermark">Written by Rad Strix</div>
+<div class="watermark">RAD STRIX</div>
 
 <div id="toast" class="toast"></div>
 <div id="ov" class="ov">
-    <div class="spin"></div>
-    <div style="color:var(--text2);font-weight:600;font-size:.82em;">Menganalisis graph...</div>
+    <div class="ov-card">
+        <div class="spin"></div>
+        <div style="color:var(--text2);font-weight:600;font-size:.82em;" id="ovText">Menganalisis graph...</div>
+        <div class="pdf-progress" id="pdfProgress">
+            <div class="pdf-bar-bg"><div class="pdf-bar" id="pdfBar"></div></div>
+            <div class="pdf-status" id="pdfStatus">Preparing...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-backdrop" id="shareModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
+        <h3> Share Graph</h3>
+        <p style="font-size:.78em;color:var(--text2);margin-bottom:10px;">Bagikan graph ini via URL. Penerima akan mendapat graph yang sama persis.</p>
+        <div class="share-url-box">
+            <input type="text" id="shareUrl" readonly>
+            <button class="btn btn-primary btn-sm" onclick="copyShareUrl()">Copy</button>
+        </div>
+        <div style="margin-top:14px;">
+            <div class="lbl">Atau Export sebagai JSON</div>
+            <div style="display:flex;gap:6px;margin-top:6px;">
+                <button class="btn btn-ghost btn-sm" onclick="exportJSON()">📄 Export JSON</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('jsonImport').click()">📥 Import JSON</button>
+                <input type="file" id="jsonImport" accept=".json" style="display:none" onchange="importJSON(event)">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shortcuts Modal -->
+<div class="shortcuts-panel" id="shortcutsPanel">
+    <button class="modal-close" onclick="document.getElementById('shortcutsPanel').classList.remove('show')" style="float:right">&times;</button>
+    <h3> Keyboard Shortcuts</h3>
+    <div class="shortcut-row"><span>Run Algorithm</span><span class="kbd">Ctrl+Enter</span></div>
+    <div class="shortcut-row"><span>Next Iteration</span><span class="kbd">→</span></div>
+    <div class="shortcut-row"><span>Prev Iteration</span><span class="kbd">←</span></div>
+    <div class="shortcut-row"><span>First Iteration</span><span class="kbd">Home</span></div>
+    <div class="shortcut-row"><span>Last Iteration</span><span class="kbd">End</span></div>
+    <div class="shortcut-row"><span>Play/Pause</span><span class="kbd">Space</span></div>
+    <div class="shortcut-row"><span>Toggle Dark Mode</span><span class="kbd">D</span></div>
+    <div class="shortcut-row"><span>Print PDF</span><span class="kbd">Ctrl+P</span></div>
+    <div class="shortcut-row"><span>Show Shortcuts</span><span class="kbd">?</span></div>
+    <div class="shortcut-row"><span>Reset</span><span class="kbd">Ctrl+R</span></div>
+</div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="top-bar-left">
+        <div class="top-bar-logo">⬡ Graph Visualizer</div>
+    </div>
+    <div class="top-bar-right">
+        <button class="tb-btn" onclick="toggleDark()" id="darkBtn" title="Toggle Dark Mode (D)">
+            <span id="darkIcon">🌙</span><span>Dark</span>
+        </button>
+        <button class="tb-btn" onclick="showShortcuts()" title="Shortcuts (?)">
+             <span>Keys</span>
+        </button>
+        <button class="tb-btn" onclick="openShareModal()" title="Share">
+             <span>Share</span>
+        </button>
+        <button class="tb-btn" onclick="screenshotCanvas()" title="Screenshot Canvas">
+             <span>Capture</span>
+        </button>
+        <button class="tb-btn accent-btn" onclick="printPDF()" id="pdfBtn" title="Print to PDF (Ctrl+P)">
+             <span>PDF</span>
+        </button>
+    </div>
 </div>
 
 <div class="shell">
@@ -625,7 +1114,7 @@
 <div class="hero">
     <div class="hero-label">Riset Operasi</div>
     <h1>Graph Algorithm Visualizer</h1>
-    <p>Shortest Path dan Minimum Spanning Tree -- Written by Rad Strix</p>
+    <p>Shortest Path & Minimum Spanning Tree — Enhanced Edition by RAD STRIX</p>
 </div>
 
 <!-- 1. METHOD -->
@@ -636,29 +1125,14 @@
     </div>
     <div class="lbl">Shortest Path</div>
     <div class="m-row">
-        <div class="m-card" onclick="pickM('dijkstra',this)">
-            <div class="nm">Dijkstra</div><div class="mtp">Shortest Path</div>
-            <div class="cx">O((V+E)logV)</div>
-        </div>
-        <div class="m-card" onclick="pickM('bellman-ford',this)">
-            <div class="nm">Bellman-Ford</div><div class="mtp">Shortest Path</div>
-            <div class="cx">O(V*E)</div>
-        </div>
-        <div class="m-card" onclick="pickM('floyd-warshall',this)">
-            <div class="nm">Floyd-Warshall</div><div class="mtp">All-Pairs SP</div>
-            <div class="cx">O(V^3)</div>
-        </div>
+        <div class="m-card" onclick="pickM('dijkstra',this)"><div class="nm">Dijkstra</div><div class="mtp">Shortest Path</div><div class="cx">O((V+E)logV)</div></div>
+        <div class="m-card" onclick="pickM('bellman-ford',this)"><div class="nm">Bellman-Ford</div><div class="mtp">Shortest Path</div><div class="cx">O(V·E)</div></div>
+        <div class="m-card" onclick="pickM('floyd-warshall',this)"><div class="nm">Floyd-Warshall</div><div class="mtp">All-Pairs SP</div><div class="cx">O(V³)</div></div>
     </div>
     <div class="lbl">Minimum Spanning Tree</div>
     <div class="m-row">
-        <div class="m-card" onclick="pickM('kruskal',this)">
-            <div class="nm">Kruskal</div><div class="mtp">MST</div>
-            <div class="cx">O(E logE)</div>
-        </div>
-        <div class="m-card" onclick="pickM('prim',this)">
-            <div class="nm">Prim</div><div class="mtp">MST</div>
-            <div class="cx">O((V+E)logV)</div>
-        </div>
+        <div class="m-card" onclick="pickM('kruskal',this)"><div class="nm">Kruskal</div><div class="mtp">MST</div><div class="cx">O(E logE)</div></div>
+        <div class="m-card" onclick="pickM('prim',this)"><div class="nm">Prim</div><div class="mtp">MST</div><div class="cx">O((V+E)logV)</div></div>
     </div>
 </div>
 
@@ -678,42 +1152,29 @@
 
     <div class="lbl" style="margin-top:14px;">Konfigurasi</div>
     <div class="row3" style="margin-bottom:10px;">
-        <div class="field"><label>Jumlah Nodes</label>
-            <input type="number" id="inpN" min="2" max="12" value="5" onchange="chgN()">
-        </div>
+        <div class="field"><label>Jumlah Nodes</label><input type="number" id="inpN" min="2" max="12" value="5" onchange="chgN()"></div>
         <div class="field"><label>Tipe Graph</label>
             <select id="inpT" onchange="gT=this.value;rebuildMtx();draw();">
                 <option value="undirected">Undirected</option>
                 <option value="directed">Directed</option>
             </select>
         </div>
-        <div class="field"><label>Labels (pisah koma)</label>
-            <input type="text" id="inpL" placeholder="A,B,C,D,E" onchange="parseL()">
-        </div>
+        <div class="field"><label>Labels (pisah koma)</label><input type="text" id="inpL" placeholder="A,B,C,D,E" onchange="parseL()"></div>
     </div>
 
     <div class="lbl">Adjacency Matrix</div>
-    <p style="font-size:.7em;color:var(--text3);margin-bottom:5px;">
-        Isi bobot antar node. Kosongkan jika tidak ada koneksi.
-    </p>
+    <p style="font-size:.7em;color:var(--text3);margin-bottom:5px;">Isi bobot antar node. Kosongkan jika tidak ada koneksi.</p>
     <div class="mtx-wrap" id="mw"></div>
     <div class="btn-group">
         <button class="btn btn-ghost btn-sm" onclick="clrMtx()">Clear Matrix</button>
         <button class="btn btn-ghost btn-sm" onclick="rndMtx()">Random Fill</button>
     </div>
 
-    <!-- Source / Target config -->
     <div class="st-config" id="stConfig">
         <div class="lbl">Titik Awal dan Akhir</div>
         <div class="st-fields" id="stFields">
-            <div class="field">
-                <label>Source (Titik Awal)</label>
-                <select id="sSrc"></select>
-            </div>
-            <div class="field tgt-field" id="tgtField">
-                <label>Target (Titik Akhir)</label>
-                <select id="sTgt"></select>
-            </div>
+            <div class="field"><label>Source (Titik Awal)</label><select id="sSrc"></select></div>
+            <div class="field tgt-field" id="tgtField"><label>Target (Titik Akhir)</label><select id="sTgt"></select></div>
         </div>
         <div class="toggle-row" id="tgtToggleRow" style="display:none;">
             <input type="checkbox" id="tgtToggle" onchange="toggleTarget()">
@@ -723,13 +1184,13 @@
     </div>
 
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="run()">Jalankan Algoritma</button>
+        <button class="btn btn-primary" onclick="run()">▶ Jalankan Algoritma</button>
         <button class="btn btn-ghost" onclick="resetAll()">Reset</button>
     </div>
 </div>
 
 <!-- 3. VIS -->
-<div class="section">
+<div class="section" id="visSection">
     <div class="section-head">
         <div class="section-num">3</div>
         <div class="section-title">Visualisasi Graph</div>
@@ -743,24 +1204,24 @@
         <button class="lo-btn" onclick="setLo('random',this)">Random</button>
         <button class="lo-btn" onclick="setLo('star',this)">Star</button>
     </div>
-    <p style="font-size:.68em;color:var(--text3);margin:6px 0 8px;">
-        Drag node untuk atur posisi manual. Layout dipertahankan saat navigasi iterasi.
-    </p>
+    <p style="font-size:.68em;color:var(--text3);margin:6px 0 8px;">Drag node untuk atur posisi manual.</p>
 
     <div class="legend" id="legend" style="display:none;">
-        <div class="legend-item"><div class="legend-dot" style="background:#1a1a1a;"></div> Node aktif / path</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ffffff;border-color:#1a1a1a;"></div> Node default</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#888;"></div> Node visited</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--text);"></div> Aktif / Path</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--node-fill);border-color:var(--text);"></div> Default</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#888;"></div> Visited</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div> Connected</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div> Unconnected</div>
     </div>
 
     <div class="cv-wrap" id="cvW">
         <canvas id="cv"></canvas>
         <div class="cv-bar">
-            <button onclick="zI()">+</button>
-            <button onclick="zO()">-</button>
-            <button onclick="zR()">R</button>
+            <button onclick="zI()" title="Zoom In">+</button>
+            <button onclick="zO()" title="Zoom Out">-</button>
+            <button onclick="zR()" title="Reset View">R</button>
         </div>
-        <div class="cv-hint">Drag node untuk atur posisi</div>
+        <div class="cv-hint">Drag node untuk atur posisi • Keyboard: ←→ navigasi iterasi</div>
     </div>
 
     <!-- Iteration controls -->
@@ -771,12 +1232,35 @@
             <span id="iterLabel"></span>
         </div>
         <div class="iter-nav">
-            <button id="iterFirst" onclick="iterGo(0)">Awal</button>
-            <button id="iterPrev" onclick="iterGo(curIter-1)">Sebelumnya</button>
-            <button id="iterNext" class="primary-iter" onclick="iterGo(curIter+1)">Selanjutnya</button>
-            <button id="iterLast" onclick="iterGo(iterStates.length-1)">Akhir</button>
+            <button id="iterFirst" onclick="iterGo(0)" title="Home">⏮ Awal</button>
+            <button id="iterPrev" onclick="iterGo(curIter-1)" title="←">◀ Prev</button>
+            <button id="iterNext" class="primary-iter" onclick="iterGo(curIter+1)" title="→">Next ▶</button>
+            <button id="iterLast" onclick="iterGo(iterStates.length-1)" title="End">Akhir ⏭</button>
         </div>
     </div>
+
+    <!-- Playback controls -->
+    <div class="playback-row" id="playbackRow" style="display:none;">
+        <button class="play-btn" id="playBtn" onclick="togglePlayback()">
+            <span id="playIcon">▶</span> <span id="playText">Auto Play</span>
+        </button>
+        <select class="speed-select" id="speedSelect" onchange="playSpeed=parseInt(this.value)">
+            <option value="2000">0.5x Slow</option>
+            <option value="1200" selected>1x Normal</option>
+            <option value="700">2x Fast</option>
+            <option value="350">4x Very Fast</option>
+        </select>
+    </div>
+
+    <!-- ITERATION DETAIL PANEL -->
+    <div class="iter-detail-panel" id="iterDetailPanel" style="display:none;">
+        <div class="iter-detail-header">
+            <h4 id="iterDetailTitle">Detail Iterasi</h4>
+            <span style="font-size:.65em;color:var(--text3);font-weight:600;" id="iterDetailSub"></span>
+        </div>
+        <div class="iter-detail-body" id="iterDetailBody"></div>
+    </div>
+
     <div id="iterChanges"></div>
 </div>
 
@@ -792,96 +1276,99 @@
         <div class="tabs">
             <button class="tab-btn on" onclick="sTab('steps',this)">Step-by-Step</button>
             <button class="tab-btn" onclick="sTab('table',this)">Tabel Iterasi</button>
+            <button class="tab-btn" onclick="sTab('detail',this)">📋 Detail Iterasi</button>
             <button class="tab-btn" onclick="sTab('ai',this)">Analisis</button>
         </div>
         <div class="tp on" id="tp-steps"><div class="tl" id="tline"></div></div>
         <div class="tp" id="tp-table"><div class="rt-wrap" id="rTbl"></div></div>
+        <div class="tp" id="tp-detail">
+            <div class="all-iter-section" id="allIterSection"></div>
+        </div>
         <div class="tp" id="tp-ai"><div class="ai-box" id="aiB"></div></div>
     </div>
 </div>
 </div>
 
 <script>
+// ======================== STATE ========================
 let M=null,N=5,gT='undirected',lb=[],pos=[],res=null,sc=1,di=-1,dOff={x:0,y:0},cLo='circle';
-let curIter=0, iterStates=[];
+let curIter=0,iterStates=[];
+let playInterval=null,playSpeed=1200;
+let isDark=false;
 
-window.addEventListener('load',()=>{gLb();rebuildMtx();compLo('circle');draw();setupDrag();});
-window.addEventListener('resize',()=>draw());
+window.addEventListener('load',()=>{
+    gLb();rebuildMtx();compLo('circle');draw();setupDrag();
+    loadFromURL();
+    if(localStorage.getItem('gv-dark')==='1')toggleDark();
+});
+window.addEventListener('resize',()=>drawCurrent());
 
-function toast(m,t='info'){const e=document.getElementById('toast');e.textContent=m;e.className='toast show toast-'+(t==='success'?'ok':t==='error'?'err':'info');setTimeout(()=>e.classList.remove('show'),2200);}
+// ======================== KEYBOARD ========================
+document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
+    if(e.key==='ArrowRight'){e.preventDefault();if(iterStates.length)iterGo(curIter+1);}
+    else if(e.key==='ArrowLeft'){e.preventDefault();if(iterStates.length)iterGo(curIter-1);}
+    else if(e.key==='Home'){e.preventDefault();if(iterStates.length)iterGo(0);}
+    else if(e.key==='End'){e.preventDefault();if(iterStates.length)iterGo(iterStates.length-1);}
+    else if(e.key===' '){e.preventDefault();if(iterStates.length>1)togglePlayback();}
+    else if(e.key==='?'||e.key==='/'){e.preventDefault();showShortcuts();}
+    else if(e.key==='d'||e.key==='D'){if(!e.ctrlKey&&!e.metaKey)toggleDark();}
+    else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run();}
+    else if(e.key==='p'&&(e.ctrlKey||e.metaKey)){e.preventDefault();printPDF();}
+});
 
+// ======================== DARK MODE ========================
+function toggleDark(){
+    isDark=!isDark;
+    document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+    document.getElementById('darkIcon').textContent=isDark?'☀️':'🌙';
+    document.getElementById('darkBtn').querySelector('span:last-child').textContent=isDark?'Light':'Dark';
+    localStorage.setItem('gv-dark',isDark?'1':'0');
+    drawCurrent();
+}
+
+// ======================== TOAST ========================
+function toast(m,t='info'){const e=document.getElementById('toast');e.textContent=m;e.className='toast show toast-'+(t==='success'?'ok':t==='error'?'err':'info');setTimeout(()=>e.classList.remove('show'),2500);}
+
+// ======================== MODALS ========================
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function showShortcuts(){document.getElementById('shortcutsPanel').classList.toggle('show');}
+
+// ======================== METHOD ========================
 function pickM(m,el){
-    M=m;
-    document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));
-    el.classList.add('on');
-
-    const cfg=document.getElementById('stConfig');
-    const fields=document.getElementById('stFields');
-    const tgtF=document.getElementById('tgtField');
-    const tgtTR=document.getElementById('tgtToggleRow');
-    const hint=document.getElementById('stHint');
-    const tgtCb=document.getElementById('tgtToggle');
-
-    if(m==='dijkstra'||m==='bellman-ford'){
-        cfg.classList.add('vis');
-        fields.classList.remove('single');
-        tgtF.classList.remove('disabled');
-        tgtTR.style.display='flex';
-        tgtCb.checked=true;
-        toggleTarget();
-        hint.textContent='Shortest Path: memerlukan titik awal. Titik akhir opsional -- jika dimatikan, akan menghitung jarak ke semua node.';
-    } else if(m==='floyd-warshall'){
-        cfg.classList.remove('vis');
-        tgtTR.style.display='none';
-        hint.textContent='';
-    } else if(m==='kruskal'){
-        cfg.classList.remove('vis');
-        tgtTR.style.display='none';
-        hint.textContent='';
-    } else if(m==='prim'){
-        cfg.classList.add('vis');
-        fields.classList.add('single');
-        tgtF.classList.add('disabled');
-        tgtTR.style.display='none';
-        hint.textContent='MST: hanya memerlukan titik awal. Tidak terpaut pada titik akhir.';
-    }
-
+    M=m;document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');
+    const cfg=document.getElementById('stConfig'),fields=document.getElementById('stFields'),tgtF=document.getElementById('tgtField'),tgtTR=document.getElementById('tgtToggleRow'),hint=document.getElementById('stHint'),tgtCb=document.getElementById('tgtToggle');
+    if(m==='dijkstra'||m==='bellman-ford'){cfg.classList.add('vis');fields.classList.remove('single');tgtF.classList.remove('disabled');tgtTR.style.display='flex';tgtCb.checked=true;toggleTarget();hint.textContent='Shortest Path: titik awal diperlukan, titik akhir opsional.';}
+    else if(m==='floyd-warshall'){cfg.classList.remove('vis');tgtTR.style.display='none';hint.textContent='';}
+    else if(m==='kruskal'){cfg.classList.remove('vis');tgtTR.style.display='none';hint.textContent='';}
+    else if(m==='prim'){cfg.classList.add('vis');fields.classList.add('single');tgtF.classList.add('disabled');tgtTR.style.display='none';hint.textContent='MST: hanya memerlukan titik awal.';}
     toast(m.replace(/-/g,' ').toUpperCase()+' dipilih','success');
 }
+function toggleTarget(){const cb=document.getElementById('tgtToggle'),tf=document.getElementById('tgtField');cb.checked?tf.classList.remove('disabled'):tf.classList.add('disabled');}
 
-function toggleTarget(){
-    const cb=document.getElementById('tgtToggle');
-    const tf=document.getElementById('tgtField');
-    if(cb.checked){tf.classList.remove('disabled');}
-    else{tf.classList.add('disabled');}
-}
-
+// ======================== LABELS ========================
 function gLb(){lb=[];for(let i=0;i<N;i++)lb.push(String.fromCharCode(65+i));document.getElementById('inpL').value=lb.join(',');fillSel();}
 function parseL(){const v=document.getElementById('inpL').value.split(',').map(s=>s.trim()).filter(Boolean);if(v.length>=N)lb=v.slice(0,N);else{lb=v;while(lb.length<N)lb.push(String.fromCharCode(65+lb.length));}rebuildMtx();fillSel();draw();}
 function L(i){return lb[i]||String.fromCharCode(65+i);}
-
 function chgN(){N=Math.max(2,Math.min(12,parseInt(document.getElementById('inpN').value)||5));document.getElementById('inpN').value=N;gLb();rebuildMtx();compLo(cLo);draw();}
+function fillSel(){['sSrc','sTgt'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const p=s.value;s.innerHTML='';for(let i=0;i<N;i++){const o=document.createElement('option');o.value=i;o.textContent=L(i);s.appendChild(o);}if(p&&parseInt(p)<N)s.value=p;});const t=document.getElementById('sTgt');if(t&&t.options.length>1)t.value=N-1;}
 
-function fillSel(){['sSrc','sTgt','sPrm'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const p=s.value;s.innerHTML='';for(let i=0;i<N;i++){const o=document.createElement('option');o.value=i;o.textContent=L(i);s.appendChild(o);}if(p&&parseInt(p)<N)s.value=p;});const t=document.getElementById('sTgt');if(t&&t.options.length>1)t.value=N-1;}
-
+// ======================== MATRIX ========================
 function rebuildMtx(){const w=document.getElementById('mw');let h='<table class="mtx"><thead><tr><th class="corner"></th>';
 for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
 for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){if(i===j){h+='<td class="diag">0</td>';}else{const id='m_'+i+'_'+j;h+='<td><input id="'+id+'" type="number" placeholder="-" step="any"'+(gT==='undirected'?' oninput="mir('+i+','+j+')"':'')+' onchange="mChg()"></td>';}}h+='</tr>';}
 h+='</tbody></table>';w.innerHTML=h;}
-
 function mir(i,j){const a=document.getElementById('m_'+i+'_'+j),b=document.getElementById('m_'+j+'_'+i);if(a&&b)b.value=a.value;mChg();}
 function mChg(){if(gT==='undirected'){for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const a=document.getElementById('m_'+i+'_'+j),b=document.getElementById('m_'+j+'_'+i);if(a&&b){if(document.activeElement===a)b.value=a.value;else if(document.activeElement===b)a.value=b.value;}}}
 for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const inp=document.getElementById('m_'+i+'_'+j);if(inp)inp.parentElement.className=inp.value!==''?'hv':'';}draw();}
-
 function gV(i,j){if(i===j)return 0;const inp=document.getElementById('m_'+i+'_'+j);if(!inp||inp.value==='')return Infinity;return parseFloat(inp.value);}
 function sV(i,j,v){const inp=document.getElementById('m_'+i+'_'+j);if(inp)inp.value=(v===Infinity||v===null)?'':v;}
-
 function rEdges(){const e=[],seen=new Set();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v===Infinity)continue;if(gT==='undirected'){const k=Math.min(i,j)+'-'+Math.max(i,j);if(seen.has(k))continue;seen.add(k);}e.push({from:i,to:j,weight:v});}return e;}
 function rAllDir(){const e=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v!==Infinity)e.push({from:i,to:j,weight:v});}return e;}
-
-function clrMtx(){for(let i=0;i<N;i++)for(let j=0;j<N;j++)sV(i,j,null);mChg();draw();toast('Matrix cleared','info');}
+function clrMtx(){for(let i=0;i<N;i++)for(let j=0;j<N;j++)sV(i,j,null);mChg();draw();toast('Matrix cleared');}
 function rndMtx(){clrMtx();const d=gT==='undirected'?.5:.4;for(let i=0;i<N;i++)for(let j=(gT==='undirected'?i+1:0);j<N;j++){if(i===j)continue;if(Math.random()<d){const w=Math.floor(Math.random()*20)+1;sV(i,j,w);if(gT==='undirected')sV(j,i,w);}}mChg();draw();toast('Random matrix generated','success');}
 
+// ======================== PRESETS ========================
 function loadP(name){let d;
 if(name==='simple'){N=5;gT='undirected';lb=['A','B','C','D','E'];d=[[null,4,2,null,null],[4,null,1,5,null],[2,1,null,8,10],[null,5,8,null,2],[null,null,10,2,null]];}
 else if(name==='city'){N=6;gT='undirected';lb=['JKT','BDG','SMG','SBY','YGY','MLG'];d=[[null,150,450,800,null,null],[150,null,300,null,400,null],[450,300,null,350,100,null],[800,null,350,null,325,90],[null,400,100,325,null,400],[null,null,null,90,400,null]];}
@@ -890,8 +1377,8 @@ else if(name==='negative'){N=5;gT='directed';lb=['A','B','C','D','E'];d=[[null,6
 document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
 rebuildMtx();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d[i][j]);}mChg();fillSel();compLo(cLo);draw();toast('Preset "'+name+'" loaded','success');}
 
-function setLo(t,btn){document.querySelectorAll('.lo-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');cLo=t;compLo(t);draw();}
-
+// ======================== LAYOUT ========================
+function setLo(t,btn){document.querySelectorAll('.lo-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');cLo=t;compLo(t);drawCurrent();}
 function compLo(t){const cv=document.getElementById('cv');const W=cv.parentElement.clientWidth||800;const H=460;const cx=W/2,cy=H/2,r=Math.min(W,H)*.34;pos=[];
 if(t==='circle'){for(let i=0;i<N;i++){const a=2*Math.PI*i/N-Math.PI/2;pos.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});}}
 else if(t==='grid'){const cols=Math.ceil(Math.sqrt(N));const gap=Math.min(W/(cols+1),H/(Math.ceil(N/cols)+1));const ox=(W-gap*(cols-1))/2,oy=(H-gap*(Math.ceil(N/cols)-1))/2;for(let i=0;i<N;i++)pos.push({x:ox+(i%cols)*gap,y:oy+Math.floor(i/cols)*gap});}
@@ -907,6 +1394,7 @@ for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){let dx=pos[i].x-pos[j].x,dy=pos[i].y-
 edges.forEach(e=>{let dx=pos[e.to].x-pos[e.from].x,dy=pos[e.to].y-pos[e.from].y,d=Math.sqrt(dx*dx+dy*dy)||1,ff=.005*d;f[e.from].x+=dx/d*ff;f[e.from].y+=dy/d*ff;f[e.to].x-=dx/d*ff;f[e.to].y-=dy/d*ff;});
 for(let i=0;i<N;i++){f[i].x+=(W/2-pos[i].x)*.002;f[i].y+=(H/2-pos[i].y)*.002;vel[i].x=(vel[i].x+f[i].x)*.9*tmp;vel[i].y=(vel[i].y+f[i].y)*.9*tmp;pos[i].x=Math.max(pad,Math.min(W-pad,pos[i].x+vel[i].x));pos[i].y=Math.max(pad,Math.min(H-pad,pos[i].y+vel[i].y));}}}
 
+// ======================== DRAG ========================
 function setupDrag(){const cv=document.getElementById('cv');function xy(e){const r=cv.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX,cy=e.touches?e.touches[0].clientY:e.clientY;return{x:(cx-r.left)/sc,y:(cy-r.top)/sc};}
 function dn(e){const p=xy(e);for(let i=N-1;i>=0;i--){const dx=p.x-pos[i].x,dy=p.y-pos[i].y;if(dx*dx+dy*dy<600){di=i;dOff={x:dx,y:dy};e.preventDefault();return;}}}
 function mv(e){if(di<0)return;const p=xy(e);pos[di].x=p.x-dOff.x;pos[di].y=p.y-dOff.y;drawCurrent();e.preventDefault();}
@@ -918,13 +1406,12 @@ function zI(){sc=Math.min(2,sc+.15);drawCurrent();}
 function zO(){sc=Math.max(.5,sc-.15);drawCurrent();}
 function zR(){sc=1;compLo(cLo);drawCurrent();}
 
+// ======================== DRAW ========================
 function drawCurrent(){
-    if(iterStates.length>0 && curIter>=0 && curIter<iterStates.length){
+    if(iterStates.length>0&&curIter>=0&&curIter<iterStates.length){
         const st=iterStates[curIter];
         draw(st.hlEdges||[],st.hlNodes||[],st.pathEdges||[],st.bloomEdges||[],st.bloomNodes||[],st.labels||{},st.visitedNodes||[],st.permNodes||[],st.tempLabels||{});
-    } else {
-        draw();
-    }
+    }else{draw();}
 }
 
 function draw(hlE=[],hlN=[],pE=[],bloomE=[],bloomN=[],nodeLabels={},visitedN=[],permN=[],tempLabels={}){
@@ -932,16 +1419,20 @@ const cv=document.getElementById('cv'),W=cv.parentElement.clientWidth,H=460;
 const dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+'px';
 const c=cv.getContext('2d');c.scale(dpr*sc,dpr*sc);const sW=W/sc,sH=H/sc;
 
-// Background
-c.fillStyle='#fafafa';c.fillRect(0,0,sW,sH);
+const bgColor=getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim()||'#fafafa';
+const dotColor=getComputedStyle(document.documentElement).getPropertyValue('--canvas-dot').trim()||'#e0e0e0';
+const nFill=getComputedStyle(document.documentElement).getPropertyValue('--node-fill').trim()||'#ffffff';
+const nStroke=getComputedStyle(document.documentElement).getPropertyValue('--node-stroke').trim()||'#d0d0d0';
+const eColor=getComputedStyle(document.documentElement).getPropertyValue('--edge-color').trim()||'#d0d0d0';
+const textColor=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#1a1a1a';
+const cardColor=getComputedStyle(document.documentElement).getPropertyValue('--card').trim()||'#ffffff';
 
-// Dots pattern
-c.fillStyle='#e0e0e0';for(let x=0;x<sW;x+=24)for(let y=0;y<sH;y+=24){c.beginPath();c.arc(x,y,.5,0,6.28);c.fill();}
+c.fillStyle=bgColor;c.fillRect(0,0,sW,sH);
+c.fillStyle=dotColor;for(let x=0;x<sW;x+=24)for(let y=0;y<sH;y+=24){c.beginPath();c.arc(x,y,.5,0,6.28);c.fill();}
 
 if(!N||pos.length<N)return;
 const edges=rAllDir();const drawn=new Set();
 
-// Draw edges
 edges.forEach(e=>{if(!pos[e.from]||!pos[e.to])return;
 const k=gT==='undirected'?Math.min(e.from,e.to)+'-'+Math.max(e.from,e.to):e.from+'-'+e.to;
 if(gT==='undirected'&&drawn.has(k))return;drawn.add(k);
@@ -950,189 +1441,117 @@ const isH=hlE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from
 const isP=pE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from===e.to&&h.to===e.from));
 const isBloom=bloomE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from===e.to&&h.to===e.from));
 
-// Bloom glow for selected route
-if(isBloom){
-    c.save();
-    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
-    c.strokeStyle='rgba(26,26,26,0.12)';c.lineWidth=14;c.lineCap='round';c.stroke();
-    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
-    c.strokeStyle='rgba(26,26,26,0.08)';c.lineWidth=22;c.lineCap='round';c.stroke();
-    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
-    c.strokeStyle='rgba(26,26,26,0.04)';c.lineWidth=32;c.lineCap='round';c.stroke();
-    c.restore();
-}
+if(isBloom){c.save();
+c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);c.strokeStyle=isDark?'rgba(255,255,255,0.12)':'rgba(26,26,26,0.12)';c.lineWidth=14;c.lineCap='round';c.stroke();
+c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);c.strokeStyle=isDark?'rgba(255,255,255,0.06)':'rgba(26,26,26,0.06)';c.lineWidth=24;c.lineCap='round';c.stroke();
+c.restore();}
 
 c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
-if(isBloom){c.strokeStyle='#1a1a1a';c.lineWidth=3;} 
-else if(isP){c.strokeStyle='#555';c.lineWidth=2.5;c.setLineDash([6,3]);} 
-else if(isH){c.strokeStyle='#333';c.lineWidth=2;} 
-else{c.strokeStyle='#d0d0d0';c.lineWidth=1.2;}
+if(isBloom){c.strokeStyle=textColor;c.lineWidth=3;}
+else if(isP){c.strokeStyle=isDark?'#888':'#555';c.lineWidth=2.5;c.setLineDash([6,3]);}
+else if(isH){c.strokeStyle=isDark?'#aaa':'#333';c.lineWidth=2;}
+else{c.strokeStyle=eColor;c.lineWidth=1.2;}
 c.stroke();c.setLineDash([]);
 
-// Arrow for directed
 if(gT==='directed'){const ang=Math.atan2(p2.y-p1.y,p2.x-p1.x),nr=22,ax=p2.x-nr*Math.cos(ang),ay=p2.y-nr*Math.sin(ang),al=8;
 c.beginPath();c.moveTo(ax,ay);c.lineTo(ax-al*Math.cos(ang-.35),ay-al*Math.sin(ang-.35));c.moveTo(ax,ay);c.lineTo(ax-al*Math.cos(ang+.35),ay-al*Math.sin(ang+.35));
-c.strokeStyle=isBloom?'#1a1a1a':isH?'#333':'#aaa';c.lineWidth=1.5;c.stroke();}
+c.strokeStyle=isBloom?textColor:isH?(isDark?'#aaa':'#333'):(isDark?'#555':'#aaa');c.lineWidth=1.5;c.stroke();}
 
-// Edge weight label
 const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2,dx=p2.x-p1.x,dy=p2.y-p1.y,ln=Math.sqrt(dx*dx+dy*dy)||1;
 const ox=-dy/ln*12,oy=dx/ln*12;
 const txt=''+e.weight;c.font='600 9px "JetBrains Mono",monospace';const tw=c.measureText(txt).width+5;
-c.fillStyle='#fafafa';c.fillRect(mx+ox-tw/2,my+oy-6,tw,12);
-c.fillStyle=isBloom?'#1a1a1a':isH?'#333':'#aaa';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,mx+ox,my+oy);});
+c.fillStyle=bgColor;c.fillRect(mx+ox-tw/2,my+oy-6,tw,12);
+c.fillStyle=isBloom?textColor:isH?(isDark?'#ccc':'#333'):(isDark?'#666':'#aaa');c.textAlign='center';c.textBaseline='middle';c.fillText(txt,mx+ox,my+oy);});
 
-// Draw nodes
 for(let i=0;i<N;i++){const p=pos[i];if(!p)continue;
-const isH=hlN.includes(i);
-const isBloom=bloomN.includes(i);
-const isVisited=visitedN.includes(i);
-const isPerm=permN.includes(i);
-const nr=20;
+const isH=hlN.includes(i),isBloom=bloomN.includes(i),isVisited=visitedN.includes(i),isPerm=permN.includes(i);const nr=20;
 
-// Bloom glow for selected nodes
-if(isBloom){
-    c.save();
-    c.beginPath();c.arc(p.x,p.y,nr+12,0,6.28);
-    c.fillStyle='rgba(26,26,26,0.06)';c.fill();
-    c.beginPath();c.arc(p.x,p.y,nr+8,0,6.28);
-    c.fillStyle='rgba(26,26,26,0.1)';c.fill();
-    c.beginPath();c.arc(p.x,p.y,nr+4,0,6.28);
-    c.fillStyle='rgba(26,26,26,0.14)';c.fill();
-    c.restore();
-}
+if(isBloom){c.save();
+c.beginPath();c.arc(p.x,p.y,nr+10,0,6.28);c.fillStyle=isDark?'rgba(255,255,255,0.06)':'rgba(26,26,26,0.06)';c.fill();
+c.beginPath();c.arc(p.x,p.y,nr+6,0,6.28);c.fillStyle=isDark?'rgba(255,255,255,0.1)':'rgba(26,26,26,0.1)';c.fill();
+c.restore();}
 
 c.beginPath();c.arc(p.x,p.y,nr,0,6.28);
-if(isBloom||isH){c.fillStyle='#1a1a1a';}
-else if(isPerm){c.fillStyle='#555';}
-else if(isVisited){c.fillStyle='#999';}
-else{c.fillStyle='#ffffff';}
+if(isBloom||isH)c.fillStyle=textColor;
+else if(isPerm)c.fillStyle=isDark?'#666':'#555';
+else if(isVisited)c.fillStyle=isDark?'#444':'#999';
+else c.fillStyle=nFill;
 c.fill();
-c.strokeStyle=(isBloom||isH)?'#000':isPerm?'#333':isVisited?'#777':'#d0d0d0';
+c.strokeStyle=(isBloom||isH)?textColor:isPerm?(isDark?'#888':'#333'):isVisited?(isDark?'#555':'#777'):nStroke;
 c.lineWidth=isBloom?2:1.5;c.stroke();
 
-// Node label
-c.fillStyle=(isBloom||isH||isPerm)?'#ffffff':isVisited?'#fff':'#1a1a1a';
+c.fillStyle=(isBloom||isH||isPerm||isVisited)?cardColor:textColor;
 c.font='700 10px "DM Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';
 c.fillText(L(i),p.x,p.y);
 
-// Distance/temp labels below node
 const lbl=nodeLabels[i];
 if(lbl!==undefined){
     c.font='600 8px "JetBrains Mono",monospace';
-    const lblTxt=''+(lbl===Infinity?'Inf':lbl);
-    const lw=c.measureText(lblTxt).width+6;
-    const ly=p.y+nr+10;
-    c.fillStyle=isPerm?'#1a1a1a':'#fafafa';
-    c.strokeStyle=isPerm?'#1a1a1a':'#aaa';
-    c.lineWidth=1;
-    c.beginPath();
-    const bx=p.x-lw/2,by=ly-6;
-    c.roundRect?c.roundRect(bx,by,lw,12,2):c.rect(bx,by,lw,12);
+    const lblTxt=''+(lbl===Infinity?'∞':lbl);const lw=c.measureText(lblTxt).width+6;const ly=p.y+nr+10;
+    c.fillStyle=isPerm?textColor:bgColor;c.strokeStyle=isPerm?textColor:(isDark?'#555':'#aaa');c.lineWidth=1;
+    c.beginPath();const bx=p.x-lw/2,by=ly-6;
+    if(c.roundRect)c.roundRect(bx,by,lw,12,2);else c.rect(bx,by,lw,12);
     c.fill();c.stroke();
-    c.fillStyle=isPerm?'#fff':'#1a1a1a';
-    c.textAlign='center';c.textBaseline='middle';
-    c.fillText(lblTxt,p.x,ly);
+    c.fillStyle=isPerm?cardColor:textColor;c.textAlign='center';c.textBaseline='middle';c.fillText(lblTxt,p.x,ly);
 }
-
-// Temp label indicator (T/P)
 const tl=tempLabels[i];
-if(tl){
-    c.font='700 7px "JetBrains Mono",monospace';
-    const tx=p.x+nr+3,ty=p.y-nr+3;
-    c.fillStyle=tl==='P'?'#1a1a1a':'#888';
-    c.textAlign='left';c.textBaseline='top';
-    c.fillText(tl,tx,ty);
-}
+if(tl){c.font='700 7px "JetBrains Mono",monospace';c.fillStyle=tl==='P'?textColor:(isDark?'#666':'#888');c.textAlign='left';c.textBaseline='top';c.fillText(tl,p.x+nr+3,p.y-nr+3);}
 }
 
-// Watermark on canvas
-c.font='500 9px "DM Sans",sans-serif';
-c.fillStyle='rgba(0,0,0,0.08)';
-c.textAlign='right';c.textBaseline='bottom';
-c.fillText('Written by Rad Strix',sW-8,sH-6);
+c.font='500 9px "DM Sans",sans-serif';c.fillStyle=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+c.textAlign='right';c.textBaseline='bottom';c.fillText('RAD STRIX',sW-8,sH-6);
 }
 
 function adjL(){const a=Array.from({length:N},()=>[]);for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v!==Infinity)a[i].push({to:j,w:v});}return a;}
 
-/* ============= ALGORITHMS WITH ITERATION STATES ============= */
+// ======================== ALGORITHMS ========================
 
 function algD(src,tgt){
     const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),vis=Array(N).fill(false),al=adjL(),steps=[],states=[];
     dist[src]=0;
-
-    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0, sisanya Inf. Semua node berlabel sementara.',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0, sisanya ∞',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'INIT'});
     states.push(makeState_D(dist,vis,prev,src,tgt,[],[],'Inisialisasi: dist['+L(src)+']=0'));
 
     for(let it=0;it<N;it++){
         let u=-1;for(let i=0;i<N;i++)if(!vis[i]&&(u<0||dist[i]<dist[u]))u=i;
-        if(u<0||dist[u]===Infinity)break;
-        vis[u]=true;
-
-        const changes=['Node '+L(u)+' dipilih (jarak='+dist[u]+'), label berubah: Sementara -> Permanen'];
-
-        steps.push({t:'Iterasi '+(it+1)+': Visit '+L(u),d:'Node '+L(u)+' dijadikan permanen, jarak = '+dist[u],c:'Pilih '+L(u)+' (jarak min dari node sementara)',a:'VISIT '+L(u)});
-
-        al[u].forEach(({to:v,w})=>{
-            if(!vis[v]&&dist[u]+w<dist[v]){
-                const old=dist[v];dist[v]=dist[u]+w;prev[v]=u;
-                changes.push('dist['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[v]+' (via '+L(u)+', '+dist[u]+'+'+w+')');
-                steps.push({t:'  Relax '+L(u)+' -> '+L(v),d:'dist['+L(v)+'] = min('+(old===Infinity?'Inf':old)+', '+dist[u]+'+'+w+') = '+dist[v],c:'prev['+L(v)+']='+L(u),a:'RELAX'});
-            }
-        });
-
-        const visitedSoFar=[];const permSoFar=[];
-        for(let i=0;i<N;i++){if(vis[i])permSoFar.push(i);else if(dist[i]<Infinity)visitedSoFar.push(i);}
-
-        states.push(makeState_D(dist,vis,prev,src,tgt,changes,permSoFar,'Iterasi '+(it+1)+': '+L(u)+' permanen'));
-
-        steps.push({t:'  Status',d:'Dist: ['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',c:'Permanen: ['+permSoFar.map(L).join(',')+']',a:'STATUS'});
+        if(u<0||dist[u]===Infinity)break;vis[u]=true;
+        const changes=['Node '+L(u)+' dipilih (jarak='+dist[u]+'), Sementara → Permanen'];
+        steps.push({t:'Iterasi '+(it+1)+': Visit '+L(u),d:'Node '+L(u)+' permanen, jarak = '+dist[u],c:'Pilih '+L(u)+' (jarak min dari sementara)',a:'VISIT '+L(u)});
+        al[u].forEach(({to:v,w})=>{if(!vis[v]&&dist[u]+w<dist[v]){const old=dist[v];dist[v]=dist[u]+w;prev[v]=u;
+        changes.push('dist['+L(v)+']: '+(old===Infinity?'∞':old)+' → '+dist[v]+' (via '+L(u)+', '+dist[u]+'+'+w+')');
+        steps.push({t:'  Relax '+L(u)+' → '+L(v),d:'dist['+L(v)+'] = min('+(old===Infinity?'∞':old)+', '+dist[u]+'+'+w+') = '+dist[v],c:'prev['+L(v)+']='+L(u),a:'RELAX'});}});
+        const permSF=[];for(let i=0;i<N;i++)if(vis[i])permSF.push(i);
+        states.push(makeState_D(dist,vis,prev,src,tgt,changes,permSF,'Iterasi '+(it+1)+': '+L(u)+' permanen'));
+        steps.push({t:'  Status',d:'Dist: ['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',c:'Permanen: ['+permSF.map(L).join(',')+']',a:'STATUS'});
     }
-
     const path=[];let cur=tgt;
     if(tgt>=0){while(cur>=0){path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
     const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
-
-    // Final state with bloom
-    const finalChanges=['Algoritma selesai.'];
-    if(tgt>=0&&path.length)finalChanges.push('Path terpendek: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
-    else if(tgt>=0)finalChanges.push('Tidak ada path ke '+L(tgt));
-    else finalChanges.push('Jarak dari '+L(src)+' ke semua node dihitung.');
-
-    const finalSt={
-        hlEdges:[],hlNodes:path.length?path:[],pathEdges:[],
-        bloomEdges:pe,bloomNodes:path.length?path:[],
-        labels:{},visitedNodes:[],permNodes:[],tempLabels:{},
-        changes:finalChanges,title:'Hasil Akhir'
-    };
-    for(let i=0;i<N;i++){finalSt.labels[i]=dist[i];finalSt.tempLabels[i]=vis[i]?'P':'T';}
-    states.push(finalSt);
-
-    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'Inf':dist[tgt]):'N/A'),c:'Final dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'RESULT',f:true});
+    const fc=['Algoritma selesai.'];
+    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' → ')+' (jarak: '+dist[tgt]+')');
+    else if(tgt>=0)fc.push('Tidak ada path ke '+L(tgt));
+    const fSt={hlEdges:[],hlNodes:path.length?path:[],pathEdges:[],bloomEdges:pe,bloomNodes:path.length?path:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir',connectedNodes:[...new Set(path)],unconnectedNodes:[],selectedEdges:pe};
+    for(let i=0;i<N;i++){fSt.labels[i]=dist[i];fSt.tempLabels[i]=vis[i]?'P':'T';}
+    states.push(fSt);
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' → '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'∞':dist[tgt]):'N/A'),c:'Final dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'RESULT',f:true});
     return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Dijkstra'};
 }
 
 function makeState_D(dist,vis,prev,src,tgt,changes,permNodes,title){
-    const st={hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[...permNodes],tempLabels:{},changes:[...changes],title:title};
-    for(let i=0;i<N;i++){
-        st.labels[i]=dist[i];
-        if(vis[i])st.tempLabels[i]='P';
-        else if(dist[i]<Infinity)st.tempLabels[i]='T';
-    }
-    // Highlight permanent nodes
-    st.hlNodes=[...permNodes];
-    // Build partial path edges for vis
-    const partialEdges=[];
-    for(let i=0;i<N;i++){if(prev[i]>=0&&vis[i])partialEdges.push({from:prev[i],to:i});}
-    st.hlEdges=partialEdges;
+    const st={hlEdges:[],hlNodes:[...permNodes],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[...permNodes],tempLabels:{},changes:[...changes],title,connectedNodes:[...permNodes],unconnectedNodes:[],selectedEdges:[]};
+    for(let i=0;i<N;i++){st.labels[i]=dist[i];if(vis[i])st.tempLabels[i]='P';else if(dist[i]<Infinity)st.tempLabels[i]='T';}
+    const unconn=[];for(let i=0;i<N;i++)if(!permNodes.includes(i))unconn.push(i);
+    st.unconnectedNodes=unconn;
+    const partE=[];for(let i=0;i<N;i++)if(prev[i]>=0&&vis[i])partE.push({from:prev[i],to:i});
+    st.hlEdges=partE;st.selectedEdges=partE;
     return st;
 }
 
 function algBF(src,tgt){
     const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),steps=[],states=[];
     const edges=rAllDir();dist[src]=0;
-
-    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0 | '+edges.length+' edges',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
-    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:['Inisialisasi: dist['+L(src)+']=0'],title:'Inisialisasi'});
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0 | '+edges.length+' edges',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:['Inisialisasi: dist['+L(src)+']=0'],title:'Inisialisasi',connectedNodes:[src],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==src),selectedEdges:[]});
 
     let neg=false;
     for(let it=1;it<N;it++){
@@ -1140,32 +1559,26 @@ function algBF(src,tgt){
         steps.push({t:'Iterasi '+it+'/'+(N-1),d:'Relax semua edges',c:'',a:'ITER '+it});
         const relaxed=[];
         edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to]){const old=dist[e.to];dist[e.to]=dist[e.from]+e.weight;prev[e.to]=e.from;upd=true;
-        changes.push('dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to]+' via '+L(e.from));
+        changes.push('dist['+L(e.to)+']: '+(old===Infinity?'∞':old)+' → '+dist[e.to]+' via '+L(e.from));
         relaxed.push({from:e.from,to:e.to});
-        steps.push({t:'  Relax '+L(e.from)+' -> '+L(e.to)+' (w='+e.weight+')',d:'dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to],c:'via '+L(e.from),a:'RELAX'});}});
-        if(!upd)changes.push('Tidak ada perubahan, konvergen.');
-
+        steps.push({t:'  Relax '+L(e.from)+' → '+L(e.to)+' (w='+e.weight+')',d:'dist['+L(e.to)+']: '+(old===Infinity?'∞':old)+' → '+dist[e.to],c:'via '+L(e.from),a:'RELAX'});}});
+        if(!upd)changes.push('Tidak ada perubahan.');
         const activeN=[];for(let i=0;i<N;i++)if(dist[i]<Infinity)activeN.push(i);
         const buildE=[];for(let i=0;i<N;i++)if(prev[i]>=0)buildE.push({from:prev[i],to:i});
-        states.push({hlEdges:buildE,hlNodes:activeN,pathEdges:[],bloomEdges:relaxed,bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Iterasi '+it});
-
-        steps.push({t:'  Status',d:upd?'Ada update':'Tidak ada update',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'STATUS'});
+        const unconn=[];for(let i=0;i<N;i++)if(dist[i]===Infinity)unconn.push(i);
+        states.push({hlEdges:buildE,hlNodes:activeN,pathEdges:[],bloomEdges:relaxed,bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Iterasi '+it,connectedNodes:activeN,unconnectedNodes:unconn,selectedEdges:buildE});
+        steps.push({t:'  Status',d:upd?'Ada update':'Tidak ada update',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'STATUS'});
         if(!upd){steps.push({t:'Early Stop',d:'Konvergen di iterasi '+it,c:'',a:'STOP'});break;}
     }
-
     edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to])neg=true;});
-    if(neg)steps.push({t:'Negative Cycle Detected',d:'Graph memiliki negative cycle',c:'',a:'WARN',f:true});
-
+    if(neg)steps.push({t:'Negative Cycle',d:'Graph memiliki negative cycle!',c:'',a:'WARN',f:true});
     const path=[];let cur=tgt;const vs=new Set();
     if(tgt>=0){while(cur>=0&&!vs.has(cur)){vs.add(cur);path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
     const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
-
-    const fc=['Algoritma selesai.'];
-    if(neg)fc.push('PERINGATAN: Negative cycle terdeteksi.');
-    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
-    states.push({hlEdges:[],hlNodes:path,pathEdges:[],bloomEdges:pe,bloomNodes:path,labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir'});
-
-    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'Inf':dist[tgt]):'N/A'),c:'',a:'RESULT',f:true});
+    const fc=['Algoritma selesai.'];if(neg)fc.push('⚠ Negative cycle terdeteksi.');
+    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' → ')+' (jarak: '+dist[tgt]+')');
+    states.push({hlEdges:[],hlNodes:path,pathEdges:[],bloomEdges:pe,bloomNodes:path,labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir',connectedNodes:[...new Set(path)],unconnectedNodes:[],selectedEdges:pe});
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' → '):'NONE'),c:'',a:'RESULT',f:true});
     return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Bellman-Ford',neg};
 }
 
@@ -1173,30 +1586,26 @@ function algFW(){
     const d=[];for(let i=0;i<N;i++){d[i]=[];for(let j=0;j<N;j++)d[i][j]=gV(i,j);}
     const nxt=Array.from({length:N},(_,i)=>Array.from({length:N},(_,j)=>d[i][j]!==Infinity&&i!==j?j:-1));
     const steps=[],states=[];
-
-    steps.push({t:'Inisialisasi D0',d:'Matrix awal '+N+'x'+N,c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'INIT'});
-    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Matrix jarak awal diinisialisasi dari adjacency matrix'],title:'D0 - Matrix Awal'});
+    steps.push({t:'Inisialisasi D⁰',d:'Matrix awal '+N+'×'+N,c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Matrix jarak awal dari adjacency matrix'],title:'D⁰ - Matrix Awal',connectedNodes:[],unconnectedNodes:Array.from({length:N},(_,i)=>i),selectedEdges:[]});
 
     for(let k=0;k<N;k++){
-        let u=[];const changes=['Intermediate node k='+L(k)];
+        let u=[];const changes=['Intermediate k='+L(k)];const updatedPairs=[];
         for(let i=0;i<N;i++)for(let j=0;j<N;j++){
             if(d[i][k]!==Infinity&&d[k][j]!==Infinity&&d[i][k]+d[k][j]<d[i][j]){
-                u.push('d('+L(i)+','+L(j)+'): '+(d[i][j]===Infinity?'Inf':d[i][j])+' -> '+(d[i][k]+d[k][j]));
+                u.push('d('+L(i)+','+L(j)+'): '+(d[i][j]===Infinity?'∞':d[i][j])+' → '+(d[i][k]+d[k][j]));
                 d[i][j]=d[i][k]+d[k][j];nxt[i][j]=nxt[i][k];
+                updatedPairs.push({from:i,to:j});
             }
         }
-        if(u.length)changes.push(u.length+' jarak diperbarui:');
+        if(u.length)changes.push(u.length+' jarak diperbarui');
         u.forEach(x=>changes.push(x));
         if(!u.length)changes.push('Tidak ada perubahan.');
-
-        states.push({hlEdges:[],hlNodes:[k],pathEdges:[],bloomEdges:[],bloomNodes:[k],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'D'+(k+1)+' via '+L(k)});
-
-        steps.push({t:'k='+k+' ('+L(k)+')',d:'Via '+L(k)+': '+u.length+' updates',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'K='+k});
+        states.push({hlEdges:[],hlNodes:[k],pathEdges:[],bloomEdges:updatedPairs,bloomNodes:[k],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'D'+(k+1)+' via '+L(k),connectedNodes:[k],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==k),selectedEdges:updatedPairs});
+        steps.push({t:'k='+k+' ('+L(k)+')',d:'Via '+L(k)+': '+u.length+' updates',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'K='+k});
     }
-
-    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['All-pairs shortest path selesai dihitung.'],title:'Hasil Akhir'});
-
-    steps.push({t:'Hasil All-Pairs',d:'Matrix jarak terpendek lengkap',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'RESULT',f:true});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['All-pairs shortest path selesai.'],title:'Hasil Akhir',connectedNodes:Array.from({length:N},(_,i)=>i),unconnectedNodes:[],selectedEdges:[]});
+    steps.push({t:'Hasil All-Pairs',d:'Matrix jarak terpendek lengkap',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'RESULT',f:true});
     return{dist:d,nxt,steps,states,type:'ap',method:'Floyd-Warshall'};
 }
 
@@ -1206,33 +1615,23 @@ function algK(){
     const mst=[],steps=[],states=[];let tw=0;
     function find(x){return par[x]===x?x:par[x]=find(par[x]);}
     function union(a,b){const pa=find(a),pb=find(b);if(pa===pb)return false;if(rnk[pa]<rnk[pb])par[pa]=pb;else if(rnk[pa]>rnk[pb])par[pb]=pa;else{par[pb]=pa;rnk[pa]++;}return true;}
-
-    steps.push({t:'Inisialisasi',d:edges.length+' edges diurutkan berdasarkan bobot',c:edges.map((e,i)=>(i+1)+'. '+L(e.from)+'-'+L(e.to)+': '+e.weight).join('\n'),a:'INIT'});
-    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Semua edge diurutkan ascending: '+edges.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', ')],title:'Inisialisasi'});
+    steps.push({t:'Inisialisasi',d:edges.length+' edges diurutkan',c:edges.map((e,i)=>(i+1)+'. '+L(e.from)+'-'+L(e.to)+': '+e.weight).join('\n'),a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Edges sorted: '+edges.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', ')],title:'Inisialisasi',connectedNodes:[],unconnectedNodes:Array.from({length:N},(_,i)=>i),selectedEdges:[]});
 
     edges.forEach((e,idx)=>{
-        const rf=find(e.from),rt=find(e.to);
-        const changes=[];
-
-        if(rf!==rt){
-            union(e.from,e.to);mst.push(e);tw+=e.weight;
-            changes.push('Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITERIMA');
-            changes.push('Komponen '+L(e.from)+' (root='+L(rf)+') dan '+L(e.to)+' (root='+L(rt)+') digabung');
-            changes.push('MST: '+mst.length+'/'+(N-1)+' edges, total weight='+tw);
-            steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ACCEPTED',d:'Komponen berbeda. MST size: '+mst.length+'/'+(N-1),c:'Total: '+tw,a:'ACCEPT'});
-        } else {
-            changes.push('Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITOLAK');
-            changes.push('Keduanya sudah dalam komponen yang sama (root='+L(rf)+'), akan membentuk cycle');
-            steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') REJECTED',d:'Komponen sama (root='+L(rf)+'), skip',c:'',a:'REJECT'});
-        }
-
-        const mstNodes=new Set();mst.forEach(m=>{mstNodes.add(m.from);mstNodes.add(m.to);});
-        states.push({hlEdges:[...mst],hlNodes:[...mstNodes],pathEdges:[],bloomEdges:rf!==rt?[e]:[],bloomNodes:rf!==rt?[e.from,e.to]:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Edge #'+(idx+1)});
+        const rf=find(e.from),rt=find(e.to);const changes=[];
+        if(rf!==rt){union(e.from,e.to);mst.push(e);tw+=e.weight;
+        changes.push('✓ Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITERIMA');
+        changes.push('Komponen digabung, MST: '+mst.length+'/'+(N-1)+', total='+tw);
+        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ✓',d:'Komponen berbeda. MST: '+mst.length+'/'+(N-1),c:'Total: '+tw,a:'ACCEPT'});}
+        else{changes.push('✗ Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITOLAK (cycle)');
+        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ✗',d:'Same component, skip',c:'',a:'REJECT'});}
+        const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});
+        const unconn=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
+        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:rf!==rt?[e]:[],bloomNodes:rf!==rt?[e.from,e.to]:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Edge #'+(idx+1),connectedNodes:[...mstN],unconnectedNodes:unconn,selectedEdges:[...mst]});
     });
-
-    const mstNodes=new Set();mst.forEach(m=>{mstNodes.add(m.from);mstNodes.add(m.to);});
-    states.push({hlEdges:[...mst],hlNodes:[...mstNodes],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstNodes],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total weight='+tw],title:'Hasil Akhir'});
-
+    const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});
+    states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total='+tw],title:'Hasil Akhir',connectedNodes:[...mstN],unconnectedNodes:[],selectedEdges:[...mst]});
     steps.push({t:'Hasil MST',d:mst.length+' edges, total = '+tw,c:mst.map((m,i)=>(i+1)+'. '+L(m.from)+'-'+L(m.to)+': '+m.weight).join('\n'),a:'RESULT',f:true});
     return{mst,tw,steps,states,type:'mst',method:'Kruskal'};
 }
@@ -1240,99 +1639,71 @@ function algK(){
 function algP(src){
     const al=adjL(),inM=Array(N).fill(false),key=Array(N).fill(Infinity),par=Array(N).fill(-1);
     const mst=[],steps=[],states=[];let tw=0;key[src]=0;
-
-    steps.push({t:'Inisialisasi',d:'Start: '+L(src),c:'key=['+key.map((k,i)=>L(i)+':'+(k===Infinity?'Inf':k)).join(', ')+']',a:'INIT'});
-    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[src],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[],tempLabels:{[src]:'T'},changes:['Mulai dari node '+L(src)+', key=0'],title:'Inisialisasi'});
+    steps.push({t:'Inisialisasi',d:'Start: '+L(src),c:'key=['+key.map((k,i)=>L(i)+':'+(k===Infinity?'∞':k)).join(', ')+']',a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[src],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[],tempLabels:{[src]:'T'},changes:['Mulai dari '+L(src)+', key=0'],title:'Inisialisasi',connectedNodes:[src],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==src),selectedEdges:[]});
 
     for(let it=0;it<N;it++){
         let u=-1;for(let i=0;i<N;i++)if(!inM[i]&&(u<0||key[i]<key[u]))u=i;
         if(u<0||key[u]===Infinity)break;inM[u]=true;
         const changes=['Node '+L(u)+' ditambahkan ke MST (key='+key[u]+')'];
-
-        if(par[u]>=0){mst.push({from:par[u],to:u,weight:key[u]});tw+=key[u];changes.push('Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+') masuk MST, total weight='+tw);}
-
+        if(par[u]>=0){mst.push({from:par[u],to:u,weight:key[u]});tw+=key[u];changes.push('Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+'), total='+tw);}
         steps.push({t:'Tambah '+L(u),d:par[u]>=0?'Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+')':'Node awal',c:'MST weight: '+tw,a:'ADD '+L(u)});
-
         al[u].forEach(({to:v,w})=>{if(!inM[v]&&w<key[v]){const old=key[v];key[v]=w;par[v]=u;
-        changes.push('key['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u));
-        steps.push({t:'  Update key['+L(v)+']',d:(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u),c:'',a:'KEY'});}});
-
+        changes.push('key['+L(v)+']: '+(old===Infinity?'∞':old)+' → '+w+' via '+L(u));
+        steps.push({t:'  Update key['+L(v)+']',d:(old===Infinity?'∞':old)+' → '+w+' via '+L(u),c:'',a:'KEY'});}});
         const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
         const tl={};for(let i=0;i<N;i++){if(inM[i])tl[i]='P';else if(key[i]<Infinity)tl[i]='T';}
-        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:par[u]>=0?[{from:par[u],to:u}]:[],bloomNodes:[u],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[...mstN],tempLabels:tl,changes,title:'Tambah '+L(u)});
+        const unconn=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
+        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:par[u]>=0?[{from:par[u],to:u}]:[],bloomNodes:[u],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[...mstN],tempLabels:tl,changes,title:'Tambah '+L(u),connectedNodes:[...mstN],unconnectedNodes:unconn,selectedEdges:[...mst]});
     }
-
     const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
-    states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total weight='+tw],title:'Hasil Akhir'});
-
+    states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total='+tw],title:'Hasil Akhir',connectedNodes:[...mstN],unconnectedNodes:[],selectedEdges:[...mst]});
     steps.push({t:'Hasil MST',d:mst.length+' edges, total = '+tw,c:mst.map((m,i)=>(i+1)+'. '+L(m.from)+'-'+L(m.to)+': '+m.weight).join('\n'),a:'RESULT',f:true});
     return{mst,tw,steps,states,src,type:'mst',method:'Prim'};
 }
 
-/* ============= RUN ============= */
+// ======================== RUN ========================
 function run(){
     if(!M){toast('Pilih algoritma dulu','error');return;}
-    if(!rEdges().length){toast('Isi matrix jarak dulu','error');return;}
-
+    if(!rEdges().length){toast('Isi matrix dulu','error');return;}
+    stopPlayback();
     document.getElementById('ov').classList.add('show');
+    document.getElementById('ovText').textContent='Menganalisis graph...';
+    document.getElementById('pdfProgress').classList.remove('show');
 
     setTimeout(()=>{
         try{
-            let r;
-            const isMST=(M==='kruskal'||M==='prim');
-            const isSP=(M==='dijkstra'||M==='bellman-ford');
-            const tgtEnabled=document.getElementById('tgtToggle')&&document.getElementById('tgtToggle').checked;
-
+            let r;const tgtEnabled=document.getElementById('tgtToggle')&&document.getElementById('tgtToggle').checked;
             switch(M){
-            case'dijkstra':{
-                const s=+document.getElementById('sSrc').value;
-                const t=tgtEnabled?+document.getElementById('sTgt').value:-1;
-                if(rEdges().some(e=>e.weight<0)){toast('Dijkstra tidak support bobot negatif','error');document.getElementById('ov').classList.remove('show');return;}
+            case'dijkstra':{const s=+document.getElementById('sSrc').value,t=tgtEnabled?+document.getElementById('sTgt').value:-1;
+                if(rEdges().some(e=>e.weight<0)){toast('Dijkstra: no negative weights','error');document.getElementById('ov').classList.remove('show');return;}
                 r=algD(s,t);break;}
-            case'bellman-ford':{
-                const s=+document.getElementById('sSrc').value;
-                const t=tgtEnabled?+document.getElementById('sTgt').value:-1;
-                r=algBF(s,t);break;}
+            case'bellman-ford':{const s=+document.getElementById('sSrc').value,t=tgtEnabled?+document.getElementById('sTgt').value:-1;r=algBF(s,t);break;}
             case'floyd-warshall':r=algFW();break;
-            case'kruskal':{
-                if(gT==='directed'){toast('Kruskal butuh undirected graph','error');document.getElementById('ov').classList.remove('show');return;}
-                r=algK();break;}
-            case'prim':{
-                if(gT==='directed'){toast('Prim butuh undirected graph','error');document.getElementById('ov').classList.remove('show');return;}
-                r=algP(+document.getElementById('sSrc').value||0);break;}
+            case'kruskal':{if(gT==='directed'){toast('Kruskal: undirected only','error');document.getElementById('ov').classList.remove('show');return;}r=algK();break;}
+            case'prim':{if(gT==='directed'){toast('Prim: undirected only','error');document.getElementById('ov').classList.remove('show');return;}r=algP(+document.getElementById('sSrc').value||0);break;}
             }
-
-            res=r;
-            iterStates=r.states||[];
-            curIter=iterStates.length-1; // Show final result first
-
-            showRes(r);
-            setupIterCtrl();
-            drawCurrent();
-
+            res=r;iterStates=r.states||[];curIter=iterStates.length-1;
+            showRes(r);setupIterCtrl();drawCurrent();showIterDetail();
             document.getElementById('legend').style.display='flex';
-            toast(r.method+' selesai','success');
+            toast(r.method+' selesai!','success');
         }catch(err){console.error(err);toast('Error: '+err.message,'error');}
         document.getElementById('ov').classList.remove('show');
-    },400);
+    },350);
 }
 
+// ======================== ITERATION ========================
 function setupIterCtrl(){
-    const ctrl=document.getElementById('iterCtrl');
-    if(iterStates.length<=1){ctrl.style.display='none';return;}
-    ctrl.style.display='flex';
+    const ctrl=document.getElementById('iterCtrl'),pb=document.getElementById('playbackRow'),dp=document.getElementById('iterDetailPanel');
+    if(iterStates.length<=1){ctrl.style.display='none';pb.style.display='none';dp.style.display='none';return;}
+    ctrl.style.display='flex';pb.style.display='flex';dp.style.display='block';
     updateIterUI();
 }
 
 function iterGo(idx){
-    if(idx<0)idx=0;
-    if(idx>=iterStates.length)idx=iterStates.length-1;
-    curIter=idx;
-    updateIterUI();
-    drawCurrent();
-    showIterChanges();
-    // Highlight active step in timeline
-    document.querySelectorAll('.tl-item').forEach((el,i)=>{el.classList.toggle('active',i===curIter);});
+    if(idx<0)idx=0;if(idx>=iterStates.length)idx=iterStates.length-1;
+    curIter=idx;updateIterUI();drawCurrent();showIterChanges();showIterDetail();
+    document.querySelectorAll('.tl-item').forEach((el,i)=>el.classList.toggle('active',i===curIter));
 }
 
 function updateIterUI(){
@@ -1346,190 +1717,503 @@ function updateIterUI(){
 }
 
 function showIterChanges(){
-    const c=document.getElementById('iterChanges');
-    const st=iterStates[curIter];
+    const c=document.getElementById('iterChanges'),st=iterStates[curIter];
     if(!st||!st.changes||!st.changes.length){c.innerHTML='';return;}
-    let h='<div class="iter-changes"><div class="change-title">Perubahan pada iterasi ini:</div>';
+    let h='<div class="iter-changes"><div class="change-title">Perubahan:</div>';
     st.changes.forEach(ch=>{h+='<div class="change-item">'+ch+'</div>';});
-    h+='</div>';
-    c.innerHTML=h;
+    h+='</div>';c.innerHTML=h;
 }
 
+// ======================== ITERATION DETAIL PANEL ========================
+function showIterDetail(){
+    const panel=document.getElementById('iterDetailPanel');
+    const body=document.getElementById('iterDetailBody');
+    const title=document.getElementById('iterDetailTitle');
+    const sub=document.getElementById('iterDetailSub');
+    if(!iterStates.length||curIter<0){panel.style.display='none';return;}
+    panel.style.display='block';
+    const st=iterStates[curIter];
+    title.textContent='Detail — '+st.title;
+    sub.textContent='Iterasi '+(curIter+1)+' / '+iterStates.length;
+
+    const conn=st.connectedNodes||[];
+    const unconn=st.unconnectedNodes||[];
+    const selE=st.selectedEdges||[];
+
+    let h='<div class="detail-grid">';
+
+    // Connected Nodes
+    h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--green);"></div>Connected Nodes ('+conn.length+')</div>';
+    if(conn.length){h+='<div class="node-list">';conn.forEach(n=>{h+='<span class="node-chip chip-connected">'+L(n)+'</span>';});h+='</div>';}
+    else h+='<div style="font-size:.72em;color:var(--text3);">Belum ada</div>';
+    h+='</div>';
+
+    // Unconnected Nodes
+    h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--red);"></div>Unconnected Nodes ('+unconn.length+')</div>';
+    if(unconn.length){h+='<div class="node-list">';unconn.forEach(n=>{h+='<span class="node-chip chip-unconnected">'+L(n)+'</span>';});h+='</div>';}
+    else h+='<div style="font-size:.72em;color:var(--text3);">Semua terhubung</div>';
+    h+='</div>';
+
+    // Selected Edges
+    h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--blue);"></div>Selected Arcs/Edges ('+selE.length+')</div>';
+    if(selE.length){h+='<div class="node-list">';selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'→':'—')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});h+='</div>';}
+    else h+='<div style="font-size:.72em;color:var(--text3);">Belum ada</div>';
+    h+='</div>';
+
+    h+='</div>';
+
+    // Distance table for SP algorithms
+    if(st.labels&&Object.keys(st.labels).length){
+        h+='<div style="margin-top:12px;"><div class="lbl">Tabel Jarak</div>';
+        h+='<table class="detail-table"><thead><tr><th>Node</th><th>Jarak</th><th>Status</th></tr></thead><tbody>';
+        for(let i=0;i<N;i++){
+            const d=st.labels[i];const s=st.tempLabels?st.tempLabels[i]:'';
+            h+='<tr><td>'+L(i)+'</td><td>'+(d===Infinity?'∞':d===undefined?'-':d)+'</td><td>'+(s==='P'?'<span style="color:var(--green);font-weight:700;">Permanen</span>':s==='T'?'<span style="color:var(--amber);font-weight:700;">Sementara</span>':'-')+'</td></tr>';
+        }
+        h+='</tbody></table></div>';
+    }
+
+    body.innerHTML=h;
+}
+
+// ======================== BUILD ALL ITERATIONS TAB ========================
+function buildAllIterations(){
+    const sec=document.getElementById('allIterSection');
+    if(!iterStates.length){sec.innerHTML='<p style="color:var(--text3);font-size:.8em;">Jalankan algoritma untuk melihat detail iterasi.</p>';return;}
+    let h='';
+    iterStates.forEach((st,idx)=>{
+        const conn=st.connectedNodes||[];
+        const unconn=st.unconnectedNodes||[];
+        const selE=st.selectedEdges||[];
+        const isLast=idx===iterStates.length-1;
+
+        h+='<div class="all-iter-card'+(isLast?' expanded':'')+'" id="aiterCard'+idx+'">';
+        h+='<div class="all-iter-head" onclick="toggleIterCard('+idx+')">';
+        h+='<div style="display:flex;align-items:center;"><span class="iter-num">'+(idx+1)+'</span><span class="iter-title">'+st.title+'</span></div>';
+        h+='<span class="chevron">▼</span></div>';
+        h+='<div class="all-iter-body">';
+
+        h+='<div class="detail-grid">';
+        h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--green);"></div>Connected ('+conn.length+')</div><div class="node-list">';
+        conn.forEach(n=>{h+='<span class="node-chip chip-connected">'+L(n)+'</span>';});
+        if(!conn.length)h+='<span style="font-size:.7em;color:var(--text3)">—</span>';
+        h+='</div></div>';
+
+        h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--red);"></div>Unconnected ('+unconn.length+')</div><div class="node-list">';
+        unconn.forEach(n=>{h+='<span class="node-chip chip-unconnected">'+L(n)+'</span>';});
+        if(!unconn.length)h+='<span style="font-size:.7em;color:var(--text3)">All connected</span>';
+        h+='</div></div>';
+
+        h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--blue);"></div>Edges ('+selE.length+')</div><div class="node-list">';
+        selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'→':'—')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});
+        if(!selE.length)h+='<span style="font-size:.7em;color:var(--text3)">—</span>';
+        h+='</div></div>';
+        h+='</div>';
+
+        // Changes
+        if(st.changes&&st.changes.length){
+            h+='<div style="margin-top:8px;font-size:.72em;color:var(--text2);">';
+            st.changes.forEach(ch=>{h+='<div style="padding:1px 0 1px 10px;position:relative;"><span style="position:absolute;left:0;top:6px;width:4px;height:4px;background:var(--text3);border-radius:50%;"></span>'+ch+'</div>';});
+            h+='</div>';
+        }
+
+        h+='<div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="iterGo('+idx+');sTab(\'steps\',document.querySelector(\'.tab-btn\'))">🔍 Lihat di Visualisasi</button></div>';
+        h+='</div></div>';
+    });
+    sec.innerHTML=h;
+}
+
+function toggleIterCard(idx){
+    const card=document.getElementById('aiterCard'+idx);
+    card.classList.toggle('expanded');
+}
+
+// ======================== PLAYBACK ========================
+function togglePlayback(){
+    if(playInterval){stopPlayback();}
+    else{startPlayback();}
+}
+function startPlayback(){
+    if(curIter>=iterStates.length-1)curIter=0;
+    const btn=document.getElementById('playBtn');
+    document.getElementById('playIcon').textContent='⏸';
+    document.getElementById('playText').textContent='Pause';
+    btn.classList.add('playing');
+    playInterval=setInterval(()=>{
+        if(curIter>=iterStates.length-1){stopPlayback();return;}
+        iterGo(curIter+1);
+    },playSpeed);
+}
+function stopPlayback(){
+    if(playInterval)clearInterval(playInterval);
+    playInterval=null;
+    const btn=document.getElementById('playBtn');
+    document.getElementById('playIcon').textContent='▶';
+    document.getElementById('playText').textContent='Auto Play';
+    btn.classList.remove('playing');
+}
+
+// ======================== RESULTS ========================
 function showRes(r){
-    const el=document.getElementById('results');el.classList.add('vis');
-    setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),150);
-    bStats(r);bPath(r);bTL(r.steps);bTbl(r);bAI(r);
+    document.getElementById('results').classList.add('vis');
+    setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),150);
+    bStats(r);bPath(r);bTL(r.steps);bTbl(r);buildAllIterations();bAI(r);
 }
 
 function bStats(r){
     const c=document.getElementById('sRow');
     let h='<div class="stat"><div class="sv">'+r.method+'</div><div class="sl">Algoritma</div></div>';
-    if(r.type==='sp'){
-        const hasTgt=r.tgt>=0;
-        const d=hasTgt?r.dist[r.tgt]:null;
-        if(hasTgt)h+='<div class="stat"><div class="sv">'+(d===Infinity?'Inf':d)+'</div><div class="sl">Jarak Terpendek</div></div>';
-        h+='<div class="stat"><div class="sv">'+(r.path?r.path.length:0)+'</div><div class="sl">Nodes di Path</div></div>';
-    } else if(r.type==='mst'){
-        h+='<div class="stat"><div class="sv">'+r.tw+'</div><div class="sl">Total Weight</div></div>';
-        h+='<div class="stat"><div class="sv">'+r.mst.length+'</div><div class="sl">Edges MST</div></div>';
-    } else {
-        h+='<div class="stat"><div class="sv">'+N+'x'+N+'</div><div class="sl">Matrix</div></div>';
-    }
+    if(r.type==='sp'){const hasTgt=r.tgt>=0;const d=hasTgt?r.dist[r.tgt]:null;
+    if(hasTgt)h+='<div class="stat"><div class="sv">'+(d===Infinity?'∞':d)+'</div><div class="sl">Jarak Terpendek</div></div>';
+    h+='<div class="stat"><div class="sv">'+(r.path?r.path.length:0)+'</div><div class="sl">Nodes di Path</div></div>';}
+    else if(r.type==='mst'){h+='<div class="stat"><div class="sv">'+r.tw+'</div><div class="sl">Total Weight</div></div>';h+='<div class="stat"><div class="sv">'+r.mst.length+'</div><div class="sl">Edges MST</div></div>';}
+    else{h+='<div class="stat"><div class="sv">'+N+'×'+N+'</div><div class="sl">Matrix</div></div>';}
     h+='<div class="stat"><div class="sv">'+r.steps.length+'</div><div class="sl">Steps</div></div>';
+    h+='<div class="stat"><div class="sv">'+iterStates.length+'</div><div class="sl">Iterasi</div></div>';
     c.innerHTML=h;
 }
 
 function bPath(r){
     const c=document.getElementById('pDisp');
-    if(r.type==='sp'&&r.path&&r.path.length){
-        c.innerHTML='<div class="lbl">Shortest Path</div><div class="path-row">'+r.path.map((n,i)=>'<span class="pnode">'+L(n)+'</span>'+(i<r.path.length-1?'<span class="parrow">></span>':'')).join('')+'</div>';
-    } else if(r.type==='sp'&&r.tgt<0){
-        // No target, show all distances
-        let h='<div class="lbl">Jarak dari '+L(r.src)+' ke semua node</div><div class="edge-pills">';
-        for(let i=0;i<N;i++){if(i===r.src)continue;h+='<span class="epill">'+L(r.src)+'->'+L(i)+': '+(r.dist[i]===Infinity?'Inf':r.dist[i])+'</span>';}
-        h+='</div>';c.innerHTML=h;
-    } else if(r.type==='mst'){
-        c.innerHTML='<div class="lbl">MST Edges -- Total Weight: '+r.tw+'</div><div class="edge-pills">'+r.mst.map(e=>'<span class="epill">'+L(e.from)+'-'+L(e.to)+': '+e.weight+'</span>').join('')+'</div>';
-    } else if(r.type==='ap'){
-        let h='<div class="lbl">All-Pairs Distance Matrix</div><div class="mtx-wrap"><table class="mtx"><tr><th class="corner"></th>';
-        for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr>';
-        for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' class="diag"':v!==Infinity?' class="hv"':'')+'>'+(i===j?'0':v===Infinity?'Inf':v)+'</td>';}h+='</tr>';}
-        h+='</table></div>';c.innerHTML=h;
-    } else c.innerHTML='';
+    if(r.type==='sp'&&r.path&&r.path.length){c.innerHTML='<div class="lbl">Shortest Path</div><div class="path-row">'+r.path.map((n,i)=>'<span class="pnode">'+L(n)+'</span>'+(i<r.path.length-1?'<span class="parrow">→</span>':'')).join('')+'</div>';}
+    else if(r.type==='sp'&&r.tgt<0){let h='<div class="lbl">Jarak dari '+L(r.src)+'</div><div class="edge-pills">';for(let i=0;i<N;i++){if(i===r.src)continue;h+='<span class="epill">'+L(r.src)+'→'+L(i)+': '+(r.dist[i]===Infinity?'∞':r.dist[i])+'</span>';}h+='</div>';c.innerHTML=h;}
+    else if(r.type==='mst'){c.innerHTML='<div class="lbl">MST Edges — Total: '+r.tw+'</div><div class="edge-pills">'+r.mst.map(e=>'<span class="epill">'+L(e.from)+'—'+L(e.to)+': '+e.weight+'</span>').join('')+'</div>';}
+    else if(r.type==='ap'){let h='<div class="lbl">All-Pairs Distance</div><div class="mtx-wrap"><table class="mtx"><tr><th class="corner"></th>';for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr>';for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' class="diag"':v!==Infinity?' class="hv"':'')+'>'+(i===j?'0':v===Infinity?'∞':v)+'</td>';}h+='</tr>';}h+='</table></div>';c.innerHTML=h;}
+    else c.innerHTML='';
 }
 
 function bTL(steps){
-    document.getElementById('tline').innerHTML=steps.map((s,i)=>'<div class="tl-item'+(s.f?' fin':'')+(i===curIter?' active':'')+'" style="animation-delay:'+i*.04+'s" onclick="iterGo('+i+')"><div class="tl-head"><span class="tl-tag">'+s.a+'</span>'+(s.f?'<span class="tl-fin">FINAL</span>':'')+'</div><div class="tl-title">'+s.t+'</div><div class="tl-desc">'+s.d+'</div>'+(s.c?'<div class="tl-code">'+s.c+'</div>':'')+'</div>').join('');
+    document.getElementById('tline').innerHTML=steps.map((s,i)=>'<div class="tl-item'+(s.f?' fin':'')+(i===curIter?' active':'')+'" style="animation-delay:'+i*.04+'s" onclick="iterGo('+Math.min(i,iterStates.length-1)+')"><div class="tl-head"><span class="tl-tag">'+s.a+'</span>'+(s.f?'<span class="tl-fin">FINAL</span>':'')+'</div><div class="tl-title">'+s.t+'</div><div class="tl-desc">'+s.d+'</div>'+(s.c?'<div class="tl-code">'+s.c+'</div>':'')+'</div>').join('');
 }
 
 function bTbl(r){
     const c=document.getElementById('rTbl');
-    if(r.type==='sp'){
-        let h='<table class="rt"><thead><tr><th>#</th><th>Action</th><th>Detail</th>';
-        for(let i=0;i<N;i++)h+='<th>d('+L(i)+')</th>';
-        h+='</tr></thead><tbody>';
-        let cd=Array(N).fill('Inf');if(r.src!==undefined)cd[r.src]='0';
-        r.steps.forEach((s,idx)=>{
-            const m=s.c.match(/dist=\[([^\]]+)\]/);
-            if(m)m[1].split(', ').forEach(p=>{const[l,v]=p.split(':');for(let i=0;i<N;i++)if(L(i)===l)cd[i]=v;});
-            h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(idx+1)+'</td><td>'+s.a+'</td><td style="font-family:DM Sans;font-size:.75em;max-width:170px;overflow:hidden;text-overflow:ellipsis">'+s.d.substring(0,55)+'</td>'+cd.map(d=>'<td>'+d+'</td>').join('')+'</tr>';
-        });
-        h+='</tbody></table>';c.innerHTML=h;
-    } else if(r.type==='mst'){
-        let h='<table class="rt"><thead><tr><th>#</th><th>Edge</th><th>Weight</th><th>Status</th><th>MST Total</th></tr></thead><tbody>';
-        let tw=0;
-        r.steps.forEach((s,i)=>{
-            const wm=s.t.match(/\((\-?\d+\.?\d*)\)/);const w=wm?parseFloat(wm[1]):null;
-            if(s.a==='ACCEPT'&&w!==null)tw+=w;
-            h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(i+1)+'</td><td style="font-family:DM Sans;font-size:.78em">'+s.t.substring(0,32)+'</td><td>'+(w!==null?w:'-')+'</td><td>'+s.a+'</td><td>'+tw+'</td></tr>';
-        });
-        h+='</tbody></table>';c.innerHTML=h;
-    } else {
-        let h='<table class="rt"><thead><tr><th>From / To</th>';
-        for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
-        for(let i=0;i<N;i++){
-            h+='<tr><td><strong>'+L(i)+'</strong></td>';
-            for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' style="color:var(--text3)"':v!==Infinity?' style="font-weight:700"':' style="color:var(--text3)"')+'>'+(v===Infinity?'Inf':v)+'</td>';}
-            h+='</tr>';
-        }
-        h+='</tbody></table>';c.innerHTML=h;
-    }
+    if(r.type==='sp'){let h='<table class="rt"><thead><tr><th>#</th><th>Action</th><th>Detail</th>';for(let i=0;i<N;i++)h+='<th>d('+L(i)+')</th>';h+='</tr></thead><tbody>';let cd=Array(N).fill('∞');if(r.src!==undefined)cd[r.src]='0';
+    r.steps.forEach((s,idx)=>{const m=s.c.match(/dist=\[([^\]]+)\]/);if(m)m[1].split(', ').forEach(p=>{const[l,v]=p.split(':');for(let i=0;i<N;i++)if(L(i)===l)cd[i]=v;});
+    h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(idx+1)+'</td><td>'+s.a+'</td><td style="font-family:DM Sans;font-size:.75em;max-width:170px;overflow:hidden;text-overflow:ellipsis">'+s.d.substring(0,55)+'</td>'+cd.map(d=>'<td>'+d+'</td>').join('')+'</tr>';});
+    h+='</tbody></table>';c.innerHTML=h;}
+    else if(r.type==='mst'){let h='<table class="rt"><thead><tr><th>#</th><th>Edge</th><th>Weight</th><th>Status</th><th>MST Total</th></tr></thead><tbody>';let tw=0;
+    r.steps.forEach((s,i)=>{const wm=s.t.match(/\((\-?\d+\.?\d*)\)/);const w=wm?parseFloat(wm[1]):null;if(s.a==='ACCEPT'&&w!==null)tw+=w;
+    h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(i+1)+'</td><td style="font-family:DM Sans;font-size:.78em">'+s.t.substring(0,32)+'</td><td>'+(w!==null?w:'-')+'</td><td>'+s.a+'</td><td>'+tw+'</td></tr>';});
+    h+='</tbody></table>';c.innerHTML=h;}
+    else{let h='<table class="rt"><thead><tr><th>From/To</th>';for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
+    for(let i=0;i<N;i++){h+='<tr><td><strong>'+L(i)+'</strong></td>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' style="color:var(--text3)"':v!==Infinity?' style="font-weight:700"':' style="color:var(--text3)"')+'>'+(v===Infinity?'∞':v)+'</td>';}h+='</tr>';}
+    h+='</tbody></table>';c.innerHTML=h;}
 }
 
 function bAI(r){
     const c=document.getElementById('aiB');const edges=rEdges();
     const dens=gT==='undirected'?(2*edges.length)/(N*(N-1)):(edges.length)/(N*(N-1));
-    let h='<h3>Analysis Report</h3>';
-    h+='<p><strong>Metode:</strong> '+r.method+' | <strong>Nodes:</strong> '+N+' | <strong>Edges:</strong> '+edges.length+' | <strong>Density:</strong> '+(dens*100).toFixed(1)+'%</p>';
+    let h='<h3>📊 Analysis Report</h3>';
+    h+='<p><strong>Metode:</strong> '+r.method+' | <strong>Nodes:</strong> '+N+' | <strong>Edges:</strong> '+edges.length+' | <strong>Density:</strong> '+(dens*100).toFixed(1)+'% | <strong>Type:</strong> '+gT+'</p>';
 
     if(r.method==='Dijkstra'){
-        h+='<p>Dijkstra menggunakan strategi greedy: selalu memilih node dengan jarak terkecil yang belum dikunjungi (label sementara), lalu menjadikannya permanen dan meng-update tetangganya. Optimal untuk graph tanpa bobot negatif.</p>';
-        h+='<p>Pada setiap iterasi, node dengan label sementara terkecil diubah menjadi label permanen (P). Node yang sudah permanen tidak akan berubah lagi.</p>';
-        if(r.path&&r.path.length){
-            h+='<p><strong>Path Analysis:</strong></p><ul>';
-            h+='<li>Jalur optimal: '+r.path.map(L).join(' -> ')+' ('+( r.path.length-1)+' hop)</li>';
-            h+='<li>Total jarak: '+r.dist[r.tgt]+'</li>';
-            for(let i=0;i<r.path.length-1;i++){const w=gV(r.path[i],r.path[i+1]);h+='<li>Segment '+L(r.path[i])+' -> '+L(r.path[i+1])+': '+w+'</li>';}
-            const direct=gV(r.src,r.tgt);
-            if(direct!==Infinity&&direct>r.dist[r.tgt])h+='<li>Jalur langsung = '+direct+', tapi via intermediate lebih pendek ('+r.dist[r.tgt]+')</li>';
-            else if(direct===Infinity)h+='<li>Tidak ada edge langsung, harus via intermediate nodes</li>';
-            h+='</ul>';
-        } else if(r.tgt<0){
-            h+='<p>Mode tanpa target: menghitung jarak terpendek dari '+L(r.src)+' ke semua node.</p>';
-        }
-        h+='<p><strong>Complexity:</strong> O((V+E)logV) = O('+((N+edges.length)*Math.ceil(Math.log2(N||2)))+')</p>';
+        h+='<p>Dijkstra menggunakan greedy strategy: memilih node dengan jarak terkecil (label sementara), menjadikannya permanen, lalu update tetangga.</p>';
+        if(r.path&&r.path.length){h+='<ul>';for(let i=0;i<r.path.length-1;i++){const w=gV(r.path[i],r.path[i+1]);h+='<li>'+L(r.path[i])+' → '+L(r.path[i+1])+': '+w+'</li>';}h+='<li>Total: '+r.dist[r.tgt]+'</li></ul>';}
+    } else if(r.method==='Bellman-Ford'){
+        h+='<p>Bellman-Ford: V-1 iterasi relax semua edges. Support negative weights.</p>';
+        if(r.neg)h+='<p style="color:var(--red);font-weight:700;">⚠ Negative cycle terdeteksi!</p>';
+    } else if(r.method==='Floyd-Warshall'){
+        h+='<p>Floyd-Warshall: DP all-pairs via intermediate nodes k=0..V-1.</p>';
+    } else if(r.method==='Kruskal'){
+        h+='<p>Kruskal: sort edges, Union-Find untuk cycle detection.</p>';
+        h+='<ul><li>MST weight: '+r.tw+'</li><li>Edges in MST: '+r.mst.length+'</li></ul>';
+    } else if(r.method==='Prim'){
+        h+='<p>Prim: grow MST from start node, always pick cheapest crossing edge.</p>';
+        h+='<ul><li>Start: '+L(r.src)+'</li><li>MST weight: '+r.tw+'</li></ul>';
     }
-    else if(r.method==='Bellman-Ford'){
-        h+='<p>Bellman-Ford melakukan V-1 iterasi relax pada semua edges. Mampu menangani bobot negatif dan mendeteksi negative cycle.</p>';
-        if(r.neg)h+='<p><strong>PERINGATAN: NEGATIVE CYCLE TERDETEKSI.</strong> Shortest path mungkin tidak terdefinisi dengan baik.</p>';
-        if(r.path&&r.path.length){
-            h+='<ul><li>Path: '+r.path.map(L).join(' -> ')+' | Jarak: '+r.dist[r.tgt]+'</li>';
-            const hasN=edges.some(e=>e.weight<0);
-            h+='<li>'+(hasN?'Graph memiliki edge negatif, Bellman-Ford adalah pilihan tepat':'Tidak ada edge negatif, Dijkstra lebih efisien')+'</li></ul>';
-        }
-        h+='<p><strong>Complexity:</strong> O(V*E) = O('+(N*edges.length)+')</p>';
-    }
-    else if(r.method==='Floyd-Warshall'){
-        h+='<p>Floyd-Warshall menghitung all-pairs shortest path menggunakan dynamic programming. Setiap iterasi k mempertimbangkan node k sebagai intermediate.</p>';
-        let maxD=0,maxP=[0,0],unr=0;
-        for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(i!==j){if(r.dist[i][j]===Infinity)unr++;else if(r.dist[i][j]>maxD){maxD=r.dist[i][j];maxP=[i,j];}}
-        h+='<ul><li>Longest shortest path: '+L(maxP[0])+' -> '+L(maxP[1])+' = '+maxD+'</li>';
-        h+='<li>Unreachable pairs: '+unr+'</li>';
-        h+='<li>'+(unr===0?'Graph fully connected':'Ada pasangan node yang tidak terhubung')+'</li></ul>';
-        h+='<p><strong>Complexity:</strong> O(V^3) = O('+(N*N*N)+')</p>';
-    }
-    else if(r.method==='Kruskal'){
-        h+='<p>Kruskal mengurutkan semua edges berdasarkan bobot ascending, lalu menambahkan satu per satu ke MST selama tidak membentuk cycle. Deteksi cycle menggunakan Union-Find (disjoint set).</p>';
-        const totalW=edges.reduce((s,e)=>s+e.weight,0);const sav=totalW-r.tw;
-        const maxE=r.mst.reduce((m,e)=>e.weight>m.weight?e:m,{weight:-Infinity});
-        const rej=r.steps.filter(s=>s.a==='REJECT').length;
-        h+='<ul><li>MST weight: '+r.tw+'</li>';
-        h+='<li>Penghematan dari total: '+sav+' ('+((sav/totalW)*100).toFixed(1)+'%)</li>';
-        h+='<li>Edge ditolak (cycle): '+rej+'</li>';
-        h+='<li>Bottleneck edge: '+L(maxE.from)+'-'+L(maxE.to)+' = '+maxE.weight+'</li></ul>';
-        h+='<p><strong>Complexity:</strong> O(E logE) = O('+(edges.length*Math.ceil(Math.log2(edges.length||2)))+')</p>';
-    }
-    else if(r.method==='Prim'){
-        h+='<p>Prim membangun MST secara greedy dari starting node, berulang kali menambahkan edge termurah yang menghubungkan node di MST ke node di luar MST.</p>';
-        h+='<p>MST tidak terpaut pada titik akhir tertentu -- tujuannya adalah menghubungkan semua node dengan total bobot minimum.</p>';
-        const totalW=edges.reduce((s,e)=>s+e.weight,0);
-        h+='<ul><li>Start: '+L(r.src)+'</li>';
-        h+='<li>MST weight: '+r.tw+' ('+((r.tw/totalW)*100).toFixed(1)+'% dari total graph)</li>';
-        const ao=r.steps.filter(s=>s.a.startsWith('ADD')).map(s=>s.a.replace('ADD ',''));
-        h+='<li>Urutan penambahan: '+ao.join(' -> ')+'</li>';
-        h+='<li>Prim dan Kruskal menghasilkan total weight yang sama jika MST unik</li></ul>';
-        h+='<p><strong>Complexity:</strong> O((V+E)logV)</p>';
-    }
-
-    h+='<p style="margin-top:10px;"><strong>Rekomendasi:</strong></p><ul>';
-    if(dens>.5)h+='<li>Graph dense ('+( dens*100).toFixed(0)+'%), Floyd-Warshall efisien untuk all-pairs</li>';
-    else h+='<li>Graph sparse ('+(dens*100).toFixed(0)+'%), Dijkstra/Kruskal lebih efisien</li>';
-    if(edges.some(e=>e.weight<0))h+='<li>Ada bobot negatif, hanya Bellman-Ford dan Floyd-Warshall yang aman</li>';
-    if(N<=5)h+='<li>Graph kecil, semua algoritma bekerja dengan baik</li>';
-    else if(N>8)h+='<li>Graph cukup besar, pertimbangkan Dijkstra dengan Priority Queue</li>';
-    h+='</ul>';
+    h+='<p><strong>Complexity:</strong> ';
+    if(r.method==='Dijkstra')h+='O((V+E)logV) ≈ O('+((N+edges.length)*Math.ceil(Math.log2(N||2)))+')';
+    else if(r.method==='Bellman-Ford')h+='O(V·E) = O('+(N*edges.length)+')';
+    else if(r.method==='Floyd-Warshall')h+='O(V³) = O('+(N*N*N)+')';
+    else if(r.method==='Kruskal')h+='O(E logE) = O('+(edges.length*Math.ceil(Math.log2(edges.length||2)))+')';
+    else if(r.method==='Prim')h+='O((V+E)logV)';
+    h+='</p>';
     c.innerHTML=h;
 }
 
 function sTab(n,btn){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
-    btn.classList.add('on');
+    if(btn)btn.classList.add('on');
+    else document.querySelector('.tab-btn').classList.add('on');
     document.getElementById('tp-'+n).classList.add('on');
 }
 
+// ======================== SHARE ========================
+function openShareModal(){
+    const modal=document.getElementById('shareModal');modal.classList.add('show');
+    const state=encodeGraphState();
+    const url=window.location.origin+window.location.pathname+'?g='+encodeURIComponent(state);
+    document.getElementById('shareUrl').value=url;
+}
+
+function encodeGraphState(){
+    const mtx=[];for(let i=0;i<N;i++){mtx[i]=[];for(let j=0;j<N;j++)mtx[i][j]=i===j?0:gV(i,j);}
+    return btoa(JSON.stringify({n:N,t:gT,l:lb,m:mtx.map(r=>r.map(v=>v===Infinity?null:v)),a:M}));
+}
+
+function loadFromURL(){
+    const params=new URLSearchParams(window.location.search);
+    const g=params.get('g');
+    if(!g)return;
+    try{
+        const d=JSON.parse(atob(g));
+        N=d.n;gT=d.t;lb=d.l;
+        document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
+        rebuildMtx();
+        for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d.m[i][j]);}
+        mChg();fillSel();compLo(cLo);draw();
+        if(d.a){M=d.a;document.querySelectorAll('.m-card').forEach(c=>{if(c.querySelector('.nm').textContent.toLowerCase().replace(/[\s-]/g,'')===(d.a||'').replace(/-/g,''))pickM(d.a,c);});}
+        toast('Graph loaded from URL','success');
+        window.history.replaceState({},'',window.location.pathname);
+    }catch(e){console.error('URL parse error',e);}
+}
+
+function copyShareUrl(){
+    const inp=document.getElementById('shareUrl');inp.select();
+    navigator.clipboard.writeText(inp.value).then(()=>toast('URL copied!','success')).catch(()=>{document.execCommand('copy');toast('URL copied!','success');});
+}
+
+function exportJSON(){
+    const mtx=[];for(let i=0;i<N;i++){mtx[i]=[];for(let j=0;j<N;j++)mtx[i][j]=i===j?0:gV(i,j);}
+    const data={version:2,nodes:N,type:gT,labels:lb,matrix:mtx.map(r=>r.map(v=>v===Infinity?null:v)),algorithm:M,timestamp:new Date().toISOString(),author:'RAD STRIX'};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='graph-'+new Date().toISOString().split('T')[0]+'.json';a.click();
+    toast('JSON exported','success');
+}
+
+function importJSON(e){
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+        try{
+            const d=JSON.parse(ev.target.result);
+            N=d.nodes||d.n;gT=d.type||d.t;lb=d.labels||d.l;
+            document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
+            rebuildMtx();const m=d.matrix||d.m;
+            for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,m[i][j]);}
+            mChg();fillSel();compLo(cLo);draw();
+            toast('JSON imported','success');
+        }catch(err){toast('Invalid JSON','error');}
+    };
+    reader.readAsText(file);
+    e.target.value='';
+}
+
+// ======================== SCREENSHOT ========================
+function screenshotCanvas(){
+    const cv=document.getElementById('cv');
+    const link=document.createElement('a');
+    link.download='graph-screenshot-'+Date.now()+'.png';
+    link.href=cv.toDataURL('image/png');
+    link.click();
+    toast('Screenshot saved!','success');
+}
+
+// ======================== PDF GENERATION ========================
+async function printPDF(){
+    if(!res||!iterStates.length){toast('Jalankan algoritma dulu','error');return;}
+
+    const overlay=document.getElementById('ov');
+    overlay.classList.add('show');
+    document.getElementById('ovText').textContent='Generating PDF...';
+    const prog=document.getElementById('pdfProgress');
+    prog.classList.add('show');
+    const bar=document.getElementById('pdfBar');
+    const status=document.getElementById('pdfStatus');
+
+    await new Promise(r=>setTimeout(r,100));
+
+    try{
+        const{jsPDF}=window.jspdf;
+        const pdf=new jsPDF('p','mm','a4');
+        const pw=210,ph=297;
+        const margin=15;
+        const cw=pw-2*margin;
+        let y=margin;
+
+        function addWatermark(){
+            pdf.setFontSize(48);pdf.setTextColor(230,230,230);
+            pdf.text('RAD STRIX',pw/2,ph/2,{align:'center',angle:45});
+            pdf.setTextColor(0,0,0);
+        }
+
+        function checkPage(need){
+            if(y+need>ph-margin){pdf.addPage();addWatermark();y=margin;return true;}
+            return false;
+        }
+
+        // Page 1: Title
+        addWatermark();
+        pdf.setFontSize(22);pdf.setFont(undefined,'bold');
+        pdf.text('Graph Algorithm Report',pw/2,y+8,{align:'center'});
+        y+=16;
+        pdf.setFontSize(10);pdf.setFont(undefined,'normal');
+        pdf.setTextColor(100);
+        pdf.text('Generated: '+new Date().toLocaleString('id-ID'),pw/2,y,{align:'center'});
+        y+=5;
+        pdf.text('Algorithm: '+res.method+' | Nodes: '+N+' | Edges: '+rEdges().length+' | Type: '+gT,pw/2,y,{align:'center'});
+        pdf.setTextColor(0);
+        y+=10;
+
+        // Separator
+        pdf.setDrawColor(200);pdf.line(margin,y,pw-margin,y);y+=8;
+
+        status.textContent='Capturing graph...';bar.style.width='10%';
+
+        // Capture current canvas (final state)
+        const savedIter=curIter;
+        iterGo(iterStates.length-1);
+        await new Promise(r=>setTimeout(r,200));
+        const cv=document.getElementById('cv');
+        const cvImg=cv.toDataURL('image/png',1.0);
+        const cvAspect=cv.height/cv.width;
+        const imgW=cw;const imgH=imgW*cvAspect;
+
+        checkPage(imgH+10);
+        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
+        pdf.text('Final Graph Visualization',margin,y);y+=6;
+        pdf.addImage(cvImg,'PNG',margin,y,imgW,Math.min(imgH,100));
+        y+=Math.min(imgH,100)+8;
+
+        // Summary stats
+        checkPage(30);
+        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
+        pdf.text('Summary',margin,y);y+=6;
+        pdf.setFontSize(9);pdf.setFont(undefined,'normal');
+
+        if(res.type==='sp'&&res.path&&res.path.length){
+            pdf.text('Shortest Path: '+res.path.map(L).join(' → '),margin,y);y+=5;
+            pdf.text('Distance: '+(res.dist[res.tgt]===Infinity?'∞':res.dist[res.tgt]),margin,y);y+=5;
+        }else if(res.type==='mst'){
+            pdf.text('MST Total Weight: '+res.tw,margin,y);y+=5;
+            pdf.text('MST Edges: '+res.mst.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', '),margin,y);y+=5;
+        }
+        y+=5;
+
+        // Iterations
+        pdf.setDrawColor(200);pdf.line(margin,y,pw-margin,y);y+=8;
+        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
+        pdf.text('Iteration Details',margin,y);y+=8;
+
+        const totalIter=iterStates.length;
+        for(let idx=0;idx<totalIter;idx++){
+            const pct=10+Math.round((idx/totalIter)*80);
+            bar.style.width=pct+'%';
+            status.textContent='Processing iteration '+(idx+1)+'/'+totalIter+'...';
+
+            const st=iterStates[idx];
+            const conn=st.connectedNodes||[];
+            const unconn=st.unconnectedNodes||[];
+            const selE=st.selectedEdges||[];
+
+            checkPage(55);
+
+            // Iteration header
+            pdf.setFillColor(240,240,240);
+            pdf.rect(margin,y-3,cw,8,'F');
+            pdf.setFontSize(10);pdf.setFont(undefined,'bold');
+            pdf.setTextColor(30);
+            pdf.text('Iteration '+(idx+1)+': '+st.title,margin+2,y+2);
+            y+=10;
+
+            pdf.setFontSize(8);pdf.setFont(undefined,'normal');pdf.setTextColor(60);
+
+            // Connected
+            pdf.setFont(undefined,'bold');pdf.text('Connected Nodes ('+conn.length+'):',margin,y);
+            pdf.setFont(undefined,'normal');
+            pdf.text(conn.length?conn.map(L).join(', '):'None',margin+40,y);y+=4.5;
+
+            // Unconnected
+            pdf.setFont(undefined,'bold');pdf.text('Unconnected ('+unconn.length+'):',margin,y);
+            pdf.setFont(undefined,'normal');
+            pdf.text(unconn.length?unconn.map(L).join(', '):'All connected',margin+40,y);y+=4.5;
+
+            // Selected edges
+            pdf.setFont(undefined,'bold');pdf.text('Selected Edges ('+selE.length+'):',margin,y);
+            pdf.setFont(undefined,'normal');
+            const edgeStr=selE.map(e=>{const w=gV(e.from,e.to);return L(e.from)+'-'+L(e.to)+(w!==Infinity&&w!==0?'('+w+')':'');}).join(', ');
+            const edgeLines=pdf.splitTextToSize(edgeStr||'None',cw-42);
+            pdf.text(edgeLines,margin+40,y);y+=edgeLines.length*4;y+=1;
+
+            // Distance labels if available
+            if(st.labels&&Object.keys(st.labels).length&&idx>0){
+                pdf.setFont(undefined,'bold');pdf.text('Distances:',margin,y);
+                pdf.setFont(undefined,'normal');
+                const distStr=Array.from({length:N},(_,i)=>L(i)+':'+(st.labels[i]===Infinity?'∞':st.labels[i]!==undefined?st.labels[i]:'-')).join('  ');
+                pdf.text(distStr,margin+40,y);y+=4.5;
+            }
+
+            // Changes
+            if(st.changes&&st.changes.length){
+                checkPage(st.changes.length*4+5);
+                pdf.setFont(undefined,'bold');pdf.text('Changes:',margin,y);y+=4;
+                pdf.setFont(undefined,'normal');pdf.setTextColor(80);
+                st.changes.forEach(ch=>{
+                    checkPage(5);
+                    const lines=pdf.splitTextToSize('• '+ch,cw-4);
+                    pdf.text(lines,margin+4,y);y+=lines.length*3.5;
+                });
+                pdf.setTextColor(60);
+            }
+
+            // Capture iteration graph snapshot
+            if(idx<totalIter-1&&(idx%3===0||idx===0)){
+                iterGo(idx);
+                await new Promise(r=>setTimeout(r,150));
+                const snapImg=cv.toDataURL('image/png',0.85);
+                const snapH=Math.min(imgH,55);
+                checkPage(snapH+5);
+                pdf.addImage(snapImg,'PNG',margin,y,cw,snapH);
+                y+=snapH+3;
+            }
+
+            y+=4;
+            pdf.setDrawColor(220);pdf.line(margin,y,pw-margin,y);y+=5;
+        }
+
+        // Restore iteration
+        iterGo(savedIter);
+
+        bar.style.width='95%';
+        status.textContent='Finalizing...';
+
+        // Footer on last page
+        pdf.setFontSize(7);pdf.setTextColor(150);
+        pdf.text('Generated by Graph Algorithm Visualizer — RAD STRIX — '+new Date().toISOString(),pw/2,ph-8,{align:'center'});
+
+        bar.style.width='100%';
+        status.textContent='Done!';
+
+        await new Promise(r=>setTimeout(r,300));
+
+        pdf.save('graph-report-'+res.method+'-'+new Date().toISOString().split('T')[0]+'.pdf');
+        toast('PDF saved!','success');
+    }catch(err){
+        console.error('PDF Error:',err);
+        toast('PDF generation failed: '+err.message,'error');
+    }finally{
+        overlay.classList.remove('show');
+        prog.classList.remove('show');
+        bar.style.width='0%';
+    }
+}
+
+// ======================== RESET ========================
 function resetAll(){
     M=null;res=null;N=5;gT='undirected';sc=1;curIter=0;iterStates=[];
+    stopPlayback();
     document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));
-    document.getElementById('inpN').value=5;
-    document.getElementById('inpT').value='undirected';
+    document.getElementById('inpN').value=5;document.getElementById('inpT').value='undirected';
     document.getElementById('stConfig').classList.remove('vis');
     document.getElementById('iterCtrl').style.display='none';
+    document.getElementById('playbackRow').style.display='none';
+    document.getElementById('iterDetailPanel').style.display='none';
     document.getElementById('iterChanges').innerHTML='';
     document.getElementById('legend').style.display='none';
     document.getElementById('results').classList.remove('vis');
-    gLb();rebuildMtx();compLo('circle');draw();
-    toast('Reset complete','info');
+    gLb();rebuildMtx();compLo('circle');draw();toast('Reset','info');
 }
 </script>
 </body>
