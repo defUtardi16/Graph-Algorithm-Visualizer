@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Algorithm Visualizer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #f5f5f5;
+            --bg2: #ebebeb;
+            --bg3: #e0e0e0;
+            --bg4: #d5d5d5;
+            --card: #ffffff;
+            --card2: #fafafa;
+            --border: #d0d0d0;
+            --border2: #c0c0c0;
+            --text: #1a1a1a;
+            --text2: #4a4a4a;
+            --text3: #888888;
+            --accent: #333333;
+            --accent2: #111111;
+            --accent-bg: #e8e8e8;
+            --green: #2d2d2d;
+            --green-bg: #e0e0e0;
+            --red: #555555;
+            --red-bg: #ededed;
+            --amber: #666666;
+            --amber-bg: #efefef;
+            --highlight: #1a1a1a;
+            --highlight-soft: rgba(26,26,26,0.08);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 1px 3px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,.07);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,.09);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:9px; }
+
+        .shell { max-width:1100px; margin:0 auto; padding:20px 24px 80px; }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            font-size: .68em;
+            font-weight: 600;
+            color: var(--text3);
+            letter-spacing: .5px;
+            opacity: .55;
+            z-index: 900;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Header */
+        .hero { text-align:center; padding:36px 0 28px; }
+        .hero-label {
+            display:inline-block;
+            font-size:.65em; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+            color:var(--text2);
+            background:var(--bg2);
+            border:1px solid var(--border);
+            padding:4px 14px; border-radius:99px;
+            margin-bottom:12px;
+        }
+        .hero h1 {
+            font-size:clamp(1.5em,3.2vw,2.2em);
+            font-weight:800;
+            color:var(--text);
+            letter-spacing:-.5px;
+        }
+        .hero p { color:var(--text3); font-size:.85em; margin-top:6px; font-weight:400; }
+
+        /* Section */
+        .section {
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:22px;
+            margin-bottom:14px;
+            box-shadow:var(--shadow);
+        }
+        .section-head {
+            display:flex; align-items:center; gap:10px;
+            margin-bottom:18px;
+        }
+        .section-num {
+            width:26px; height:26px;
+            display:grid; place-items:center;
+            border-radius:50%;
+            font-size:.72em; font-weight:700;
+            background:var(--text);
+            color:var(--card);
+            flex-shrink:0;
+        }
+        .section-title { font-size:1em; font-weight:700; color:var(--text); }
+
+        /* Label */
+        .lbl {
+            font-size:.65em; font-weight:700; letter-spacing:1px;
+            text-transform:uppercase; color:var(--text3);
+            margin-bottom:8px;
+        }
+
+        /* Method Cards */
+        .m-row {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+            gap:6px; margin-bottom:14px;
+        }
+        .m-card {
+            background:var(--card2);
+            border:1.5px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:12px 10px;
+            cursor:pointer;
+            transition:all .15s;
+            text-align:center;
+        }
+        .m-card:hover { border-color:var(--text3); background:var(--bg2); }
+        .m-card.on {
+            border-color:var(--text);
+            background:var(--accent-bg);
+            box-shadow: 0 0 0 1px var(--text);
+        }
+        .m-card .nm { font-weight:700; font-size:.82em; color:var(--text); }
+        .m-card .mtp {
+            font-size:.6em; font-weight:600; letter-spacing:.6px;
+            text-transform:uppercase; color:var(--text3); margin-top:2px;
+        }
+        .m-card .cx {
+            display:inline-block; margin-top:4px;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.62em; font-weight:600;
+            padding:2px 6px; border-radius:3px;
+            background:var(--bg3); color:var(--text2);
+        }
+
+        /* Form */
+        .field { display:flex; flex-direction:column; gap:4px; }
+        .field label {
+            font-size:.65em; font-weight:700; letter-spacing:.5px;
+            text-transform:uppercase; color:var(--text3);
+        }
+        .field input, .field select {
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'JetBrains Mono',monospace;
+            font-size:.82em;
+            transition:border .15s;
+            outline:none;
+        }
+        .field input:focus, .field select:focus {
+            border-color:var(--text);
+            box-shadow:0 0 0 2px var(--highlight-soft);
+        }
+        .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+        /* Checkbox toggle */
+        .toggle-row {
+            display:flex; align-items:center; gap:8px;
+            margin-top:8px;
+        }
+        .toggle-row input[type="checkbox"] {
+            appearance:none; -webkit-appearance:none;
+            width:34px; height:18px;
+            background:var(--border);
+            border-radius:99px;
+            position:relative;
+            cursor:pointer;
+            transition:background .2s;
+            flex-shrink:0;
+        }
+        .toggle-row input[type="checkbox"]::after {
+            content:'';
+            position:absolute; top:2px; left:2px;
+            width:14px; height:14px;
+            background:var(--card);
+            border-radius:50%;
+            transition:transform .2s;
+        }
+        .toggle-row input[type="checkbox"]:checked {
+            background:var(--text);
+        }
+        .toggle-row input[type="checkbox"]:checked::after {
+            transform:translateX(16px);
+        }
+        .toggle-row label {
+            font-size:.75em; font-weight:600; color:var(--text2);
+            cursor:pointer;
+        }
+
+        /* Button */
+        .btn {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:8px 18px; border:none;
+            border-radius:var(--radius-sm);
+            font-family:'DM Sans',sans-serif;
+            font-weight:700; font-size:.78em;
+            cursor:pointer; transition:all .15s;
+        }
+        .btn-primary {
+            background:var(--text); color:var(--card);
+        }
+        .btn-primary:hover { background:var(--accent2); }
+        .btn-ghost {
+            background:var(--card2); color:var(--text2);
+            border:1px solid var(--border);
+        }
+        .btn-ghost:hover { background:var(--bg2); color:var(--text); }
+        .btn-sm { padding:5px 10px; font-size:.72em; }
+        .btn-group { display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; }
+
+        /* Matrix */
+        .mtx-wrap {
+            overflow-x:auto;
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            margin-top:6px;
+        }
+        .mtx {
+            border-collapse:collapse; width:100%;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.78em;
+        }
+        .mtx th {
+            background:var(--bg2);
+            padding:8px 4px;
+            text-align:center;
+            font-weight:700;
+            color:var(--text2);
+            border:1px solid var(--border);
+            min-width:48px;
+        }
+        .mtx th.corner { background:var(--bg); }
+        .mtx td {
+            padding:0;
+            border:1px solid var(--border);
+            text-align:center;
+        }
+        .mtx td.diag { background:var(--bg2); color:var(--text3); padding:8px 4px; }
+        .mtx td input {
+            width:100%; background:transparent; border:none;
+            color:var(--text); font-family:'JetBrains Mono',monospace;
+            font-size:1em; padding:8px 4px; text-align:center; outline:none;
+            transition:background .1s;
+        }
+        .mtx td input:focus { background:var(--accent-bg); }
+        .mtx td input::placeholder { color:var(--text3); }
+        .mtx td.hv input { color:var(--text); font-weight:700; }
+
+        /* Canvas */
+        .cv-wrap {
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            position:relative; overflow:hidden;
+        }
+        .cv-wrap canvas { display:block; width:100%; touch-action:none; }
+        .cv-bar {
+            position:absolute; top:8px; right:8px;
+            display:flex; gap:3px; z-index:2;
+        }
+        .cv-bar button {
+            width:28px; height:28px;
+            display:grid; place-items:center;
+            background:rgba(255,255,255,.85);
+            border:1px solid var(--border);
+            border-radius:5px; color:var(--text2);
+            cursor:pointer; font-size:.8em;
+            transition:all .1s;
+            font-family:'DM Sans',sans-serif; font-weight:700;
+        }
+        .cv-bar button:hover { border-color:var(--text); color:var(--text); }
+        .cv-hint {
+            position:absolute; bottom:6px; left:8px;
+            font-size:.62em; color:var(--text3);
+            background:rgba(255,255,255,.75);
+            padding:2px 7px; border-radius:3px;
+        }
+
+        /* Layout */
+        .lo-row { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+        .lo-btn {
+            padding:5px 11px;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:5px;
+            font-family:'DM Sans',sans-serif;
+            font-size:.7em; font-weight:600; color:var(--text2);
+            cursor:pointer; transition:all .1s;
+        }
+        .lo-btn:hover { border-color:var(--text3); color:var(--text); }
+        .lo-btn.on { background:var(--text); border-color:var(--text); color:var(--card); }
+
+        /* Source/Target config */
+        .st-config {
+            margin-top:14px; padding:14px;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            display:none;
+        }
+        .st-config.vis { display:block; }
+        .st-fields {
+            display:grid; grid-template-columns:1fr 1fr; gap:10px;
+            margin-top:8px;
+        }
+        .st-fields.single { grid-template-columns:1fr; }
+        .tgt-field { transition:opacity .2s; }
+        .tgt-field.disabled { opacity:.35; pointer-events:none; }
+
+        /* Presets */
+        .pr-row {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+            gap:5px; margin-bottom:14px;
+        }
+        .pr-btn {
+            background:var(--card2);
+            border:1px dashed var(--border);
+            border-radius:var(--radius-sm);
+            padding:9px; text-align:center;
+            cursor:pointer; transition:all .15s;
+        }
+        .pr-btn:hover { border-color:var(--text); border-style:solid; background:var(--accent-bg); }
+        .pr-btn .pn { font-weight:700; font-size:.75em; color:var(--text); }
+        .pr-btn .pd { font-size:.6em; color:var(--text3); margin-top:2px; }
+
+        /* Results */
+        #results { display:none; }
+        #results.vis { display:block; }
+
+        .stats-row {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+            gap:8px; margin-bottom:18px;
+        }
+        .stat {
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:14px; text-align:center;
+        }
+        .stat .sv {
+            font-size:1.35em; font-weight:800;
+            font-family:'JetBrains Mono',monospace;
+            color:var(--text);
+        }
+        .stat .sl {
+            font-size:.6em; font-weight:700;
+            letter-spacing:.6px; text-transform:uppercase;
+            color:var(--text3); margin-top:3px;
+        }
+
+        /* Iteration Controls */
+        .iter-controls {
+            display:flex; align-items:center; justify-content:space-between;
+            gap:10px; margin:14px 0;
+            padding:12px 16px;
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            flex-wrap:wrap;
+        }
+        .iter-nav { display:flex; gap:6px; align-items:center; }
+        .iter-nav button {
+            padding:6px 14px;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:5px;
+            font-family:'DM Sans',sans-serif;
+            font-size:.72em; font-weight:700;
+            color:var(--text2);
+            cursor:pointer;
+            transition:all .1s;
+        }
+        .iter-nav button:hover:not(:disabled) { border-color:var(--text); color:var(--text); }
+        .iter-nav button:disabled { opacity:.3; cursor:not-allowed; }
+        .iter-nav button.primary-iter { background:var(--text); color:var(--card); border-color:var(--text); }
+        .iter-nav button.primary-iter:hover:not(:disabled) { background:var(--accent2); }
+        .iter-info {
+            font-size:.75em; font-weight:600; color:var(--text2);
+            display:flex; align-items:center; gap:8px;
+        }
+        .iter-badge {
+            background:var(--text); color:var(--card);
+            padding:2px 8px; border-radius:3px;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.85em; font-weight:700;
+        }
+        .iter-changes {
+            margin:8px 0;
+            padding:10px 14px;
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            font-size:.78em;
+            color:var(--text2);
+            line-height:1.6;
+        }
+        .iter-changes .change-title {
+            font-weight:700; color:var(--text);
+            margin-bottom:4px; font-size:.9em;
+        }
+        .iter-changes .change-item {
+            padding:2px 0 2px 12px;
+            position:relative;
+        }
+        .iter-changes .change-item::before {
+            content:'';
+            position:absolute; left:0; top:9px;
+            width:5px; height:5px;
+            background:var(--text3);
+            border-radius:50%;
+        }
+
+        /* Path */
+        .path-row { display:flex; align-items:center; flex-wrap:wrap; gap:3px; margin:8px 0; }
+        .pnode {
+            background:var(--accent-bg); color:var(--text);
+            padding:4px 10px; border-radius:4px;
+            font-family:'JetBrains Mono',monospace;
+            font-weight:700; font-size:.78em;
+            border:1px solid var(--border);
+        }
+        .parrow { color:var(--text3); font-size:.85em; }
+        .edge-pills { display:flex; flex-wrap:wrap; gap:4px; margin:6px 0; }
+        .epill {
+            background:var(--bg2); border:1px solid var(--border);
+            color:var(--text);
+            padding:3px 9px; border-radius:4px;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.7em; font-weight:600;
+        }
+
+        /* Tabs */
+        .tabs {
+            display:flex; gap:1px;
+            background:var(--bg2); padding:3px;
+            border-radius:var(--radius-sm); margin-bottom:16px;
+            border:1px solid var(--border);
+        }
+        .tab-btn {
+            padding:7px 14px; border:none; background:transparent;
+            border-radius:4px; font-family:'DM Sans',sans-serif;
+            font-size:.75em; font-weight:600;
+            color:var(--text3); cursor:pointer; transition:all .1s;
+        }
+        .tab-btn:hover { color:var(--text2); }
+        .tab-btn.on { background:var(--card); color:var(--text); box-shadow:var(--shadow); }
+        .tp { display:none; }
+        .tp.on { display:block; }
+
+        /* Timeline */
+        .tl { padding-left:20px; position:relative; }
+        .tl::before {
+            content:''; position:absolute; left:6px;
+            top:0; bottom:0; width:1.5px;
+            background:var(--border);
+        }
+        .tl-item {
+            position:relative; margin-bottom:10px;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:10px 14px;
+            animation:su .25s ease both;
+        }
+        @keyframes su { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+        .tl-item::before {
+            content:''; position:absolute;
+            left:-18px; top:14px;
+            width:8px; height:8px;
+            border-radius:50%;
+            background:var(--text3);
+            border:2px solid var(--card);
+            z-index:1;
+        }
+        .tl-item.fin::before { background:var(--text); }
+        .tl-item.active { border-color:var(--text); box-shadow:0 0 0 1px var(--text); }
+        .tl-item.active::before { background:var(--text); }
+        .tl-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+        .tl-tag {
+            font-family:'JetBrains Mono',monospace;
+            font-size:.62em; font-weight:700;
+            color:var(--text2); background:var(--bg2);
+            padding:2px 7px; border-radius:3px;
+            border:1px solid var(--border);
+        }
+        .tl-fin { font-size:.62em; font-weight:700; color:var(--text); }
+        .tl-title { font-weight:700; font-size:.82em; margin-bottom:2px; }
+        .tl-desc { font-size:.78em; color:var(--text2); line-height:1.5; }
+        .tl-code {
+            margin-top:5px; padding:7px 10px;
+            background:var(--bg2); border-radius:4px;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.68em; color:var(--text2);
+            line-height:1.6; white-space:pre-wrap; word-break:break-all;
+            border:1px solid var(--border);
+        }
+
+        /* Table */
+        .rt-wrap { border:1px solid var(--border); border-radius:var(--radius-sm); overflow-x:auto; }
+        .rt {
+            width:100%; border-collapse:collapse;
+            font-size:.75em;
+        }
+        .rt th {
+            background:var(--bg2); padding:9px 10px;
+            text-align:left; font-weight:700; color:var(--text2);
+            font-size:.78em; letter-spacing:.3px;
+            text-transform:uppercase;
+            border-bottom:1.5px solid var(--border);
+        }
+        .rt td {
+            padding:8px 10px; border-bottom:1px solid var(--border);
+            font-family:'JetBrains Mono',monospace; font-size:.85em;
+        }
+        .rt tr:hover td { background:var(--card2); }
+        .rt tr.hl td { background:var(--accent-bg); font-weight:700; }
+
+        /* AI */
+        .ai-box {
+            background:var(--card2);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:20px;
+        }
+        .ai-box h3 { font-size:.95em; font-weight:700; margin-bottom:10px; color:var(--text); }
+        .ai-box p { color:var(--text2); line-height:1.65; font-size:.85em; margin-bottom:7px; }
+        .ai-box ul { list-style:none; padding:0; }
+        .ai-box li {
+            padding:4px 0 4px 14px; position:relative;
+            color:var(--text2); font-size:.82em; line-height:1.5;
+        }
+        .ai-box li::before {
+            content:''; position:absolute; left:0; top:10px;
+            width:4px; height:4px;
+            background:var(--text3);
+            border-radius:50%;
+        }
+
+        /* Toast */
+        .toast {
+            position:fixed; top:14px; right:14px;
+            padding:9px 18px; border-radius:var(--radius-sm);
+            font-weight:600; font-size:.78em;
+            z-index:999; transform:translateX(140%);
+            transition:transform .25s ease;
+            box-shadow:var(--shadow-md);
+        }
+        .toast.show { transform:translateX(0); }
+        .toast-ok { background:var(--text); color:var(--card); }
+        .toast-err { background:var(--text2); color:var(--card); }
+        .toast-info { background:var(--text); color:var(--card); }
+
+        /* Overlay */
+        .ov {
+            display:none; position:fixed; inset:0;
+            background:rgba(245,245,245,.85);
+            z-index:998; justify-content:center;
+            align-items:center; flex-direction:column; gap:10px;
+        }
+        .ov.show { display:flex; }
+        .spin {
+            width:32px; height:32px;
+            border:3px solid var(--border);
+            border-top-color:var(--text);
+            border-radius:50%;
+            animation:sp .55s linear infinite;
+        }
+        @keyframes sp { to{transform:rotate(360deg)} }
+
+        /* Bloom legend */
+        .legend {
+            display:flex; gap:14px; flex-wrap:wrap;
+            margin:8px 0; font-size:.7em; color:var(--text2);
+        }
+        .legend-item { display:flex; align-items:center; gap:5px; }
+        .legend-dot {
+            width:10px; height:10px; border-radius:50%;
+            border:1px solid var(--border);
+        }
+
+        @media(max-width:768px){
+            .shell { padding:10px; }
+            .section { padding:14px; }
+            .row2,.row3,.st-fields { grid-template-columns:1fr; }
+            .m-row { grid-template-columns:1fr 1fr; }
+            .stats-row { grid-template-columns:1fr 1fr; }
+            .iter-controls { flex-direction:column; align-items:stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="watermark">Written by Rad Strix</div>
+
+<div id="toast" class="toast"></div>
+<div id="ov" class="ov">
+    <div class="spin"></div>
+    <div style="color:var(--text2);font-weight:600;font-size:.82em;">Menganalisis graph...</div>
+</div>
+
+<div class="shell">
+
+<div class="hero">
+    <div class="hero-label">Riset Operasi</div>
+    <h1>Graph Algorithm Visualizer</h1>
+    <p>Shortest Path dan Minimum Spanning Tree -- Written by Rad Strix</p>
+</div>
+
+<!-- 1. METHOD -->
+<div class="section">
+    <div class="section-head">
+        <div class="section-num">1</div>
+        <div class="section-title">Pilih Algoritma</div>
+    </div>
+    <div class="lbl">Shortest Path</div>
+    <div class="m-row">
+        <div class="m-card" onclick="pickM('dijkstra',this)">
+            <div class="nm">Dijkstra</div><div class="mtp">Shortest Path</div>
+            <div class="cx">O((V+E)logV)</div>
+        </div>
+        <div class="m-card" onclick="pickM('bellman-ford',this)">
+            <div class="nm">Bellman-Ford</div><div class="mtp">Shortest Path</div>
+            <div class="cx">O(V*E)</div>
+        </div>
+        <div class="m-card" onclick="pickM('floyd-warshall',this)">
+            <div class="nm">Floyd-Warshall</div><div class="mtp">All-Pairs SP</div>
+            <div class="cx">O(V^3)</div>
+        </div>
+    </div>
+    <div class="lbl">Minimum Spanning Tree</div>
+    <div class="m-row">
+        <div class="m-card" onclick="pickM('kruskal',this)">
+            <div class="nm">Kruskal</div><div class="mtp">MST</div>
+            <div class="cx">O(E logE)</div>
+        </div>
+        <div class="m-card" onclick="pickM('prim',this)">
+            <div class="nm">Prim</div><div class="mtp">MST</div>
+            <div class="cx">O((V+E)logV)</div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. INPUT -->
+<div class="section">
+    <div class="section-head">
+        <div class="section-num">2</div>
+        <div class="section-title">Input Graph</div>
+    </div>
+    <div class="lbl">Template</div>
+    <div class="pr-row">
+        <div class="pr-btn" onclick="loadP('simple')"><div class="pn">Simple</div><div class="pd">5 nodes, 7 edges</div></div>
+        <div class="pr-btn" onclick="loadP('city')"><div class="pn">City Network</div><div class="pd">6 nodes, 10 edges</div></div>
+        <div class="pr-btn" onclick="loadP('dense')"><div class="pn">Dense</div><div class="pd">7 nodes, 12 edges</div></div>
+        <div class="pr-btn" onclick="loadP('negative')"><div class="pn">Negative</div><div class="pd">5 nodes, directed</div></div>
+    </div>
+
+    <div class="lbl" style="margin-top:14px;">Konfigurasi</div>
+    <div class="row3" style="margin-bottom:10px;">
+        <div class="field"><label>Jumlah Nodes</label>
+            <input type="number" id="inpN" min="2" max="12" value="5" onchange="chgN()">
+        </div>
+        <div class="field"><label>Tipe Graph</label>
+            <select id="inpT" onchange="gT=this.value;rebuildMtx();draw();">
+                <option value="undirected">Undirected</option>
+                <option value="directed">Directed</option>
+            </select>
+        </div>
+        <div class="field"><label>Labels (pisah koma)</label>
+            <input type="text" id="inpL" placeholder="A,B,C,D,E" onchange="parseL()">
+        </div>
+    </div>
+
+    <div class="lbl">Adjacency Matrix</div>
+    <p style="font-size:.7em;color:var(--text3);margin-bottom:5px;">
+        Isi bobot antar node. Kosongkan jika tidak ada koneksi.
+    </p>
+    <div class="mtx-wrap" id="mw"></div>
+    <div class="btn-group">
+        <button class="btn btn-ghost btn-sm" onclick="clrMtx()">Clear Matrix</button>
+        <button class="btn btn-ghost btn-sm" onclick="rndMtx()">Random Fill</button>
+    </div>
+
+    <!-- Source / Target config -->
+    <div class="st-config" id="stConfig">
+        <div class="lbl">Titik Awal dan Akhir</div>
+        <div class="st-fields" id="stFields">
+            <div class="field">
+                <label>Source (Titik Awal)</label>
+                <select id="sSrc"></select>
+            </div>
+            <div class="field tgt-field" id="tgtField">
+                <label>Target (Titik Akhir)</label>
+                <select id="sTgt"></select>
+            </div>
+        </div>
+        <div class="toggle-row" id="tgtToggleRow" style="display:none;">
+            <input type="checkbox" id="tgtToggle" onchange="toggleTarget()">
+            <label for="tgtToggle">Aktifkan titik akhir (target)</label>
+        </div>
+        <p id="stHint" style="font-size:.68em;color:var(--text3);margin-top:6px;"></p>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="run()">Jalankan Algoritma</button>
+        <button class="btn btn-ghost" onclick="resetAll()">Reset</button>
+    </div>
+</div>
+
+<!-- 3. VIS -->
+<div class="section">
+    <div class="section-head">
+        <div class="section-num">3</div>
+        <div class="section-title">Visualisasi Graph</div>
+    </div>
+    <div class="lbl">Layout</div>
+    <div class="lo-row">
+        <button class="lo-btn on" onclick="setLo('circle',this)">Circle</button>
+        <button class="lo-btn" onclick="setLo('grid',this)">Grid</button>
+        <button class="lo-btn" onclick="setLo('tree',this)">Tree</button>
+        <button class="lo-btn" onclick="setLo('spring',this)">Force</button>
+        <button class="lo-btn" onclick="setLo('random',this)">Random</button>
+        <button class="lo-btn" onclick="setLo('star',this)">Star</button>
+    </div>
+    <p style="font-size:.68em;color:var(--text3);margin:6px 0 8px;">
+        Drag node untuk atur posisi manual. Layout dipertahankan saat navigasi iterasi.
+    </p>
+
+    <div class="legend" id="legend" style="display:none;">
+        <div class="legend-item"><div class="legend-dot" style="background:#1a1a1a;"></div> Node aktif / path</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ffffff;border-color:#1a1a1a;"></div> Node default</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#888;"></div> Node visited</div>
+    </div>
+
+    <div class="cv-wrap" id="cvW">
+        <canvas id="cv"></canvas>
+        <div class="cv-bar">
+            <button onclick="zI()">+</button>
+            <button onclick="zO()">-</button>
+            <button onclick="zR()">R</button>
+        </div>
+        <div class="cv-hint">Drag node untuk atur posisi</div>
+    </div>
+
+    <!-- Iteration controls -->
+    <div class="iter-controls" id="iterCtrl" style="display:none;">
+        <div class="iter-info">
+            <span>Iterasi</span>
+            <span class="iter-badge" id="iterBadge">0 / 0</span>
+            <span id="iterLabel"></span>
+        </div>
+        <div class="iter-nav">
+            <button id="iterFirst" onclick="iterGo(0)">Awal</button>
+            <button id="iterPrev" onclick="iterGo(curIter-1)">Sebelumnya</button>
+            <button id="iterNext" class="primary-iter" onclick="iterGo(curIter+1)">Selanjutnya</button>
+            <button id="iterLast" onclick="iterGo(iterStates.length-1)">Akhir</button>
+        </div>
+    </div>
+    <div id="iterChanges"></div>
+</div>
+
+<!-- 4. RESULTS -->
+<div id="results">
+    <div class="section">
+        <div class="section-head">
+            <div class="section-num">4</div>
+            <div class="section-title">Hasil Analisis</div>
+        </div>
+        <div class="stats-row" id="sRow"></div>
+        <div id="pDisp"></div>
+        <div class="tabs">
+            <button class="tab-btn on" onclick="sTab('steps',this)">Step-by-Step</button>
+            <button class="tab-btn" onclick="sTab('table',this)">Tabel Iterasi</button>
+            <button class="tab-btn" onclick="sTab('ai',this)">Analisis</button>
+        </div>
+        <div class="tp on" id="tp-steps"><div class="tl" id="tline"></div></div>
+        <div class="tp" id="tp-table"><div class="rt-wrap" id="rTbl"></div></div>
+        <div class="tp" id="tp-ai"><div class="ai-box" id="aiB"></div></div>
+    </div>
+</div>
+</div>
+
+<script>
+let M=null,N=5,gT='undirected',lb=[],pos=[],res=null,sc=1,di=-1,dOff={x:0,y:0},cLo='circle';
+let curIter=0, iterStates=[];
+
+window.addEventListener('load',()=>{gLb();rebuildMtx();compLo('circle');draw();setupDrag();});
+window.addEventListener('resize',()=>draw());
+
+function toast(m,t='info'){const e=document.getElementById('toast');e.textContent=m;e.className='toast show toast-'+(t==='success'?'ok':t==='error'?'err':'info');setTimeout(()=>e.classList.remove('show'),2200);}
+
+function pickM(m,el){
+    M=m;
+    document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');
+
+    const cfg=document.getElementById('stConfig');
+    const fields=document.getElementById('stFields');
+    const tgtF=document.getElementById('tgtField');
+    const tgtTR=document.getElementById('tgtToggleRow');
+    const hint=document.getElementById('stHint');
+    const tgtCb=document.getElementById('tgtToggle');
+
+    if(m==='dijkstra'||m==='bellman-ford'){
+        cfg.classList.add('vis');
+        fields.classList.remove('single');
+        tgtF.classList.remove('disabled');
+        tgtTR.style.display='flex';
+        tgtCb.checked=true;
+        toggleTarget();
+        hint.textContent='Shortest Path: memerlukan titik awal. Titik akhir opsional -- jika dimatikan, akan menghitung jarak ke semua node.';
+    } else if(m==='floyd-warshall'){
+        cfg.classList.remove('vis');
+        tgtTR.style.display='none';
+        hint.textContent='';
+    } else if(m==='kruskal'){
+        cfg.classList.remove('vis');
+        tgtTR.style.display='none';
+        hint.textContent='';
+    } else if(m==='prim'){
+        cfg.classList.add('vis');
+        fields.classList.add('single');
+        tgtF.classList.add('disabled');
+        tgtTR.style.display='none';
+        hint.textContent='MST: hanya memerlukan titik awal. Tidak terpaut pada titik akhir.';
+    }
+
+    toast(m.replace(/-/g,' ').toUpperCase()+' dipilih','success');
+}
+
+function toggleTarget(){
+    const cb=document.getElementById('tgtToggle');
+    const tf=document.getElementById('tgtField');
+    if(cb.checked){tf.classList.remove('disabled');}
+    else{tf.classList.add('disabled');}
+}
+
+function gLb(){lb=[];for(let i=0;i<N;i++)lb.push(String.fromCharCode(65+i));document.getElementById('inpL').value=lb.join(',');fillSel();}
+function parseL(){const v=document.getElementById('inpL').value.split(',').map(s=>s.trim()).filter(Boolean);if(v.length>=N)lb=v.slice(0,N);else{lb=v;while(lb.length<N)lb.push(String.fromCharCode(65+lb.length));}rebuildMtx();fillSel();draw();}
+function L(i){return lb[i]||String.fromCharCode(65+i);}
+
+function chgN(){N=Math.max(2,Math.min(12,parseInt(document.getElementById('inpN').value)||5));document.getElementById('inpN').value=N;gLb();rebuildMtx();compLo(cLo);draw();}
+
+function fillSel(){['sSrc','sTgt','sPrm'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const p=s.value;s.innerHTML='';for(let i=0;i<N;i++){const o=document.createElement('option');o.value=i;o.textContent=L(i);s.appendChild(o);}if(p&&parseInt(p)<N)s.value=p;});const t=document.getElementById('sTgt');if(t&&t.options.length>1)t.value=N-1;}
+
+function rebuildMtx(){const w=document.getElementById('mw');let h='<table class="mtx"><thead><tr><th class="corner"></th>';
+for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
+for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){if(i===j){h+='<td class="diag">0</td>';}else{const id='m_'+i+'_'+j;h+='<td><input id="'+id+'" type="number" placeholder="-" step="any"'+(gT==='undirected'?' oninput="mir('+i+','+j+')"':'')+' onchange="mChg()"></td>';}}h+='</tr>';}
+h+='</tbody></table>';w.innerHTML=h;}
+
+function mir(i,j){const a=document.getElementById('m_'+i+'_'+j),b=document.getElementById('m_'+j+'_'+i);if(a&&b)b.value=a.value;mChg();}
+function mChg(){if(gT==='undirected'){for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const a=document.getElementById('m_'+i+'_'+j),b=document.getElementById('m_'+j+'_'+i);if(a&&b){if(document.activeElement===a)b.value=a.value;else if(document.activeElement===b)a.value=b.value;}}}
+for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const inp=document.getElementById('m_'+i+'_'+j);if(inp)inp.parentElement.className=inp.value!==''?'hv':'';}draw();}
+
+function gV(i,j){if(i===j)return 0;const inp=document.getElementById('m_'+i+'_'+j);if(!inp||inp.value==='')return Infinity;return parseFloat(inp.value);}
+function sV(i,j,v){const inp=document.getElementById('m_'+i+'_'+j);if(inp)inp.value=(v===Infinity||v===null)?'':v;}
+
+function rEdges(){const e=[],seen=new Set();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v===Infinity)continue;if(gT==='undirected'){const k=Math.min(i,j)+'-'+Math.max(i,j);if(seen.has(k))continue;seen.add(k);}e.push({from:i,to:j,weight:v});}return e;}
+function rAllDir(){const e=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v!==Infinity)e.push({from:i,to:j,weight:v});}return e;}
+
+function clrMtx(){for(let i=0;i<N;i++)for(let j=0;j<N;j++)sV(i,j,null);mChg();draw();toast('Matrix cleared','info');}
+function rndMtx(){clrMtx();const d=gT==='undirected'?.5:.4;for(let i=0;i<N;i++)for(let j=(gT==='undirected'?i+1:0);j<N;j++){if(i===j)continue;if(Math.random()<d){const w=Math.floor(Math.random()*20)+1;sV(i,j,w);if(gT==='undirected')sV(j,i,w);}}mChg();draw();toast('Random matrix generated','success');}
+
+function loadP(name){let d;
+if(name==='simple'){N=5;gT='undirected';lb=['A','B','C','D','E'];d=[[null,4,2,null,null],[4,null,1,5,null],[2,1,null,8,10],[null,5,8,null,2],[null,null,10,2,null]];}
+else if(name==='city'){N=6;gT='undirected';lb=['JKT','BDG','SMG','SBY','YGY','MLG'];d=[[null,150,450,800,null,null],[150,null,300,null,400,null],[450,300,null,350,100,null],[800,null,350,null,325,90],[null,400,100,325,null,400],[null,null,null,90,400,null]];}
+else if(name==='dense'){N=7;gT='undirected';lb=['A','B','C','D','E','F','G'];d=[[null,7,null,5,null,null,20],[7,null,8,9,7,null,null],[null,8,null,null,5,null,null],[5,9,null,null,15,6,null],[null,7,5,15,null,8,9],[null,null,null,6,8,null,11],[20,null,null,null,9,11,null]];}
+else if(name==='negative'){N=5;gT='directed';lb=['A','B','C','D','E'];d=[[null,6,7,null,null],[null,null,8,-4,5],[null,null,null,9,-3],[2,null,null,null,null],[null,null,null,7,null]];}
+document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
+rebuildMtx();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d[i][j]);}mChg();fillSel();compLo(cLo);draw();toast('Preset "'+name+'" loaded','success');}
+
+function setLo(t,btn){document.querySelectorAll('.lo-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');cLo=t;compLo(t);draw();}
+
+function compLo(t){const cv=document.getElementById('cv');const W=cv.parentElement.clientWidth||800;const H=460;const cx=W/2,cy=H/2,r=Math.min(W,H)*.34;pos=[];
+if(t==='circle'){for(let i=0;i<N;i++){const a=2*Math.PI*i/N-Math.PI/2;pos.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});}}
+else if(t==='grid'){const cols=Math.ceil(Math.sqrt(N));const gap=Math.min(W/(cols+1),H/(Math.ceil(N/cols)+1));const ox=(W-gap*(cols-1))/2,oy=(H-gap*(Math.ceil(N/cols)-1))/2;for(let i=0;i<N;i++)pos.push({x:ox+(i%cols)*gap,y:oy+Math.floor(i/cols)*gap});}
+else if(t==='tree'){const lev=[];const vis=new Set();let cl=[0];vis.add(0);while(cl.length){lev.push([...cl]);const nl=[];cl.forEach(u=>{for(let v=0;v<N;v++){if(!vis.has(v)&&gV(u,v)!==Infinity){vis.add(v);nl.push(v);}}});cl=nl;}for(let i=0;i<N;i++)if(!vis.has(i))lev.push([i]);const lH=H/(lev.length+1);lev.forEach((ns,li)=>{const g=W/(ns.length+1);ns.forEach((n,ni)=>{pos[n]={x:g*(ni+1),y:lH*(li+1)};});});while(pos.length<N)pos.push({x:cx,y:cy});}
+else if(t==='spring'){forceL(W,H);}
+else if(t==='random'){const p=60;for(let i=0;i<N;i++)pos.push({x:p+Math.random()*(W-2*p),y:p+Math.random()*(H-2*p)});}
+else if(t==='star'){if(N>0)pos.push({x:cx,y:cy});for(let i=1;i<N;i++){const a=2*Math.PI*(i-1)/(N-1)-Math.PI/2;pos.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});}}}
+
+function forceL(W,H){const pad=70;pos=[];for(let i=0;i<N;i++)pos.push({x:pad+Math.random()*(W-2*pad),y:pad+Math.random()*(H-2*pad)});
+const edges=rAllDir();const vel=pos.map(()=>({x:0,y:0}));
+for(let it=0;it<250;it++){const tmp=1-it/250;const f=pos.map(()=>({x:0,y:0}));
+for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){let dx=pos[i].x-pos[j].x,dy=pos[i].y-pos[j].y,d=Math.sqrt(dx*dx+dy*dy)||1,ff=6000/(d*d);f[i].x+=dx/d*ff;f[i].y+=dy/d*ff;f[j].x-=dx/d*ff;f[j].y-=dy/d*ff;}
+edges.forEach(e=>{let dx=pos[e.to].x-pos[e.from].x,dy=pos[e.to].y-pos[e.from].y,d=Math.sqrt(dx*dx+dy*dy)||1,ff=.005*d;f[e.from].x+=dx/d*ff;f[e.from].y+=dy/d*ff;f[e.to].x-=dx/d*ff;f[e.to].y-=dy/d*ff;});
+for(let i=0;i<N;i++){f[i].x+=(W/2-pos[i].x)*.002;f[i].y+=(H/2-pos[i].y)*.002;vel[i].x=(vel[i].x+f[i].x)*.9*tmp;vel[i].y=(vel[i].y+f[i].y)*.9*tmp;pos[i].x=Math.max(pad,Math.min(W-pad,pos[i].x+vel[i].x));pos[i].y=Math.max(pad,Math.min(H-pad,pos[i].y+vel[i].y));}}}
+
+function setupDrag(){const cv=document.getElementById('cv');function xy(e){const r=cv.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX,cy=e.touches?e.touches[0].clientY:e.clientY;return{x:(cx-r.left)/sc,y:(cy-r.top)/sc};}
+function dn(e){const p=xy(e);for(let i=N-1;i>=0;i--){const dx=p.x-pos[i].x,dy=p.y-pos[i].y;if(dx*dx+dy*dy<600){di=i;dOff={x:dx,y:dy};e.preventDefault();return;}}}
+function mv(e){if(di<0)return;const p=xy(e);pos[di].x=p.x-dOff.x;pos[di].y=p.y-dOff.y;drawCurrent();e.preventDefault();}
+function up(){di=-1;}
+cv.addEventListener('mousedown',dn);cv.addEventListener('mousemove',mv);cv.addEventListener('mouseup',up);cv.addEventListener('mouseleave',up);
+cv.addEventListener('touchstart',dn,{passive:false});cv.addEventListener('touchmove',mv,{passive:false});cv.addEventListener('touchend',up);}
+
+function zI(){sc=Math.min(2,sc+.15);drawCurrent();}
+function zO(){sc=Math.max(.5,sc-.15);drawCurrent();}
+function zR(){sc=1;compLo(cLo);drawCurrent();}
+
+function drawCurrent(){
+    if(iterStates.length>0 && curIter>=0 && curIter<iterStates.length){
+        const st=iterStates[curIter];
+        draw(st.hlEdges||[],st.hlNodes||[],st.pathEdges||[],st.bloomEdges||[],st.bloomNodes||[],st.labels||{},st.visitedNodes||[],st.permNodes||[],st.tempLabels||{});
+    } else {
+        draw();
+    }
+}
+
+function draw(hlE=[],hlN=[],pE=[],bloomE=[],bloomN=[],nodeLabels={},visitedN=[],permN=[],tempLabels={}){
+const cv=document.getElementById('cv'),W=cv.parentElement.clientWidth,H=460;
+const dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+'px';
+const c=cv.getContext('2d');c.scale(dpr*sc,dpr*sc);const sW=W/sc,sH=H/sc;
+
+// Background
+c.fillStyle='#fafafa';c.fillRect(0,0,sW,sH);
+
+// Dots pattern
+c.fillStyle='#e0e0e0';for(let x=0;x<sW;x+=24)for(let y=0;y<sH;y+=24){c.beginPath();c.arc(x,y,.5,0,6.28);c.fill();}
+
+if(!N||pos.length<N)return;
+const edges=rAllDir();const drawn=new Set();
+
+// Draw edges
+edges.forEach(e=>{if(!pos[e.from]||!pos[e.to])return;
+const k=gT==='undirected'?Math.min(e.from,e.to)+'-'+Math.max(e.from,e.to):e.from+'-'+e.to;
+if(gT==='undirected'&&drawn.has(k))return;drawn.add(k);
+const p1=pos[e.from],p2=pos[e.to];
+const isH=hlE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from===e.to&&h.to===e.from));
+const isP=pE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from===e.to&&h.to===e.from));
+const isBloom=bloomE.some(h=>(h.from===e.from&&h.to===e.to)||(gT==='undirected'&&h.from===e.to&&h.to===e.from));
+
+// Bloom glow for selected route
+if(isBloom){
+    c.save();
+    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
+    c.strokeStyle='rgba(26,26,26,0.12)';c.lineWidth=14;c.lineCap='round';c.stroke();
+    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
+    c.strokeStyle='rgba(26,26,26,0.08)';c.lineWidth=22;c.lineCap='round';c.stroke();
+    c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
+    c.strokeStyle='rgba(26,26,26,0.04)';c.lineWidth=32;c.lineCap='round';c.stroke();
+    c.restore();
+}
+
+c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);
+if(isBloom){c.strokeStyle='#1a1a1a';c.lineWidth=3;} 
+else if(isP){c.strokeStyle='#555';c.lineWidth=2.5;c.setLineDash([6,3]);} 
+else if(isH){c.strokeStyle='#333';c.lineWidth=2;} 
+else{c.strokeStyle='#d0d0d0';c.lineWidth=1.2;}
+c.stroke();c.setLineDash([]);
+
+// Arrow for directed
+if(gT==='directed'){const ang=Math.atan2(p2.y-p1.y,p2.x-p1.x),nr=22,ax=p2.x-nr*Math.cos(ang),ay=p2.y-nr*Math.sin(ang),al=8;
+c.beginPath();c.moveTo(ax,ay);c.lineTo(ax-al*Math.cos(ang-.35),ay-al*Math.sin(ang-.35));c.moveTo(ax,ay);c.lineTo(ax-al*Math.cos(ang+.35),ay-al*Math.sin(ang+.35));
+c.strokeStyle=isBloom?'#1a1a1a':isH?'#333':'#aaa';c.lineWidth=1.5;c.stroke();}
+
+// Edge weight label
+const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2,dx=p2.x-p1.x,dy=p2.y-p1.y,ln=Math.sqrt(dx*dx+dy*dy)||1;
+const ox=-dy/ln*12,oy=dx/ln*12;
+const txt=''+e.weight;c.font='600 9px "JetBrains Mono",monospace';const tw=c.measureText(txt).width+5;
+c.fillStyle='#fafafa';c.fillRect(mx+ox-tw/2,my+oy-6,tw,12);
+c.fillStyle=isBloom?'#1a1a1a':isH?'#333':'#aaa';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,mx+ox,my+oy);});
+
+// Draw nodes
+for(let i=0;i<N;i++){const p=pos[i];if(!p)continue;
+const isH=hlN.includes(i);
+const isBloom=bloomN.includes(i);
+const isVisited=visitedN.includes(i);
+const isPerm=permN.includes(i);
+const nr=20;
+
+// Bloom glow for selected nodes
+if(isBloom){
+    c.save();
+    c.beginPath();c.arc(p.x,p.y,nr+12,0,6.28);
+    c.fillStyle='rgba(26,26,26,0.06)';c.fill();
+    c.beginPath();c.arc(p.x,p.y,nr+8,0,6.28);
+    c.fillStyle='rgba(26,26,26,0.1)';c.fill();
+    c.beginPath();c.arc(p.x,p.y,nr+4,0,6.28);
+    c.fillStyle='rgba(26,26,26,0.14)';c.fill();
+    c.restore();
+}
+
+c.beginPath();c.arc(p.x,p.y,nr,0,6.28);
+if(isBloom||isH){c.fillStyle='#1a1a1a';}
+else if(isPerm){c.fillStyle='#555';}
+else if(isVisited){c.fillStyle='#999';}
+else{c.fillStyle='#ffffff';}
+c.fill();
+c.strokeStyle=(isBloom||isH)?'#000':isPerm?'#333':isVisited?'#777':'#d0d0d0';
+c.lineWidth=isBloom?2:1.5;c.stroke();
+
+// Node label
+c.fillStyle=(isBloom||isH||isPerm)?'#ffffff':isVisited?'#fff':'#1a1a1a';
+c.font='700 10px "DM Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';
+c.fillText(L(i),p.x,p.y);
+
+// Distance/temp labels below node
+const lbl=nodeLabels[i];
+if(lbl!==undefined){
+    c.font='600 8px "JetBrains Mono",monospace';
+    const lblTxt=''+(lbl===Infinity?'Inf':lbl);
+    const lw=c.measureText(lblTxt).width+6;
+    const ly=p.y+nr+10;
+    c.fillStyle=isPerm?'#1a1a1a':'#fafafa';
+    c.strokeStyle=isPerm?'#1a1a1a':'#aaa';
+    c.lineWidth=1;
+    c.beginPath();
+    const bx=p.x-lw/2,by=ly-6;
+    c.roundRect?c.roundRect(bx,by,lw,12,2):c.rect(bx,by,lw,12);
+    c.fill();c.stroke();
+    c.fillStyle=isPerm?'#fff':'#1a1a1a';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText(lblTxt,p.x,ly);
+}
+
+// Temp label indicator (T/P)
+const tl=tempLabels[i];
+if(tl){
+    c.font='700 7px "JetBrains Mono",monospace';
+    const tx=p.x+nr+3,ty=p.y-nr+3;
+    c.fillStyle=tl==='P'?'#1a1a1a':'#888';
+    c.textAlign='left';c.textBaseline='top';
+    c.fillText(tl,tx,ty);
+}
+}
+
+// Watermark on canvas
+c.font='500 9px "DM Sans",sans-serif';
+c.fillStyle='rgba(0,0,0,0.08)';
+c.textAlign='right';c.textBaseline='bottom';
+c.fillText('Written by Rad Strix',sW-8,sH-6);
+}
+
+function adjL(){const a=Array.from({length:N},()=>[]);for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v!==Infinity)a[i].push({to:j,w:v});}return a;}
+
+/* ============= ALGORITHMS WITH ITERATION STATES ============= */
+
+function algD(src,tgt){
+    const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),vis=Array(N).fill(false),al=adjL(),steps=[],states=[];
+    dist[src]=0;
+
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0, sisanya Inf. Semua node berlabel sementara.',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
+    states.push(makeState_D(dist,vis,prev,src,tgt,[],[],'Inisialisasi: dist['+L(src)+']=0'));
+
+    for(let it=0;it<N;it++){
+        let u=-1;for(let i=0;i<N;i++)if(!vis[i]&&(u<0||dist[i]<dist[u]))u=i;
+        if(u<0||dist[u]===Infinity)break;
+        vis[u]=true;
+
+        const changes=['Node '+L(u)+' dipilih (jarak='+dist[u]+'), label berubah: Sementara -> Permanen'];
+
+        steps.push({t:'Iterasi '+(it+1)+': Visit '+L(u),d:'Node '+L(u)+' dijadikan permanen, jarak = '+dist[u],c:'Pilih '+L(u)+' (jarak min dari node sementara)',a:'VISIT '+L(u)});
+
+        al[u].forEach(({to:v,w})=>{
+            if(!vis[v]&&dist[u]+w<dist[v]){
+                const old=dist[v];dist[v]=dist[u]+w;prev[v]=u;
+                changes.push('dist['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[v]+' (via '+L(u)+', '+dist[u]+'+'+w+')');
+                steps.push({t:'  Relax '+L(u)+' -> '+L(v),d:'dist['+L(v)+'] = min('+(old===Infinity?'Inf':old)+', '+dist[u]+'+'+w+') = '+dist[v],c:'prev['+L(v)+']='+L(u),a:'RELAX'});
+            }
+        });
+
+        const visitedSoFar=[];const permSoFar=[];
+        for(let i=0;i<N;i++){if(vis[i])permSoFar.push(i);else if(dist[i]<Infinity)visitedSoFar.push(i);}
+
+        states.push(makeState_D(dist,vis,prev,src,tgt,changes,permSoFar,'Iterasi '+(it+1)+': '+L(u)+' permanen'));
+
+        steps.push({t:'  Status',d:'Dist: ['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',c:'Permanen: ['+permSoFar.map(L).join(',')+']',a:'STATUS'});
+    }
+
+    const path=[];let cur=tgt;
+    if(tgt>=0){while(cur>=0){path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
+    const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
+
+    // Final state with bloom
+    const finalChanges=['Algoritma selesai.'];
+    if(tgt>=0&&path.length)finalChanges.push('Path terpendek: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
+    else if(tgt>=0)finalChanges.push('Tidak ada path ke '+L(tgt));
+    else finalChanges.push('Jarak dari '+L(src)+' ke semua node dihitung.');
+
+    const finalSt={
+        hlEdges:[],hlNodes:path.length?path:[],pathEdges:[],
+        bloomEdges:pe,bloomNodes:path.length?path:[],
+        labels:{},visitedNodes:[],permNodes:[],tempLabels:{},
+        changes:finalChanges,title:'Hasil Akhir'
+    };
+    for(let i=0;i<N;i++){finalSt.labels[i]=dist[i];finalSt.tempLabels[i]=vis[i]?'P':'T';}
+    states.push(finalSt);
+
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'Inf':dist[tgt]):'N/A'),c:'Final dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'RESULT',f:true});
+    return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Dijkstra'};
+}
+
+function makeState_D(dist,vis,prev,src,tgt,changes,permNodes,title){
+    const st={hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[...permNodes],tempLabels:{},changes:[...changes],title:title};
+    for(let i=0;i<N;i++){
+        st.labels[i]=dist[i];
+        if(vis[i])st.tempLabels[i]='P';
+        else if(dist[i]<Infinity)st.tempLabels[i]='T';
+    }
+    // Highlight permanent nodes
+    st.hlNodes=[...permNodes];
+    // Build partial path edges for vis
+    const partialEdges=[];
+    for(let i=0;i<N;i++){if(prev[i]>=0&&vis[i])partialEdges.push({from:prev[i],to:i});}
+    st.hlEdges=partialEdges;
+    return st;
+}
+
+function algBF(src,tgt){
+    const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),steps=[],states=[];
+    const edges=rAllDir();dist[src]=0;
+
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0 | '+edges.length+' edges',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:['Inisialisasi: dist['+L(src)+']=0'],title:'Inisialisasi'});
+
+    let neg=false;
+    for(let it=1;it<N;it++){
+        let upd=false;const changes=['Iterasi '+it+': relax semua '+edges.length+' edges'];
+        steps.push({t:'Iterasi '+it+'/'+(N-1),d:'Relax semua edges',c:'',a:'ITER '+it});
+        const relaxed=[];
+        edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to]){const old=dist[e.to];dist[e.to]=dist[e.from]+e.weight;prev[e.to]=e.from;upd=true;
+        changes.push('dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to]+' via '+L(e.from));
+        relaxed.push({from:e.from,to:e.to});
+        steps.push({t:'  Relax '+L(e.from)+' -> '+L(e.to)+' (w='+e.weight+')',d:'dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to],c:'via '+L(e.from),a:'RELAX'});}});
+        if(!upd)changes.push('Tidak ada perubahan, konvergen.');
+
+        const activeN=[];for(let i=0;i<N;i++)if(dist[i]<Infinity)activeN.push(i);
+        const buildE=[];for(let i=0;i<N;i++)if(prev[i]>=0)buildE.push({from:prev[i],to:i});
+        states.push({hlEdges:buildE,hlNodes:activeN,pathEdges:[],bloomEdges:relaxed,bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Iterasi '+it});
+
+        steps.push({t:'  Status',d:upd?'Ada update':'Tidak ada update',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'STATUS'});
+        if(!upd){steps.push({t:'Early Stop',d:'Konvergen di iterasi '+it,c:'',a:'STOP'});break;}
+    }
+
+    edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to])neg=true;});
+    if(neg)steps.push({t:'Negative Cycle Detected',d:'Graph memiliki negative cycle',c:'',a:'WARN',f:true});
+
+    const path=[];let cur=tgt;const vs=new Set();
+    if(tgt>=0){while(cur>=0&&!vs.has(cur)){vs.add(cur);path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
+    const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
+
+    const fc=['Algoritma selesai.'];
+    if(neg)fc.push('PERINGATAN: Negative cycle terdeteksi.');
+    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
+    states.push({hlEdges:[],hlNodes:path,pathEdges:[],bloomEdges:pe,bloomNodes:path,labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir'});
+
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'Inf':dist[tgt]):'N/A'),c:'',a:'RESULT',f:true});
+    return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Bellman-Ford',neg};
+}
+
+function algFW(){
+    const d=[];for(let i=0;i<N;i++){d[i]=[];for(let j=0;j<N;j++)d[i][j]=gV(i,j);}
+    const nxt=Array.from({length:N},(_,i)=>Array.from({length:N},(_,j)=>d[i][j]!==Infinity&&i!==j?j:-1));
+    const steps=[],states=[];
+
+    steps.push({t:'Inisialisasi D0',d:'Matrix awal '+N+'x'+N,c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Matrix jarak awal diinisialisasi dari adjacency matrix'],title:'D0 - Matrix Awal'});
+
+    for(let k=0;k<N;k++){
+        let u=[];const changes=['Intermediate node k='+L(k)];
+        for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+            if(d[i][k]!==Infinity&&d[k][j]!==Infinity&&d[i][k]+d[k][j]<d[i][j]){
+                u.push('d('+L(i)+','+L(j)+'): '+(d[i][j]===Infinity?'Inf':d[i][j])+' -> '+(d[i][k]+d[k][j]));
+                d[i][j]=d[i][k]+d[k][j];nxt[i][j]=nxt[i][k];
+            }
+        }
+        if(u.length)changes.push(u.length+' jarak diperbarui:');
+        u.forEach(x=>changes.push(x));
+        if(!u.length)changes.push('Tidak ada perubahan.');
+
+        states.push({hlEdges:[],hlNodes:[k],pathEdges:[],bloomEdges:[],bloomNodes:[k],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'D'+(k+1)+' via '+L(k)});
+
+        steps.push({t:'k='+k+' ('+L(k)+')',d:'Via '+L(k)+': '+u.length+' updates',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'K='+k});
+    }
+
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['All-pairs shortest path selesai dihitung.'],title:'Hasil Akhir'});
+
+    steps.push({t:'Hasil All-Pairs',d:'Matrix jarak terpendek lengkap',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'RESULT',f:true});
+    return{dist:d,nxt,steps,states,type:'ap',method:'Floyd-Warshall'};
+}
+
+function algK(){
+    const edges=rEdges().sort((a,b)=>a.weight-b.weight);
+    const par=Array.from({length:N},(_,i)=>i),rnk=Array(N).fill(0);
+    const mst=[],steps=[],states=[];let tw=0;
+    function find(x){return par[x]===x?x:par[x]=find(par[x]);}
+    function union(a,b){const pa=find(a),pb=find(b);if(pa===pb)return false;if(rnk[pa]<rnk[pb])par[pa]=pb;else if(rnk[pa]>rnk[pb])par[pb]=pa;else{par[pb]=pa;rnk[pa]++;}return true;}
+
+    steps.push({t:'Inisialisasi',d:edges.length+' edges diurutkan berdasarkan bobot',c:edges.map((e,i)=>(i+1)+'. '+L(e.from)+'-'+L(e.to)+': '+e.weight).join('\n'),a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Semua edge diurutkan ascending: '+edges.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', ')],title:'Inisialisasi'});
+
+    edges.forEach((e,idx)=>{
+        const rf=find(e.from),rt=find(e.to);
+        const changes=[];
+
+        if(rf!==rt){
+            union(e.from,e.to);mst.push(e);tw+=e.weight;
+            changes.push('Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITERIMA');
+            changes.push('Komponen '+L(e.from)+' (root='+L(rf)+') dan '+L(e.to)+' (root='+L(rt)+') digabung');
+            changes.push('MST: '+mst.length+'/'+(N-1)+' edges, total weight='+tw);
+            steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ACCEPTED',d:'Komponen berbeda. MST size: '+mst.length+'/'+(N-1),c:'Total: '+tw,a:'ACCEPT'});
+        } else {
+            changes.push('Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITOLAK');
+            changes.push('Keduanya sudah dalam komponen yang sama (root='+L(rf)+'), akan membentuk cycle');
+            steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') REJECTED',d:'Komponen sama (root='+L(rf)+'), skip',c:'',a:'REJECT'});
+        }
+
+        const mstNodes=new Set();mst.forEach(m=>{mstNodes.add(m.from);mstNodes.add(m.to);});
+        states.push({hlEdges:[...mst],hlNodes:[...mstNodes],pathEdges:[],bloomEdges:rf!==rt?[e]:[],bloomNodes:rf!==rt?[e.from,e.to]:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Edge #'+(idx+1)});
+    });
+
+    const mstNodes=new Set();mst.forEach(m=>{mstNodes.add(m.from);mstNodes.add(m.to);});
+    states.push({hlEdges:[...mst],hlNodes:[...mstNodes],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstNodes],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total weight='+tw],title:'Hasil Akhir'});
+
+    steps.push({t:'Hasil MST',d:mst.length+' edges, total = '+tw,c:mst.map((m,i)=>(i+1)+'. '+L(m.from)+'-'+L(m.to)+': '+m.weight).join('\n'),a:'RESULT',f:true});
+    return{mst,tw,steps,states,type:'mst',method:'Kruskal'};
+}
+
+function algP(src){
+    const al=adjL(),inM=Array(N).fill(false),key=Array(N).fill(Infinity),par=Array(N).fill(-1);
+    const mst=[],steps=[],states=[];let tw=0;key[src]=0;
+
+    steps.push({t:'Inisialisasi',d:'Start: '+L(src),c:'key=['+key.map((k,i)=>L(i)+':'+(k===Infinity?'Inf':k)).join(', ')+']',a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[src],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[],tempLabels:{[src]:'T'},changes:['Mulai dari node '+L(src)+', key=0'],title:'Inisialisasi'});
+
+    for(let it=0;it<N;it++){
+        let u=-1;for(let i=0;i<N;i++)if(!inM[i]&&(u<0||key[i]<key[u]))u=i;
+        if(u<0||key[u]===Infinity)break;inM[u]=true;
+        const changes=['Node '+L(u)+' ditambahkan ke MST (key='+key[u]+')'];
+
+        if(par[u]>=0){mst.push({from:par[u],to:u,weight:key[u]});tw+=key[u];changes.push('Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+') masuk MST, total weight='+tw);}
+
+        steps.push({t:'Tambah '+L(u),d:par[u]>=0?'Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+')':'Node awal',c:'MST weight: '+tw,a:'ADD '+L(u)});
+
+        al[u].forEach(({to:v,w})=>{if(!inM[v]&&w<key[v]){const old=key[v];key[v]=w;par[v]=u;
+        changes.push('key['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u));
+        steps.push({t:'  Update key['+L(v)+']',d:(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u),c:'',a:'KEY'});}});
+
+        const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
+        const tl={};for(let i=0;i<N;i++){if(inM[i])tl[i]='P';else if(key[i]<Infinity)tl[i]='T';}
+        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:par[u]>=0?[{from:par[u],to:u}]:[],bloomNodes:[u],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[...mstN],tempLabels:tl,changes,title:'Tambah '+L(u)});
+    }
+
+    const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
+    states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total weight='+tw],title:'Hasil Akhir'});
+
+    steps.push({t:'Hasil MST',d:mst.length+' edges, total = '+tw,c:mst.map((m,i)=>(i+1)+'. '+L(m.from)+'-'+L(m.to)+': '+m.weight).join('\n'),a:'RESULT',f:true});
+    return{mst,tw,steps,states,src,type:'mst',method:'Prim'};
+}
+
+/* ============= RUN ============= */
+function run(){
+    if(!M){toast('Pilih algoritma dulu','error');return;}
+    if(!rEdges().length){toast('Isi matrix jarak dulu','error');return;}
+
+    document.getElementById('ov').classList.add('show');
+
+    setTimeout(()=>{
+        try{
+            let r;
+            const isMST=(M==='kruskal'||M==='prim');
+            const isSP=(M==='dijkstra'||M==='bellman-ford');
+            const tgtEnabled=document.getElementById('tgtToggle')&&document.getElementById('tgtToggle').checked;
+
+            switch(M){
+            case'dijkstra':{
+                const s=+document.getElementById('sSrc').value;
+                const t=tgtEnabled?+document.getElementById('sTgt').value:-1;
+                if(rEdges().some(e=>e.weight<0)){toast('Dijkstra tidak support bobot negatif','error');document.getElementById('ov').classList.remove('show');return;}
+                r=algD(s,t);break;}
+            case'bellman-ford':{
+                const s=+document.getElementById('sSrc').value;
+                const t=tgtEnabled?+document.getElementById('sTgt').value:-1;
+                r=algBF(s,t);break;}
+            case'floyd-warshall':r=algFW();break;
+            case'kruskal':{
+                if(gT==='directed'){toast('Kruskal butuh undirected graph','error');document.getElementById('ov').classList.remove('show');return;}
+                r=algK();break;}
+            case'prim':{
+                if(gT==='directed'){toast('Prim butuh undirected graph','error');document.getElementById('ov').classList.remove('show');return;}
+                r=algP(+document.getElementById('sSrc').value||0);break;}
+            }
+
+            res=r;
+            iterStates=r.states||[];
+            curIter=iterStates.length-1; // Show final result first
+
+            showRes(r);
+            setupIterCtrl();
+            drawCurrent();
+
+            document.getElementById('legend').style.display='flex';
+            toast(r.method+' selesai','success');
+        }catch(err){console.error(err);toast('Error: '+err.message,'error');}
+        document.getElementById('ov').classList.remove('show');
+    },400);
+}
+
+function setupIterCtrl(){
+    const ctrl=document.getElementById('iterCtrl');
+    if(iterStates.length<=1){ctrl.style.display='none';return;}
+    ctrl.style.display='flex';
+    updateIterUI();
+}
+
+function iterGo(idx){
+    if(idx<0)idx=0;
+    if(idx>=iterStates.length)idx=iterStates.length-1;
+    curIter=idx;
+    updateIterUI();
+    drawCurrent();
+    showIterChanges();
+    // Highlight active step in timeline
+    document.querySelectorAll('.tl-item').forEach((el,i)=>{el.classList.toggle('active',i===curIter);});
+}
+
+function updateIterUI(){
+    document.getElementById('iterBadge').textContent=(curIter+1)+' / '+iterStates.length;
+    const st=iterStates[curIter];
+    document.getElementById('iterLabel').textContent=st?st.title:'';
+    document.getElementById('iterFirst').disabled=(curIter===0);
+    document.getElementById('iterPrev').disabled=(curIter===0);
+    document.getElementById('iterNext').disabled=(curIter>=iterStates.length-1);
+    document.getElementById('iterLast').disabled=(curIter>=iterStates.length-1);
+}
+
+function showIterChanges(){
+    const c=document.getElementById('iterChanges');
+    const st=iterStates[curIter];
+    if(!st||!st.changes||!st.changes.length){c.innerHTML='';return;}
+    let h='<div class="iter-changes"><div class="change-title">Perubahan pada iterasi ini:</div>';
+    st.changes.forEach(ch=>{h+='<div class="change-item">'+ch+'</div>';});
+    h+='</div>';
+    c.innerHTML=h;
+}
+
+function showRes(r){
+    const el=document.getElementById('results');el.classList.add('vis');
+    setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),150);
+    bStats(r);bPath(r);bTL(r.steps);bTbl(r);bAI(r);
+}
+
+function bStats(r){
+    const c=document.getElementById('sRow');
+    let h='<div class="stat"><div class="sv">'+r.method+'</div><div class="sl">Algoritma</div></div>';
+    if(r.type==='sp'){
+        const hasTgt=r.tgt>=0;
+        const d=hasTgt?r.dist[r.tgt]:null;
+        if(hasTgt)h+='<div class="stat"><div class="sv">'+(d===Infinity?'Inf':d)+'</div><div class="sl">Jarak Terpendek</div></div>';
+        h+='<div class="stat"><div class="sv">'+(r.path?r.path.length:0)+'</div><div class="sl">Nodes di Path</div></div>';
+    } else if(r.type==='mst'){
+        h+='<div class="stat"><div class="sv">'+r.tw+'</div><div class="sl">Total Weight</div></div>';
+        h+='<div class="stat"><div class="sv">'+r.mst.length+'</div><div class="sl">Edges MST</div></div>';
+    } else {
+        h+='<div class="stat"><div class="sv">'+N+'x'+N+'</div><div class="sl">Matrix</div></div>';
+    }
+    h+='<div class="stat"><div class="sv">'+r.steps.length+'</div><div class="sl">Steps</div></div>';
+    c.innerHTML=h;
+}
+
+function bPath(r){
+    const c=document.getElementById('pDisp');
+    if(r.type==='sp'&&r.path&&r.path.length){
+        c.innerHTML='<div class="lbl">Shortest Path</div><div class="path-row">'+r.path.map((n,i)=>'<span class="pnode">'+L(n)+'</span>'+(i<r.path.length-1?'<span class="parrow">></span>':'')).join('')+'</div>';
+    } else if(r.type==='sp'&&r.tgt<0){
+        // No target, show all distances
+        let h='<div class="lbl">Jarak dari '+L(r.src)+' ke semua node</div><div class="edge-pills">';
+        for(let i=0;i<N;i++){if(i===r.src)continue;h+='<span class="epill">'+L(r.src)+'->'+L(i)+': '+(r.dist[i]===Infinity?'Inf':r.dist[i])+'</span>';}
+        h+='</div>';c.innerHTML=h;
+    } else if(r.type==='mst'){
+        c.innerHTML='<div class="lbl">MST Edges -- Total Weight: '+r.tw+'</div><div class="edge-pills">'+r.mst.map(e=>'<span class="epill">'+L(e.from)+'-'+L(e.to)+': '+e.weight+'</span>').join('')+'</div>';
+    } else if(r.type==='ap'){
+        let h='<div class="lbl">All-Pairs Distance Matrix</div><div class="mtx-wrap"><table class="mtx"><tr><th class="corner"></th>';
+        for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr>';
+        for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' class="diag"':v!==Infinity?' class="hv"':'')+'>'+(i===j?'0':v===Infinity?'Inf':v)+'</td>';}h+='</tr>';}
+        h+='</table></div>';c.innerHTML=h;
+    } else c.innerHTML='';
+}
+
+function bTL(steps){
+    document.getElementById('tline').innerHTML=steps.map((s,i)=>'<div class="tl-item'+(s.f?' fin':'')+(i===curIter?' active':'')+'" style="animation-delay:'+i*.04+'s" onclick="iterGo('+i+')"><div class="tl-head"><span class="tl-tag">'+s.a+'</span>'+(s.f?'<span class="tl-fin">FINAL</span>':'')+'</div><div class="tl-title">'+s.t+'</div><div class="tl-desc">'+s.d+'</div>'+(s.c?'<div class="tl-code">'+s.c+'</div>':'')+'</div>').join('');
+}
+
+function bTbl(r){
+    const c=document.getElementById('rTbl');
+    if(r.type==='sp'){
+        let h='<table class="rt"><thead><tr><th>#</th><th>Action</th><th>Detail</th>';
+        for(let i=0;i<N;i++)h+='<th>d('+L(i)+')</th>';
+        h+='</tr></thead><tbody>';
+        let cd=Array(N).fill('Inf');if(r.src!==undefined)cd[r.src]='0';
+        r.steps.forEach((s,idx)=>{
+            const m=s.c.match(/dist=\[([^\]]+)\]/);
+            if(m)m[1].split(', ').forEach(p=>{const[l,v]=p.split(':');for(let i=0;i<N;i++)if(L(i)===l)cd[i]=v;});
+            h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(idx+1)+'</td><td>'+s.a+'</td><td style="font-family:DM Sans;font-size:.75em;max-width:170px;overflow:hidden;text-overflow:ellipsis">'+s.d.substring(0,55)+'</td>'+cd.map(d=>'<td>'+d+'</td>').join('')+'</tr>';
+        });
+        h+='</tbody></table>';c.innerHTML=h;
+    } else if(r.type==='mst'){
+        let h='<table class="rt"><thead><tr><th>#</th><th>Edge</th><th>Weight</th><th>Status</th><th>MST Total</th></tr></thead><tbody>';
+        let tw=0;
+        r.steps.forEach((s,i)=>{
+            const wm=s.t.match(/\((\-?\d+\.?\d*)\)/);const w=wm?parseFloat(wm[1]):null;
+            if(s.a==='ACCEPT'&&w!==null)tw+=w;
+            h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(i+1)+'</td><td style="font-family:DM Sans;font-size:.78em">'+s.t.substring(0,32)+'</td><td>'+(w!==null?w:'-')+'</td><td>'+s.a+'</td><td>'+tw+'</td></tr>';
+        });
+        h+='</tbody></table>';c.innerHTML=h;
+    } else {
+        let h='<table class="rt"><thead><tr><th>From / To</th>';
+        for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
+        for(let i=0;i<N;i++){
+            h+='<tr><td><strong>'+L(i)+'</strong></td>';
+            for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' style="color:var(--text3)"':v!==Infinity?' style="font-weight:700"':' style="color:var(--text3)"')+'>'+(v===Infinity?'Inf':v)+'</td>';}
+            h+='</tr>';
+        }
+        h+='</tbody></table>';c.innerHTML=h;
+    }
+}
+
+function bAI(r){
+    const c=document.getElementById('aiB');const edges=rEdges();
+    const dens=gT==='undirected'?(2*edges.length)/(N*(N-1)):(edges.length)/(N*(N-1));
+    let h='<h3>Analysis Report</h3>';
+    h+='<p><strong>Metode:</strong> '+r.method+' | <strong>Nodes:</strong> '+N+' | <strong>Edges:</strong> '+edges.length+' | <strong>Density:</strong> '+(dens*100).toFixed(1)+'%</p>';
+
+    if(r.method==='Dijkstra'){
+        h+='<p>Dijkstra menggunakan strategi greedy: selalu memilih node dengan jarak terkecil yang belum dikunjungi (label sementara), lalu menjadikannya permanen dan meng-update tetangganya. Optimal untuk graph tanpa bobot negatif.</p>';
+        h+='<p>Pada setiap iterasi, node dengan label sementara terkecil diubah menjadi label permanen (P). Node yang sudah permanen tidak akan berubah lagi.</p>';
+        if(r.path&&r.path.length){
+            h+='<p><strong>Path Analysis:</strong></p><ul>';
+            h+='<li>Jalur optimal: '+r.path.map(L).join(' -> ')+' ('+( r.path.length-1)+' hop)</li>';
+            h+='<li>Total jarak: '+r.dist[r.tgt]+'</li>';
+            for(let i=0;i<r.path.length-1;i++){const w=gV(r.path[i],r.path[i+1]);h+='<li>Segment '+L(r.path[i])+' -> '+L(r.path[i+1])+': '+w+'</li>';}
+            const direct=gV(r.src,r.tgt);
+            if(direct!==Infinity&&direct>r.dist[r.tgt])h+='<li>Jalur langsung = '+direct+', tapi via intermediate lebih pendek ('+r.dist[r.tgt]+')</li>';
+            else if(direct===Infinity)h+='<li>Tidak ada edge langsung, harus via intermediate nodes</li>';
+            h+='</ul>';
+        } else if(r.tgt<0){
+            h+='<p>Mode tanpa target: menghitung jarak terpendek dari '+L(r.src)+' ke semua node.</p>';
+        }
+        h+='<p><strong>Complexity:</strong> O((V+E)logV) = O('+((N+edges.length)*Math.ceil(Math.log2(N||2)))+')</p>';
+    }
+    else if(r.method==='Bellman-Ford'){
+        h+='<p>Bellman-Ford melakukan V-1 iterasi relax pada semua edges. Mampu menangani bobot negatif dan mendeteksi negative cycle.</p>';
+        if(r.neg)h+='<p><strong>PERINGATAN: NEGATIVE CYCLE TERDETEKSI.</strong> Shortest path mungkin tidak terdefinisi dengan baik.</p>';
+        if(r.path&&r.path.length){
+            h+='<ul><li>Path: '+r.path.map(L).join(' -> ')+' | Jarak: '+r.dist[r.tgt]+'</li>';
+            const hasN=edges.some(e=>e.weight<0);
+            h+='<li>'+(hasN?'Graph memiliki edge negatif, Bellman-Ford adalah pilihan tepat':'Tidak ada edge negatif, Dijkstra lebih efisien')+'</li></ul>';
+        }
+        h+='<p><strong>Complexity:</strong> O(V*E) = O('+(N*edges.length)+')</p>';
+    }
+    else if(r.method==='Floyd-Warshall'){
+        h+='<p>Floyd-Warshall menghitung all-pairs shortest path menggunakan dynamic programming. Setiap iterasi k mempertimbangkan node k sebagai intermediate.</p>';
+        let maxD=0,maxP=[0,0],unr=0;
+        for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(i!==j){if(r.dist[i][j]===Infinity)unr++;else if(r.dist[i][j]>maxD){maxD=r.dist[i][j];maxP=[i,j];}}
+        h+='<ul><li>Longest shortest path: '+L(maxP[0])+' -> '+L(maxP[1])+' = '+maxD+'</li>';
+        h+='<li>Unreachable pairs: '+unr+'</li>';
+        h+='<li>'+(unr===0?'Graph fully connected':'Ada pasangan node yang tidak terhubung')+'</li></ul>';
+        h+='<p><strong>Complexity:</strong> O(V^3) = O('+(N*N*N)+')</p>';
+    }
+    else if(r.method==='Kruskal'){
+        h+='<p>Kruskal mengurutkan semua edges berdasarkan bobot ascending, lalu menambahkan satu per satu ke MST selama tidak membentuk cycle. Deteksi cycle menggunakan Union-Find (disjoint set).</p>';
+        const totalW=edges.reduce((s,e)=>s+e.weight,0);const sav=totalW-r.tw;
+        const maxE=r.mst.reduce((m,e)=>e.weight>m.weight?e:m,{weight:-Infinity});
+        const rej=r.steps.filter(s=>s.a==='REJECT').length;
+        h+='<ul><li>MST weight: '+r.tw+'</li>';
+        h+='<li>Penghematan dari total: '+sav+' ('+((sav/totalW)*100).toFixed(1)+'%)</li>';
+        h+='<li>Edge ditolak (cycle): '+rej+'</li>';
+        h+='<li>Bottleneck edge: '+L(maxE.from)+'-'+L(maxE.to)+' = '+maxE.weight+'</li></ul>';
+        h+='<p><strong>Complexity:</strong> O(E logE) = O('+(edges.length*Math.ceil(Math.log2(edges.length||2)))+')</p>';
+    }
+    else if(r.method==='Prim'){
+        h+='<p>Prim membangun MST secara greedy dari starting node, berulang kali menambahkan edge termurah yang menghubungkan node di MST ke node di luar MST.</p>';
+        h+='<p>MST tidak terpaut pada titik akhir tertentu -- tujuannya adalah menghubungkan semua node dengan total bobot minimum.</p>';
+        const totalW=edges.reduce((s,e)=>s+e.weight,0);
+        h+='<ul><li>Start: '+L(r.src)+'</li>';
+        h+='<li>MST weight: '+r.tw+' ('+((r.tw/totalW)*100).toFixed(1)+'% dari total graph)</li>';
+        const ao=r.steps.filter(s=>s.a.startsWith('ADD')).map(s=>s.a.replace('ADD ',''));
+        h+='<li>Urutan penambahan: '+ao.join(' -> ')+'</li>';
+        h+='<li>Prim dan Kruskal menghasilkan total weight yang sama jika MST unik</li></ul>';
+        h+='<p><strong>Complexity:</strong> O((V+E)logV)</p>';
+    }
+
+    h+='<p style="margin-top:10px;"><strong>Rekomendasi:</strong></p><ul>';
+    if(dens>.5)h+='<li>Graph dense ('+( dens*100).toFixed(0)+'%), Floyd-Warshall efisien untuk all-pairs</li>';
+    else h+='<li>Graph sparse ('+(dens*100).toFixed(0)+'%), Dijkstra/Kruskal lebih efisien</li>';
+    if(edges.some(e=>e.weight<0))h+='<li>Ada bobot negatif, hanya Bellman-Ford dan Floyd-Warshall yang aman</li>';
+    if(N<=5)h+='<li>Graph kecil, semua algoritma bekerja dengan baik</li>';
+    else if(N>8)h+='<li>Graph cukup besar, pertimbangkan Dijkstra dengan Priority Queue</li>';
+    h+='</ul>';
+    c.innerHTML=h;
+}
+
+function sTab(n,btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('tp-'+n).classList.add('on');
+}
+
+function resetAll(){
+    M=null;res=null;N=5;gT='undirected';sc=1;curIter=0;iterStates=[];
+    document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));
+    document.getElementById('inpN').value=5;
+    document.getElementById('inpT').value='undirected';
+    document.getElementById('stConfig').classList.remove('vis');
+    document.getElementById('iterCtrl').style.display='none';
+    document.getElementById('iterChanges').innerHTML='';
+    document.getElementById('legend').style.display='none';
+    document.getElementById('results').classList.remove('vis');
+    gLb();rebuildMtx();compLo('circle');draw();
+    toast('Reset complete','info');
+}
+</script>
+</body>
+</html>
