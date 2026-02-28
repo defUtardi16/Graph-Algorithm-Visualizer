@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Algorithm Visualizer</title>
-
-    <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -100,291 +97,148 @@
         .shell { max-width:1100px; margin:0 auto; padding:20px 24px 80px; }
 
         .watermark {
-            position: fixed;
-            bottom: 12px;
-            right: 16px;
-            font-size: .68em;
-            font-weight: 600;
-            color: var(--text3);
-            letter-spacing: .5px;
-            opacity: .55;
-            z-index: 900;
-            pointer-events: none;
-            user-select: none;
+            position: fixed; bottom: 12px; right: 16px;
+            font-size: .68em; font-weight: 600; color: var(--text3);
+            letter-spacing: .5px; opacity: .55; z-index: 900;
+            pointer-events: none; user-select: none;
         }
 
         /* Top Bar */
         .top-bar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            padding: 8px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            position: sticky; top: 0; z-index: 100;
+            background: var(--card); border-bottom: 1px solid var(--border);
+            padding: 8px 20px; display: flex; align-items: center;
+            justify-content: space-between; gap: 10px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .top-bar-logo {
-            font-weight: 800;
-            font-size: .85em;
-            color: var(--text);
-            letter-spacing: -.3px;
-        }
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .top-bar-left { display: flex; align-items: center; gap: 10px; }
+        .top-bar-logo { font-weight: 800; font-size: .85em; color: var(--text); letter-spacing: -.3px; }
+        .top-bar-right { display: flex; align-items: center; gap: 6px; }
         .tb-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            background: var(--card2);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: .7em;
-            font-weight: 600;
-            color: var(--text2);
-            cursor: pointer;
-            transition: all .15s;
-            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 10px; background: var(--card2);
+            border: 1px solid var(--border); border-radius: 5px;
+            font-family: 'DM Sans', sans-serif; font-size: .7em;
+            font-weight: 600; color: var(--text2); cursor: pointer;
+            transition: all .15s; white-space: nowrap;
         }
         .tb-btn:hover { border-color: var(--text); color: var(--text); }
-        .tb-btn svg { width: 14px; height: 14px; }
-        .tb-btn.accent-btn {
-            background: var(--text);
-            color: var(--card);
-            border-color: var(--text);
-        }
+        .tb-btn.accent-btn { background: var(--text); color: var(--card); border-color: var(--text); }
         .tb-btn.accent-btn:hover { background: var(--accent2); }
 
-        /* Keyboard shortcut hint */
         .kbd {
-            display: inline-block;
-            padding: 1px 5px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .75em;
-            color: var(--text3);
-            line-height: 1.4;
+            display: inline-block; padding: 1px 5px;
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 3px; font-family: 'JetBrains Mono', monospace;
+            font-size: .75em; color: var(--text3); line-height: 1.4;
         }
 
         /* Header */
         .hero { text-align:center; padding:36px 0 28px; }
         .hero-label {
-            display:inline-block;
-            font-size:.65em; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
-            color:var(--text2);
-            background:var(--bg2);
-            border:1px solid var(--border);
-            padding:4px 14px; border-radius:99px;
-            margin-bottom:12px;
+            display:inline-block; font-size:.65em; font-weight:700;
+            letter-spacing:1.2px; text-transform:uppercase; color:var(--text2);
+            background:var(--bg2); border:1px solid var(--border);
+            padding:4px 14px; border-radius:99px; margin-bottom:12px;
         }
         .hero h1 {
-            font-size:clamp(1.5em,3.2vw,2.2em);
-            font-weight:800;
-            color:var(--text);
-            letter-spacing:-.5px;
+            font-size:clamp(1.5em,3.2vw,2.2em); font-weight:800;
+            color:var(--text); letter-spacing:-.5px;
         }
         .hero p { color:var(--text3); font-size:.85em; margin-top:6px; font-weight:400; }
 
         /* Section */
         .section {
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:22px;
-            margin-bottom:14px;
-            box-shadow:var(--shadow);
-            transition: background .3s, border-color .3s;
+            background:var(--card); border:1px solid var(--border);
+            border-radius:var(--radius); padding:22px; margin-bottom:14px;
+            box-shadow:var(--shadow); transition: background .3s, border-color .3s;
         }
-        .section-head {
-            display:flex; align-items:center; gap:10px;
-            margin-bottom:18px;
-        }
+        .section-head { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
         .section-num {
-            width:26px; height:26px;
-            display:grid; place-items:center;
-            border-radius:50%;
-            font-size:.72em; font-weight:700;
-            background:var(--text);
-            color:var(--card);
-            flex-shrink:0;
+            width:26px; height:26px; display:grid; place-items:center;
+            border-radius:50%; font-size:.72em; font-weight:700;
+            background:var(--text); color:var(--card); flex-shrink:0;
         }
         .section-title { font-size:1em; font-weight:700; color:var(--text); }
-
         .lbl {
             font-size:.65em; font-weight:700; letter-spacing:1px;
-            text-transform:uppercase; color:var(--text3);
-            margin-bottom:8px;
+            text-transform:uppercase; color:var(--text3); margin-bottom:8px;
         }
 
         /* Method Cards */
         .m-row {
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
             gap:6px; margin-bottom:14px;
         }
         .m-card {
-            background:var(--card2);
-            border:1.5px solid var(--border);
-            border-radius:var(--radius-sm);
-            padding:12px 10px;
-            cursor:pointer;
-            transition:all .15s;
-            text-align:center;
+            background:var(--card2); border:1.5px solid var(--border);
+            border-radius:var(--radius-sm); padding:12px 10px;
+            cursor:pointer; transition:all .15s; text-align:center;
         }
         .m-card:hover { border-color:var(--text3); background:var(--bg2); }
-        .m-card.on {
-            border-color:var(--text);
-            background:var(--accent-bg);
-            box-shadow: 0 0 0 1px var(--text);
-        }
+        .m-card.on { border-color:var(--text); background:var(--accent-bg); box-shadow: 0 0 0 1px var(--text); }
         .m-card .nm { font-weight:700; font-size:.82em; color:var(--text); }
-        .m-card .mtp {
-            font-size:.6em; font-weight:600; letter-spacing:.6px;
-            text-transform:uppercase; color:var(--text3); margin-top:2px;
-        }
+        .m-card .mtp { font-size:.6em; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:var(--text3); margin-top:2px; }
         .m-card .cx {
-            display:inline-block; margin-top:4px;
-            font-family:'JetBrains Mono',monospace;
-            font-size:.62em; font-weight:600;
-            padding:2px 6px; border-radius:3px;
+            display:inline-block; margin-top:4px; font-family:'JetBrains Mono',monospace;
+            font-size:.62em; font-weight:600; padding:2px 6px; border-radius:3px;
             background:var(--bg3); color:var(--text2);
         }
 
         /* Form */
         .field { display:flex; flex-direction:column; gap:4px; }
-        .field label {
-            font-size:.65em; font-weight:700; letter-spacing:.5px;
-            text-transform:uppercase; color:var(--text3);
-        }
+        .field label { font-size:.65em; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--text3); }
         .field input, .field select {
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            padding:8px 10px;
-            color:var(--text);
-            font-family:'JetBrains Mono',monospace;
-            font-size:.82em;
-            transition:border .15s;
-            outline:none;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); padding:8px 10px; color:var(--text);
+            font-family:'JetBrains Mono',monospace; font-size:.82em;
+            transition:border .15s; outline:none;
         }
-        .field input:focus, .field select:focus {
-            border-color:var(--text);
-            box-shadow:0 0 0 2px var(--highlight-soft);
-        }
+        .field input:focus, .field select:focus { border-color:var(--text); box-shadow:0 0 0 2px var(--highlight-soft); }
         .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 
-        /* Checkbox toggle */
-        .toggle-row {
-            display:flex; align-items:center; gap:8px;
-            margin-top:8px;
-        }
+        /* Toggle */
+        .toggle-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
         .toggle-row input[type="checkbox"] {
-            appearance:none; -webkit-appearance:none;
-            width:34px; height:18px;
-            background:var(--border);
-            border-radius:99px;
-            position:relative;
-            cursor:pointer;
-            transition:background .2s;
-            flex-shrink:0;
+            appearance:none; -webkit-appearance:none; width:34px; height:18px;
+            background:var(--border); border-radius:99px; position:relative;
+            cursor:pointer; transition:background .2s; flex-shrink:0;
         }
         .toggle-row input[type="checkbox"]::after {
-            content:'';
-            position:absolute; top:2px; left:2px;
-            width:14px; height:14px;
-            background:var(--card);
-            border-radius:50%;
-            transition:transform .2s;
+            content:''; position:absolute; top:2px; left:2px;
+            width:14px; height:14px; background:var(--card);
+            border-radius:50%; transition:transform .2s;
         }
-        .toggle-row input[type="checkbox"]:checked {
-            background:var(--text);
-        }
-        .toggle-row input[type="checkbox"]:checked::after {
-            transform:translateX(16px);
-        }
-        .toggle-row label {
-            font-size:.75em; font-weight:600; color:var(--text2);
-            cursor:pointer;
-        }
+        .toggle-row input[type="checkbox"]:checked { background:var(--text); }
+        .toggle-row input[type="checkbox"]:checked::after { transform:translateX(16px); }
+        .toggle-row label { font-size:.75em; font-weight:600; color:var(--text2); cursor:pointer; }
 
         /* Button */
         .btn {
             display:inline-flex; align-items:center; gap:6px;
-            padding:8px 18px; border:none;
-            border-radius:var(--radius-sm);
-            font-family:'DM Sans',sans-serif;
-            font-weight:700; font-size:.78em;
+            padding:8px 18px; border:none; border-radius:var(--radius-sm);
+            font-family:'DM Sans',sans-serif; font-weight:700; font-size:.78em;
             cursor:pointer; transition:all .15s;
         }
-        .btn-primary {
-            background:var(--text); color:var(--card);
-        }
+        .btn-primary { background:var(--text); color:var(--card); }
         .btn-primary:hover { background:var(--accent2); }
-        .btn-ghost {
-            background:var(--card2); color:var(--text2);
-            border:1px solid var(--border);
-        }
+        .btn-ghost { background:var(--card2); color:var(--text2); border:1px solid var(--border); }
         .btn-ghost:hover { background:var(--bg2); color:var(--text); }
         .btn-sm { padding:5px 10px; font-size:.72em; }
         .btn-group { display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; }
 
-        .btn-green { background:var(--green); color:#fff; border:none; }
-        .btn-green:hover { filter:brightness(1.1); }
-        .btn-blue { background:var(--blue); color:#fff; border:none; }
-        .btn-blue:hover { filter:brightness(1.1); }
-        .btn-amber { background:var(--amber); color:#fff; border:none; }
-        .btn-amber:hover { filter:brightness(1.1); }
-
         /* Matrix */
-        .mtx-wrap {
-            overflow-x:auto;
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            margin-top:6px;
-        }
-        .mtx {
-            border-collapse:collapse; width:100%;
-            font-family:'JetBrains Mono',monospace;
-            font-size:.78em;
-        }
-        .mtx th {
-            background:var(--bg2);
-            padding:8px 4px;
-            text-align:center;
-            font-weight:700;
-            color:var(--text2);
-            border:1px solid var(--border);
-            min-width:48px;
-        }
+        .mtx-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-sm); margin-top:6px; }
+        .mtx { border-collapse:collapse; width:100%; font-family:'JetBrains Mono',monospace; font-size:.78em; }
+        .mtx th { background:var(--bg2); padding:8px 4px; text-align:center; font-weight:700; color:var(--text2); border:1px solid var(--border); min-width:48px; }
         .mtx th.corner { background:var(--bg); }
-        .mtx td {
-            padding:0;
-            border:1px solid var(--border);
-            text-align:center;
-        }
+        .mtx td { padding:0; border:1px solid var(--border); text-align:center; }
         .mtx td.diag { background:var(--bg2); color:var(--text3); padding:8px 4px; }
         .mtx td input {
-            width:100%; background:transparent; border:none;
-            color:var(--text); font-family:'JetBrains Mono',monospace;
-            font-size:1em; padding:8px 4px; text-align:center; outline:none;
-            transition:background .1s;
+            width:100%; background:transparent; border:none; color:var(--text);
+            font-family:'JetBrains Mono',monospace; font-size:1em; padding:8px 4px;
+            text-align:center; outline:none; transition:background .1s;
         }
         .mtx td input:focus { background:var(--accent-bg); }
         .mtx td input::placeholder { color:var(--text3); }
@@ -392,76 +246,49 @@
 
         /* Canvas */
         .cv-wrap {
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            position:relative; overflow:hidden;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); position:relative; overflow:hidden;
         }
         .cv-wrap canvas { display:block; width:100%; touch-action:none; }
-        .cv-bar {
-            position:absolute; top:8px; right:8px;
-            display:flex; gap:3px; z-index:2;
-        }
+        .cv-bar { position:absolute; top:8px; right:8px; display:flex; gap:3px; z-index:2; }
         .cv-bar button {
-            width:28px; height:28px;
-            display:grid; place-items:center;
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:5px; color:var(--text2);
-            cursor:pointer; font-size:.8em;
-            transition:all .1s;
-            font-family:'DM Sans',sans-serif; font-weight:700;
-            opacity: .85;
+            width:28px; height:28px; display:grid; place-items:center;
+            background:var(--card); border:1px solid var(--border);
+            border-radius:5px; color:var(--text2); cursor:pointer; font-size:.8em;
+            transition:all .1s; font-family:'DM Sans',sans-serif; font-weight:700; opacity:.85;
         }
         .cv-bar button:hover { border-color:var(--text); color:var(--text); opacity:1; }
         .cv-hint {
-            position:absolute; bottom:6px; left:8px;
-            font-size:.62em; color:var(--text3);
-            background:var(--card);
-            padding:2px 7px; border-radius:3px;
-            opacity:.75;
+            position:absolute; bottom:6px; left:8px; font-size:.62em; color:var(--text3);
+            background:var(--card); padding:2px 7px; border-radius:3px; opacity:.75;
         }
 
         /* Layout */
         .lo-row { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
         .lo-btn {
-            padding:5px 11px;
-            background:var(--card2); border:1px solid var(--border);
-            border-radius:5px;
-            font-family:'DM Sans',sans-serif;
-            font-size:.7em; font-weight:600; color:var(--text2);
-            cursor:pointer; transition:all .1s;
+            padding:5px 11px; background:var(--card2); border:1px solid var(--border);
+            border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.7em;
+            font-weight:600; color:var(--text2); cursor:pointer; transition:all .1s;
         }
         .lo-btn:hover { border-color:var(--text3); color:var(--text); }
         .lo-btn.on { background:var(--text); border-color:var(--text); color:var(--card); }
 
-        /* Source/Target config */
+        /* Source/Target */
         .st-config {
-            margin-top:14px; padding:14px;
-            background:var(--card2); border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            display:none;
+            margin-top:14px; padding:14px; background:var(--card2);
+            border:1px solid var(--border); border-radius:var(--radius-sm); display:none;
         }
         .st-config.vis { display:block; }
-        .st-fields {
-            display:grid; grid-template-columns:1fr 1fr; gap:10px;
-            margin-top:8px;
-        }
+        .st-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px; }
         .st-fields.single { grid-template-columns:1fr; }
         .tgt-field { transition:opacity .2s; }
         .tgt-field.disabled { opacity:.35; pointer-events:none; }
 
         /* Presets */
-        .pr-row {
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-            gap:5px; margin-bottom:14px;
-        }
+        .pr-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:5px; margin-bottom:14px; }
         .pr-btn {
-            background:var(--card2);
-            border:1px dashed var(--border);
-            border-radius:var(--radius-sm);
-            padding:9px; text-align:center;
+            background:var(--card2); border:1px dashed var(--border);
+            border-radius:var(--radius-sm); padding:9px; text-align:center;
             cursor:pointer; transition:all .15s;
         }
         .pr-btn:hover { border-color:var(--text); border-style:solid; background:var(--accent-bg); }
@@ -471,318 +298,154 @@
         /* Results */
         #results { display:none; }
         #results.vis { display:block; }
-
-        .stats-row {
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-            gap:8px; margin-bottom:18px;
-        }
-        .stat {
-            background:var(--card2); border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            padding:14px; text-align:center;
-        }
-        .stat .sv {
-            font-size:1.35em; font-weight:800;
-            font-family:'JetBrains Mono',monospace;
-            color:var(--text);
-        }
-        .stat .sl {
-            font-size:.6em; font-weight:700;
-            letter-spacing:.6px; text-transform:uppercase;
-            color:var(--text3); margin-top:3px;
-        }
+        .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin-bottom:18px; }
+        .stat { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; text-align:center; }
+        .stat .sv { font-size:1.35em; font-weight:800; font-family:'JetBrains Mono',monospace; color:var(--text); }
+        .stat .sl { font-size:.6em; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--text3); margin-top:3px; }
 
         /* Iteration Controls */
         .iter-controls {
             display:flex; align-items:center; justify-content:space-between;
-            gap:10px; margin:14px 0;
-            padding:12px 16px;
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            flex-wrap:wrap;
+            gap:10px; margin:14px 0; padding:12px 16px;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); flex-wrap:wrap;
         }
         .iter-nav { display:flex; gap:6px; align-items:center; }
         .iter-nav button {
-            padding:6px 14px;
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:5px;
-            font-family:'DM Sans',sans-serif;
-            font-size:.72em; font-weight:700;
-            color:var(--text2);
-            cursor:pointer;
-            transition:all .1s;
+            padding:6px 14px; background:var(--card); border:1px solid var(--border);
+            border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.72em;
+            font-weight:700; color:var(--text2); cursor:pointer; transition:all .1s;
         }
         .iter-nav button:hover:not(:disabled) { border-color:var(--text); color:var(--text); }
         .iter-nav button:disabled { opacity:.3; cursor:not-allowed; }
         .iter-nav button.primary-iter { background:var(--text); color:var(--card); border-color:var(--text); }
         .iter-nav button.primary-iter:hover:not(:disabled) { background:var(--accent2); }
-        .iter-info {
-            font-size:.75em; font-weight:600; color:var(--text2);
-            display:flex; align-items:center; gap:8px;
-        }
+        .iter-info { font-size:.75em; font-weight:600; color:var(--text2); display:flex; align-items:center; gap:8px; }
         .iter-badge {
-            background:var(--text); color:var(--card);
-            padding:2px 8px; border-radius:3px;
-            font-family:'JetBrains Mono',monospace;
-            font-size:.85em; font-weight:700;
+            background:var(--text); color:var(--card); padding:2px 8px; border-radius:3px;
+            font-family:'JetBrains Mono',monospace; font-size:.85em; font-weight:700;
         }
 
         /* Playback */
-        .playback-row {
-            display:flex; align-items:center; gap:8px;
-            margin-top:8px;
-        }
+        .playback-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
         .play-btn {
-            padding:6px 16px;
-            background:var(--green);
-            color:#fff;
-            border:none;
-            border-radius:5px;
-            font-family:'DM Sans',sans-serif;
-            font-size:.72em; font-weight:700;
-            cursor:pointer;
-            transition:all .15s;
-            display:inline-flex;
-            align-items:center;
-            gap:5px;
+            padding:6px 16px; background:var(--green); color:#fff; border:none;
+            border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.72em;
+            font-weight:700; cursor:pointer; transition:all .15s;
+            display:inline-flex; align-items:center; gap:5px;
         }
         .play-btn:hover { filter:brightness(1.1); }
         .play-btn.playing { background:var(--red); }
         .speed-select {
-            padding:5px 8px;
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:5px;
-            font-family:'DM Sans',sans-serif;
-            font-size:.72em; font-weight:600;
-            color:var(--text2);
-            cursor:pointer;
+            padding:5px 8px; background:var(--card2); border:1px solid var(--border);
+            border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.72em;
+            font-weight:600; color:var(--text2); cursor:pointer;
         }
 
         /* Iteration Detail Panel */
         .iter-detail-panel {
-            margin:12px 0;
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            overflow:hidden;
-            background:var(--card);
+            margin:12px 0; border:1px solid var(--border);
+            border-radius:var(--radius); overflow:hidden; background:var(--card);
         }
         .iter-detail-header {
-            background:var(--bg2);
-            padding:12px 16px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
+            background:var(--bg2); padding:12px 16px; display:flex;
+            align-items:center; justify-content:space-between;
             border-bottom:1px solid var(--border);
         }
-        .iter-detail-header h4 {
-            font-size:.82em;
-            font-weight:700;
-            color:var(--text);
-        }
-        .iter-detail-body {
-            padding:16px;
-        }
-        .detail-grid {
-            display:grid;
-            grid-template-columns:1fr 1fr 1fr;
-            gap:12px;
-        }
+        .iter-detail-header h4 { font-size:.82em; font-weight:700; color:var(--text); }
+        .iter-detail-body { padding:16px; }
+        .detail-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
         .detail-card {
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            padding:12px;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); padding:12px;
         }
         .detail-card-title {
-            font-size:.62em;
-            font-weight:700;
-            letter-spacing:.8px;
-            text-transform:uppercase;
-            color:var(--text3);
-            margin-bottom:8px;
-            display:flex;
-            align-items:center;
-            gap:6px;
+            font-size:.62em; font-weight:700; letter-spacing:.8px;
+            text-transform:uppercase; color:var(--text3); margin-bottom:8px;
+            display:flex; align-items:center; gap:6px;
         }
-        .detail-card-title .dot {
-            width:8px; height:8px;
-            border-radius:50%;
-            flex-shrink:0;
-        }
-        .detail-card .node-list {
-            display:flex;
-            flex-wrap:wrap;
-            gap:4px;
-        }
+        .detail-card-title .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .detail-card .node-list { display:flex; flex-wrap:wrap; gap:4px; }
         .detail-card .node-chip {
-            padding:3px 8px;
-            border-radius:4px;
-            font-family:'JetBrains Mono',monospace;
-            font-size:.72em;
-            font-weight:600;
+            padding:3px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace;
+            font-size:.72em; font-weight:600;
         }
-        .chip-connected {
-            background:var(--green-bg);
-            color:var(--green);
-            border:1px solid var(--green);
-        }
-        .chip-unconnected {
-            background:var(--red-bg);
-            color:var(--red);
-            border:1px solid var(--red);
-        }
-        .chip-edge {
-            background:var(--blue-bg);
-            color:var(--blue);
-            border:1px solid var(--blue);
-        }
-        .chip-current {
-            background:var(--amber-bg);
-            color:var(--amber);
-            border:1px solid var(--amber);
-        }
+        .chip-connected { background:var(--green-bg); color:var(--green); border:1px solid var(--green); }
+        .chip-unconnected { background:var(--red-bg); color:var(--red); border:1px solid var(--red); }
+        .chip-edge { background:var(--blue-bg); color:var(--blue); border:1px solid var(--blue); }
+        .chip-current { background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber); }
 
-        .detail-table {
-            width:100%;
-            border-collapse:collapse;
-            font-size:.75em;
-            margin-top:8px;
-        }
+        .detail-table { width:100%; border-collapse:collapse; font-size:.75em; margin-top:8px; }
         .detail-table th {
-            background:var(--bg2);
-            padding:7px 8px;
-            text-align:left;
-            font-weight:700;
-            color:var(--text2);
-            font-size:.8em;
-            letter-spacing:.3px;
-            text-transform:uppercase;
+            background:var(--bg2); padding:7px 8px; text-align:left; font-weight:700;
+            color:var(--text2); font-size:.8em; letter-spacing:.3px; text-transform:uppercase;
             border-bottom:1px solid var(--border);
         }
         .detail-table td {
-            padding:6px 8px;
-            border-bottom:1px solid var(--border);
-            font-family:'JetBrains Mono',monospace;
-            font-size:.85em;
+            padding:6px 8px; border-bottom:1px solid var(--border);
+            font-family:'JetBrains Mono',monospace; font-size:.85em;
         }
         .detail-table tr:hover td { background:var(--card2); }
 
-        /* All iterations view */
-        .all-iter-section {
-            margin-top:16px;
-        }
+        /* All iterations */
         .all-iter-card {
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            margin-bottom:8px;
-            overflow:hidden;
-            transition:all .2s;
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); margin-bottom:8px; overflow:hidden;
         }
         .all-iter-card.expanded .all-iter-body { display:block; }
         .all-iter-card .all-iter-head {
-            padding:10px 14px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            cursor:pointer;
-            transition:background .15s;
+            padding:10px 14px; display:flex; align-items:center;
+            justify-content:space-between; cursor:pointer; transition:background .15s;
         }
         .all-iter-card .all-iter-head:hover { background:var(--bg2); }
-        .all-iter-card .all-iter-head .iter-num {
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            width:22px; height:22px;
-            border-radius:50%;
-            background:var(--text);
-            color:var(--card);
-            font-size:.65em;
-            font-weight:700;
-            margin-right:8px;
-            flex-shrink:0;
+        .all-iter-card .iter-num {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:22px; height:22px; border-radius:50%; background:var(--text);
+            color:var(--card); font-size:.65em; font-weight:700; margin-right:8px; flex-shrink:0;
         }
-        .all-iter-card .all-iter-head .iter-title {
-            font-weight:700;
-            font-size:.78em;
-            color:var(--text);
-            flex:1;
-        }
-        .all-iter-card .all-iter-head .chevron {
-            color:var(--text3);
-            font-size:.7em;
-            transition:transform .2s;
-        }
-        .all-iter-card.expanded .all-iter-head .chevron { transform:rotate(180deg); }
-        .all-iter-body {
-            display:none;
-            padding:12px 14px;
-            border-top:1px solid var(--border);
-        }
+        .all-iter-card .iter-title { font-weight:700; font-size:.78em; color:var(--text); flex:1; }
+        .all-iter-card .chevron { color:var(--text3); font-size:.7em; transition:transform .2s; }
+        .all-iter-card.expanded .chevron { transform:rotate(180deg); }
+        .all-iter-body { display:none; padding:12px 14px; border-top:1px solid var(--border); }
 
         .iter-changes {
-            margin:8px 0;
-            padding:10px 14px;
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            font-size:.78em;
-            color:var(--text2);
-            line-height:1.6;
+            margin:8px 0; padding:10px 14px; background:var(--card2);
+            border:1px solid var(--border); border-radius:var(--radius-sm);
+            font-size:.78em; color:var(--text2); line-height:1.6;
         }
-        .iter-changes .change-title {
-            font-weight:700; color:var(--text);
-            margin-bottom:4px; font-size:.9em;
-        }
-        .iter-changes .change-item {
-            padding:2px 0 2px 12px;
-            position:relative;
-        }
+        .iter-changes .change-title { font-weight:700; color:var(--text); margin-bottom:4px; font-size:.9em; }
+        .iter-changes .change-item { padding:2px 0 2px 12px; position:relative; }
         .iter-changes .change-item::before {
-            content:'';
-            position:absolute; left:0; top:9px;
-            width:5px; height:5px;
-            background:var(--text3);
-            border-radius:50%;
+            content:''; position:absolute; left:0; top:9px;
+            width:5px; height:5px; background:var(--text3); border-radius:50%;
         }
 
         /* Path */
         .path-row { display:flex; align-items:center; flex-wrap:wrap; gap:3px; margin:8px 0; }
         .pnode {
-            background:var(--accent-bg); color:var(--text);
-            padding:4px 10px; border-radius:4px;
-            font-family:'JetBrains Mono',monospace;
-            font-weight:700; font-size:.78em;
-            border:1px solid var(--border);
+            background:var(--accent-bg); color:var(--text); padding:4px 10px;
+            border-radius:4px; font-family:'JetBrains Mono',monospace;
+            font-weight:700; font-size:.78em; border:1px solid var(--border);
         }
         .parrow { color:var(--text3); font-size:.85em; }
         .edge-pills { display:flex; flex-wrap:wrap; gap:4px; margin:6px 0; }
         .epill {
-            background:var(--bg2); border:1px solid var(--border);
-            color:var(--text);
-            padding:3px 9px; border-radius:4px;
-            font-family:'JetBrains Mono',monospace;
+            background:var(--bg2); border:1px solid var(--border); color:var(--text);
+            padding:3px 9px; border-radius:4px; font-family:'JetBrains Mono',monospace;
             font-size:.7em; font-weight:600;
         }
 
         /* Tabs */
         .tabs {
-            display:flex; gap:1px;
-            background:var(--bg2); padding:3px;
+            display:flex; gap:1px; background:var(--bg2); padding:3px;
             border-radius:var(--radius-sm); margin-bottom:16px;
-            border:1px solid var(--border);
-            overflow-x:auto;
+            border:1px solid var(--border); overflow-x:auto;
         }
         .tab-btn {
             padding:7px 14px; border:none; background:transparent;
             border-radius:4px; font-family:'DM Sans',sans-serif;
-            font-size:.75em; font-weight:600;
-            color:var(--text3); cursor:pointer; transition:all .1s;
-            white-space:nowrap;
+            font-size:.75em; font-weight:600; color:var(--text3);
+            cursor:pointer; transition:all .1s; white-space:nowrap;
         }
         .tab-btn:hover { color:var(--text2); }
         .tab-btn.on { background:var(--card); color:var(--text); box-shadow:var(--shadow); }
@@ -792,28 +455,20 @@
         /* Timeline */
         .tl { padding-left:20px; position:relative; }
         .tl::before {
-            content:''; position:absolute; left:6px;
-            top:0; bottom:0; width:1.5px;
-            background:var(--border);
+            content:''; position:absolute; left:6px; top:0; bottom:0;
+            width:1.5px; background:var(--border);
         }
         .tl-item {
-            position:relative; margin-bottom:10px;
-            background:var(--card2); border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            padding:10px 14px;
-            animation:su .25s ease both;
-            cursor:pointer;
+            position:relative; margin-bottom:10px; background:var(--card2);
+            border:1px solid var(--border); border-radius:var(--radius-sm);
+            padding:10px 14px; animation:su .25s ease both; cursor:pointer;
             transition:border-color .15s, box-shadow .15s;
         }
         @keyframes su { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
         .tl-item::before {
-            content:''; position:absolute;
-            left:-18px; top:14px;
-            width:8px; height:8px;
-            border-radius:50%;
-            background:var(--text3);
-            border:2px solid var(--card);
-            z-index:1;
+            content:''; position:absolute; left:-18px; top:14px;
+            width:8px; height:8px; border-radius:50%;
+            background:var(--text3); border:2px solid var(--card); z-index:1;
         }
         .tl-item.fin::before { background:var(--text); }
         .tl-item.active { border-color:var(--text); box-shadow:0 0 0 1px var(--text); }
@@ -821,72 +476,45 @@
         .tl-item:hover { border-color:var(--text3); }
         .tl-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
         .tl-tag {
-            font-family:'JetBrains Mono',monospace;
-            font-size:.62em; font-weight:700;
-            color:var(--text2); background:var(--bg2);
-            padding:2px 7px; border-radius:3px;
-            border:1px solid var(--border);
+            font-family:'JetBrains Mono',monospace; font-size:.62em; font-weight:700;
+            color:var(--text2); background:var(--bg2); padding:2px 7px;
+            border-radius:3px; border:1px solid var(--border);
         }
         .tl-fin { font-size:.62em; font-weight:700; color:var(--text); }
         .tl-title { font-weight:700; font-size:.82em; margin-bottom:2px; }
         .tl-desc { font-size:.78em; color:var(--text2); line-height:1.5; }
         .tl-code {
-            margin-top:5px; padding:7px 10px;
-            background:var(--bg2); border-radius:4px;
-            font-family:'JetBrains Mono',monospace;
-            font-size:.68em; color:var(--text2);
+            margin-top:5px; padding:7px 10px; background:var(--bg2); border-radius:4px;
+            font-family:'JetBrains Mono',monospace; font-size:.68em; color:var(--text2);
             line-height:1.6; white-space:pre-wrap; word-break:break-all;
             border:1px solid var(--border);
         }
 
         /* Table */
         .rt-wrap { border:1px solid var(--border); border-radius:var(--radius-sm); overflow-x:auto; }
-        .rt {
-            width:100%; border-collapse:collapse;
-            font-size:.75em;
-        }
+        .rt { width:100%; border-collapse:collapse; font-size:.75em; }
         .rt th {
-            background:var(--bg2); padding:9px 10px;
-            text-align:left; font-weight:700; color:var(--text2);
-            font-size:.78em; letter-spacing:.3px;
-            text-transform:uppercase;
+            background:var(--bg2); padding:9px 10px; text-align:left; font-weight:700;
+            color:var(--text2); font-size:.78em; letter-spacing:.3px; text-transform:uppercase;
             border-bottom:1.5px solid var(--border);
         }
-        .rt td {
-            padding:8px 10px; border-bottom:1px solid var(--border);
-            font-family:'JetBrains Mono',monospace; font-size:.85em;
-        }
+        .rt td { padding:8px 10px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:.85em; }
         .rt tr:hover td { background:var(--card2); }
         .rt tr.hl td { background:var(--accent-bg); font-weight:700; }
 
         /* AI */
-        .ai-box {
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:20px;
-        }
+        .ai-box { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
         .ai-box h3 { font-size:.95em; font-weight:700; margin-bottom:10px; color:var(--text); }
         .ai-box p { color:var(--text2); line-height:1.65; font-size:.85em; margin-bottom:7px; }
         .ai-box ul { list-style:none; padding:0; }
-        .ai-box li {
-            padding:4px 0 4px 14px; position:relative;
-            color:var(--text2); font-size:.82em; line-height:1.5;
-        }
-        .ai-box li::before {
-            content:''; position:absolute; left:0; top:10px;
-            width:4px; height:4px;
-            background:var(--text3);
-            border-radius:50%;
-        }
+        .ai-box li { padding:4px 0 4px 14px; position:relative; color:var(--text2); font-size:.82em; line-height:1.5; }
+        .ai-box li::before { content:''; position:absolute; left:0; top:10px; width:4px; height:4px; background:var(--text3); border-radius:50%; }
 
         /* Toast */
         .toast {
-            position:fixed; top:14px; right:14px;
-            padding:9px 18px; border-radius:var(--radius-sm);
-            font-weight:600; font-size:.78em;
-            z-index:999; transform:translateX(140%);
-            transition:transform .25s ease;
+            position:fixed; top:14px; right:14px; padding:9px 18px;
+            border-radius:var(--radius-sm); font-weight:600; font-size:.78em;
+            z-index:999; transform:translateX(140%); transition:transform .25s ease;
             box-shadow:var(--shadow-md);
         }
         .toast.show { transform:translateX(0); }
@@ -896,127 +524,71 @@
 
         /* Overlay */
         .ov {
-            display:none; position:fixed; inset:0;
-            background:rgba(0,0,0,.4);
-            z-index:998; justify-content:center;
-            align-items:center; flex-direction:column; gap:10px;
-            backdrop-filter:blur(4px);
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,.4);
+            z-index:998; justify-content:center; align-items:center;
+            flex-direction:column; gap:10px; backdrop-filter:blur(4px);
         }
         .ov.show { display:flex; }
         .ov-card {
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:32px;
-            text-align:center;
+            background:var(--card); border:1px solid var(--border);
+            border-radius:var(--radius); padding:32px; text-align:center;
             box-shadow:var(--shadow-lg);
         }
         .spin {
-            width:32px; height:32px;
-            border:3px solid var(--border);
-            border-top-color:var(--text);
-            border-radius:50%;
-            animation:sp .55s linear infinite;
-            margin:0 auto 12px;
+            width:32px; height:32px; border:3px solid var(--border);
+            border-top-color:var(--text); border-radius:50%;
+            animation:sp .55s linear infinite; margin:0 auto 12px;
         }
         @keyframes sp { to{transform:rotate(360deg)} }
 
         /* Legend */
-        .legend {
-            display:flex; gap:14px; flex-wrap:wrap;
-            margin:8px 0; font-size:.7em; color:var(--text2);
-        }
+        .legend { display:flex; gap:14px; flex-wrap:wrap; margin:8px 0; font-size:.7em; color:var(--text2); }
         .legend-item { display:flex; align-items:center; gap:5px; }
-        .legend-dot {
-            width:10px; height:10px; border-radius:50%;
-            border:1px solid var(--border);
-        }
+        .legend-dot { width:10px; height:10px; border-radius:50%; border:1px solid var(--border); }
 
-        /* Share modal */
+        /* Modal */
         .modal-backdrop {
-            display:none; position:fixed; inset:0;
-            background:rgba(0,0,0,.4);
-            z-index:997;
-            backdrop-filter:blur(4px);
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,.4);
+            z-index:997; backdrop-filter:blur(4px);
         }
         .modal-backdrop.show { display:flex; align-items:center; justify-content:center; }
         .modal {
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:24px;
-            max-width:500px; width:90%;
+            background:var(--card); border:1px solid var(--border);
+            border-radius:var(--radius); padding:24px; max-width:500px; width:90%;
             box-shadow:var(--shadow-lg);
         }
         .modal h3 { font-size:.95em; font-weight:700; margin-bottom:12px; }
         .modal-close {
-            float:right; background:none; border:none;
-            font-size:1.2em; cursor:pointer; color:var(--text3);
-            padding:0 4px; line-height:1;
+            float:right; background:none; border:none; font-size:1.2em;
+            cursor:pointer; color:var(--text3); padding:0 4px; line-height:1;
         }
         .modal-close:hover { color:var(--text); }
-        .share-url-box {
-            display:flex; gap:6px; margin-top:8px;
-        }
+        .share-url-box { display:flex; gap:6px; margin-top:8px; }
         .share-url-box input {
-            flex:1;
-            padding:8px 10px;
-            background:var(--card2);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            font-family:'JetBrains Mono',monospace;
-            font-size:.75em;
-            color:var(--text);
-            outline:none;
+            flex:1; padding:8px 10px; background:var(--card2);
+            border:1px solid var(--border); border-radius:var(--radius-sm);
+            font-family:'JetBrains Mono',monospace; font-size:.75em;
+            color:var(--text); outline:none;
         }
 
-        /* PDF progress */
-        .pdf-progress {
-            margin-top:12px;
-            display:none;
-        }
+        .pdf-progress { margin-top:12px; display:none; }
         .pdf-progress.show { display:block; }
-        .pdf-bar-bg {
-            height:6px;
-            background:var(--bg2);
-            border-radius:3px;
-            overflow:hidden;
-            margin-top:6px;
-        }
-        .pdf-bar {
-            height:100%;
-            background:var(--text);
-            border-radius:3px;
-            transition:width .2s;
-            width:0%;
-        }
-        .pdf-status {
-            font-size:.72em;
-            color:var(--text2);
-            font-weight:600;
-            margin-top:4px;
-        }
+        .pdf-bar-bg { height:6px; background:var(--bg2); border-radius:3px; overflow:hidden; margin-top:6px; }
+        .pdf-bar { height:100%; background:var(--text); border-radius:3px; transition:width .2s; width:0%; }
+        .pdf-status { font-size:.72em; color:var(--text2); font-weight:600; margin-top:4px; }
 
-        /* Shortcut panel */
+        /* Shortcuts */
         .shortcuts-panel {
-            display:none;
-            position:fixed;
-            top:50%; left:50%;
-            transform:translate(-50%,-50%);
-            z-index:999;
-            background:var(--card);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:24px;
-            box-shadow:var(--shadow-lg);
-            min-width:320px;
+            display:none; position:fixed; top:50%; left:50%;
+            transform:translate(-50%,-50%); z-index:999; background:var(--card);
+            border:1px solid var(--border); border-radius:var(--radius);
+            padding:24px; box-shadow:var(--shadow-lg); min-width:320px;
         }
         .shortcuts-panel.show { display:block; }
         .shortcuts-panel h3 { font-size:.9em; font-weight:700; margin-bottom:14px; }
         .shortcut-row {
-            display:flex; justify-content:space-between;
-            align-items:center; padding:5px 0;
-            font-size:.78em; color:var(--text2);
+            display:flex; justify-content:space-between; align-items:center;
+            padding:5px 0; font-size:.78em; color:var(--text2);
         }
 
         @media(max-width:768px){
@@ -1028,15 +600,15 @@
             .iter-controls { flex-direction:column; align-items:stretch; }
             .detail-grid { grid-template-columns:1fr; }
             .top-bar { padding:6px 10px; }
-            .top-bar .tb-btn span { display:none; }
+            .top-bar .tb-btn span.tb-label { display:none; }
         }
     </style>
 </head>
 <body>
 
 <div class="watermark">RAD STRIX</div>
-
 <div id="toast" class="toast"></div>
+
 <div id="ov" class="ov">
     <div class="ov-card">
         <div class="spin"></div>
@@ -1051,60 +623,59 @@
 <!-- Share Modal -->
 <div class="modal-backdrop" id="shareModal">
     <div class="modal">
-        <button class="modal-close" onclick="closeModal('shareModal')">&times;</button>
-        <h3> Share Graph</h3>
+        <button class="modal-close" onclick="closeModal('shareModal')">x</button>
+        <h3>Share Graph</h3>
         <p style="font-size:.78em;color:var(--text2);margin-bottom:10px;">Bagikan graph ini via URL. Penerima akan mendapat graph yang sama persis.</p>
         <div class="share-url-box">
             <input type="text" id="shareUrl" readonly>
             <button class="btn btn-primary btn-sm" onclick="copyShareUrl()">Copy</button>
         </div>
         <div style="margin-top:14px;">
-            <div class="lbl">Atau Export sebagai JSON</div>
+            <div class="lbl">Export / Import</div>
             <div style="display:flex;gap:6px;margin-top:6px;">
-                <button class="btn btn-ghost btn-sm" onclick="exportJSON()">📄 Export JSON</button>
-                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('jsonImport').click()">📥 Import JSON</button>
+                <button class="btn btn-ghost btn-sm" onclick="exportJSON()">Export JSON</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('jsonImport').click()">Import JSON</button>
                 <input type="file" id="jsonImport" accept=".json" style="display:none" onchange="importJSON(event)">
             </div>
         </div>
     </div>
 </div>
 
-<!-- Shortcuts Modal -->
+<!-- Shortcuts -->
 <div class="shortcuts-panel" id="shortcutsPanel">
-    <button class="modal-close" onclick="document.getElementById('shortcutsPanel').classList.remove('show')" style="float:right">&times;</button>
-    <h3> Keyboard Shortcuts</h3>
+    <button class="modal-close" onclick="document.getElementById('shortcutsPanel').classList.remove('show')" style="float:right">x</button>
+    <h3>Keyboard Shortcuts</h3>
     <div class="shortcut-row"><span>Run Algorithm</span><span class="kbd">Ctrl+Enter</span></div>
-    <div class="shortcut-row"><span>Next Iteration</span><span class="kbd">→</span></div>
-    <div class="shortcut-row"><span>Prev Iteration</span><span class="kbd">←</span></div>
+    <div class="shortcut-row"><span>Next Iteration</span><span class="kbd">Right Arrow</span></div>
+    <div class="shortcut-row"><span>Prev Iteration</span><span class="kbd">Left Arrow</span></div>
     <div class="shortcut-row"><span>First Iteration</span><span class="kbd">Home</span></div>
     <div class="shortcut-row"><span>Last Iteration</span><span class="kbd">End</span></div>
-    <div class="shortcut-row"><span>Play/Pause</span><span class="kbd">Space</span></div>
+    <div class="shortcut-row"><span>Play / Pause</span><span class="kbd">Space</span></div>
     <div class="shortcut-row"><span>Toggle Dark Mode</span><span class="kbd">D</span></div>
     <div class="shortcut-row"><span>Print PDF</span><span class="kbd">Ctrl+P</span></div>
     <div class="shortcut-row"><span>Show Shortcuts</span><span class="kbd">?</span></div>
-    <div class="shortcut-row"><span>Reset</span><span class="kbd">Ctrl+R</span></div>
 </div>
 
 <!-- Top Bar -->
 <div class="top-bar">
     <div class="top-bar-left">
-        <div class="top-bar-logo">⬡ Graph Visualizer</div>
+        <div class="top-bar-logo">Graph Visualizer</div>
     </div>
     <div class="top-bar-right">
         <button class="tb-btn" onclick="toggleDark()" id="darkBtn" title="Toggle Dark Mode (D)">
-            <span id="darkIcon">🌙</span><span>Dark</span>
+            <span id="darkIcon">Dark</span>
         </button>
         <button class="tb-btn" onclick="showShortcuts()" title="Shortcuts (?)">
-             <span>Keys</span>
+            <span>Keys</span>
         </button>
         <button class="tb-btn" onclick="openShareModal()" title="Share">
-             <span>Share</span>
+            <span>Share</span>
         </button>
         <button class="tb-btn" onclick="screenshotCanvas()" title="Screenshot Canvas">
-             <span>Capture</span>
+            <span>Capture</span>
         </button>
         <button class="tb-btn accent-btn" onclick="printPDF()" id="pdfBtn" title="Print to PDF (Ctrl+P)">
-             <span>PDF</span>
+            <span>PDF</span>
         </button>
     </div>
 </div>
@@ -1114,7 +685,7 @@
 <div class="hero">
     <div class="hero-label">Riset Operasi</div>
     <h1>Graph Algorithm Visualizer</h1>
-    <p>Shortest Path & Minimum Spanning Tree — Enhanced Edition by RAD STRIX</p>
+    <p>Shortest Path dan Minimum Spanning Tree -- Written by RAD STRIX</p>
 </div>
 
 <!-- 1. METHOD -->
@@ -1126,8 +697,8 @@
     <div class="lbl">Shortest Path</div>
     <div class="m-row">
         <div class="m-card" onclick="pickM('dijkstra',this)"><div class="nm">Dijkstra</div><div class="mtp">Shortest Path</div><div class="cx">O((V+E)logV)</div></div>
-        <div class="m-card" onclick="pickM('bellman-ford',this)"><div class="nm">Bellman-Ford</div><div class="mtp">Shortest Path</div><div class="cx">O(V·E)</div></div>
-        <div class="m-card" onclick="pickM('floyd-warshall',this)"><div class="nm">Floyd-Warshall</div><div class="mtp">All-Pairs SP</div><div class="cx">O(V³)</div></div>
+        <div class="m-card" onclick="pickM('bellman-ford',this)"><div class="nm">Bellman-Ford</div><div class="mtp">Shortest Path</div><div class="cx">O(V*E)</div></div>
+        <div class="m-card" onclick="pickM('floyd-warshall',this)"><div class="nm">Floyd-Warshall</div><div class="mtp">All-Pairs SP</div><div class="cx">O(V^3)</div></div>
     </div>
     <div class="lbl">Minimum Spanning Tree</div>
     <div class="m-row">
@@ -1149,7 +720,6 @@
         <div class="pr-btn" onclick="loadP('dense')"><div class="pn">Dense</div><div class="pd">7 nodes, 12 edges</div></div>
         <div class="pr-btn" onclick="loadP('negative')"><div class="pn">Negative</div><div class="pd">5 nodes, directed</div></div>
     </div>
-
     <div class="lbl" style="margin-top:14px;">Konfigurasi</div>
     <div class="row3" style="margin-bottom:10px;">
         <div class="field"><label>Jumlah Nodes</label><input type="number" id="inpN" min="2" max="12" value="5" onchange="chgN()"></div>
@@ -1161,7 +731,6 @@
         </div>
         <div class="field"><label>Labels (pisah koma)</label><input type="text" id="inpL" placeholder="A,B,C,D,E" onchange="parseL()"></div>
     </div>
-
     <div class="lbl">Adjacency Matrix</div>
     <p style="font-size:.7em;color:var(--text3);margin-bottom:5px;">Isi bobot antar node. Kosongkan jika tidak ada koneksi.</p>
     <div class="mtx-wrap" id="mw"></div>
@@ -1169,7 +738,6 @@
         <button class="btn btn-ghost btn-sm" onclick="clrMtx()">Clear Matrix</button>
         <button class="btn btn-ghost btn-sm" onclick="rndMtx()">Random Fill</button>
     </div>
-
     <div class="st-config" id="stConfig">
         <div class="lbl">Titik Awal dan Akhir</div>
         <div class="st-fields" id="stFields">
@@ -1182,9 +750,8 @@
         </div>
         <p id="stHint" style="font-size:.68em;color:var(--text3);margin-top:6px;"></p>
     </div>
-
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="run()">▶ Jalankan Algoritma</button>
+        <button class="btn btn-primary" onclick="run()">Jalankan Algoritma</button>
         <button class="btn btn-ghost" onclick="resetAll()">Reset</button>
     </div>
 </div>
@@ -1204,7 +771,7 @@
         <button class="lo-btn" onclick="setLo('random',this)">Random</button>
         <button class="lo-btn" onclick="setLo('star',this)">Star</button>
     </div>
-    <p style="font-size:.68em;color:var(--text3);margin:6px 0 8px;">Drag node untuk atur posisi manual.</p>
+    <p style="font-size:.68em;color:var(--text3);margin:6px 0 8px;">Drag node untuk atur posisi manual. Keyboard: panah kiri/kanan untuk navigasi iterasi.</p>
 
     <div class="legend" id="legend" style="display:none;">
         <div class="legend-item"><div class="legend-dot" style="background:var(--text);"></div> Aktif / Path</div>
@@ -1221,10 +788,9 @@
             <button onclick="zO()" title="Zoom Out">-</button>
             <button onclick="zR()" title="Reset View">R</button>
         </div>
-        <div class="cv-hint">Drag node untuk atur posisi • Keyboard: ←→ navigasi iterasi</div>
+        <div class="cv-hint">Drag node untuk atur posisi</div>
     </div>
 
-    <!-- Iteration controls -->
     <div class="iter-controls" id="iterCtrl" style="display:none;">
         <div class="iter-info">
             <span>Iterasi</span>
@@ -1232,17 +798,16 @@
             <span id="iterLabel"></span>
         </div>
         <div class="iter-nav">
-            <button id="iterFirst" onclick="iterGo(0)" title="Home">⏮ Awal</button>
-            <button id="iterPrev" onclick="iterGo(curIter-1)" title="←">◀ Prev</button>
-            <button id="iterNext" class="primary-iter" onclick="iterGo(curIter+1)" title="→">Next ▶</button>
-            <button id="iterLast" onclick="iterGo(iterStates.length-1)" title="End">Akhir ⏭</button>
+            <button id="iterFirst" onclick="iterGo(0)">|&lt; Awal</button>
+            <button id="iterPrev" onclick="iterGo(curIter-1)">&lt; Prev</button>
+            <button id="iterNext" class="primary-iter" onclick="iterGo(curIter+1)">Next &gt;</button>
+            <button id="iterLast" onclick="iterGo(iterStates.length-1)">Akhir &gt;|</button>
         </div>
     </div>
 
-    <!-- Playback controls -->
     <div class="playback-row" id="playbackRow" style="display:none;">
         <button class="play-btn" id="playBtn" onclick="togglePlayback()">
-            <span id="playIcon">▶</span> <span id="playText">Auto Play</span>
+            <span id="playIcon">&gt;</span> <span id="playText">Auto Play</span>
         </button>
         <select class="speed-select" id="speedSelect" onchange="playSpeed=parseInt(this.value)">
             <option value="2000">0.5x Slow</option>
@@ -1276,21 +841,18 @@
         <div class="tabs">
             <button class="tab-btn on" onclick="sTab('steps',this)">Step-by-Step</button>
             <button class="tab-btn" onclick="sTab('table',this)">Tabel Iterasi</button>
-            <button class="tab-btn" onclick="sTab('detail',this)">📋 Detail Iterasi</button>
+            <button class="tab-btn" onclick="sTab('detail',this)">Detail Iterasi</button>
             <button class="tab-btn" onclick="sTab('ai',this)">Analisis</button>
         </div>
         <div class="tp on" id="tp-steps"><div class="tl" id="tline"></div></div>
         <div class="tp" id="tp-table"><div class="rt-wrap" id="rTbl"></div></div>
-        <div class="tp" id="tp-detail">
-            <div class="all-iter-section" id="allIterSection"></div>
-        </div>
+        <div class="tp" id="tp-detail"><div class="all-iter-section" id="allIterSection"></div></div>
         <div class="tp" id="tp-ai"><div class="ai-box" id="aiB"></div></div>
     </div>
 </div>
 </div>
 
 <script>
-// ======================== STATE ========================
 let M=null,N=5,gT='undirected',lb=[],pos=[],res=null,sc=1,di=-1,dOff={x:0,y:0},cLo='circle';
 let curIter=0,iterStates=[];
 let playInterval=null,playSpeed=1200;
@@ -1303,7 +865,6 @@ window.addEventListener('load',()=>{
 });
 window.addEventListener('resize',()=>drawCurrent());
 
-// ======================== KEYBOARD ========================
 document.addEventListener('keydown',e=>{
     if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
     if(e.key==='ArrowRight'){e.preventDefault();if(iterStates.length)iterGo(curIter+1);}
@@ -1312,29 +873,23 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='End'){e.preventDefault();if(iterStates.length)iterGo(iterStates.length-1);}
     else if(e.key===' '){e.preventDefault();if(iterStates.length>1)togglePlayback();}
     else if(e.key==='?'||e.key==='/'){e.preventDefault();showShortcuts();}
-    else if(e.key==='d'||e.key==='D'){if(!e.ctrlKey&&!e.metaKey)toggleDark();}
+    else if((e.key==='d'||e.key==='D')&&!e.ctrlKey&&!e.metaKey){toggleDark();}
     else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run();}
     else if(e.key==='p'&&(e.ctrlKey||e.metaKey)){e.preventDefault();printPDF();}
 });
 
-// ======================== DARK MODE ========================
 function toggleDark(){
     isDark=!isDark;
     document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
-    document.getElementById('darkIcon').textContent=isDark?'☀️':'🌙';
-    document.getElementById('darkBtn').querySelector('span:last-child').textContent=isDark?'Light':'Dark';
+    document.getElementById('darkIcon').textContent=isDark?'Light':'Dark';
     localStorage.setItem('gv-dark',isDark?'1':'0');
     drawCurrent();
 }
 
-// ======================== TOAST ========================
 function toast(m,t='info'){const e=document.getElementById('toast');e.textContent=m;e.className='toast show toast-'+(t==='success'?'ok':t==='error'?'err':'info');setTimeout(()=>e.classList.remove('show'),2500);}
-
-// ======================== MODALS ========================
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 function showShortcuts(){document.getElementById('shortcutsPanel').classList.toggle('show');}
 
-// ======================== METHOD ========================
 function pickM(m,el){
     M=m;document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');
     const cfg=document.getElementById('stConfig'),fields=document.getElementById('stFields'),tgtF=document.getElementById('tgtField'),tgtTR=document.getElementById('tgtToggleRow'),hint=document.getElementById('stHint'),tgtCb=document.getElementById('tgtToggle');
@@ -1346,14 +901,12 @@ function pickM(m,el){
 }
 function toggleTarget(){const cb=document.getElementById('tgtToggle'),tf=document.getElementById('tgtField');cb.checked?tf.classList.remove('disabled'):tf.classList.add('disabled');}
 
-// ======================== LABELS ========================
 function gLb(){lb=[];for(let i=0;i<N;i++)lb.push(String.fromCharCode(65+i));document.getElementById('inpL').value=lb.join(',');fillSel();}
 function parseL(){const v=document.getElementById('inpL').value.split(',').map(s=>s.trim()).filter(Boolean);if(v.length>=N)lb=v.slice(0,N);else{lb=v;while(lb.length<N)lb.push(String.fromCharCode(65+lb.length));}rebuildMtx();fillSel();draw();}
 function L(i){return lb[i]||String.fromCharCode(65+i);}
 function chgN(){N=Math.max(2,Math.min(12,parseInt(document.getElementById('inpN').value)||5));document.getElementById('inpN').value=N;gLb();rebuildMtx();compLo(cLo);draw();}
 function fillSel(){['sSrc','sTgt'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const p=s.value;s.innerHTML='';for(let i=0;i<N;i++){const o=document.createElement('option');o.value=i;o.textContent=L(i);s.appendChild(o);}if(p&&parseInt(p)<N)s.value=p;});const t=document.getElementById('sTgt');if(t&&t.options.length>1)t.value=N-1;}
 
-// ======================== MATRIX ========================
 function rebuildMtx(){const w=document.getElementById('mw');let h='<table class="mtx"><thead><tr><th class="corner"></th>';
 for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
 for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){if(i===j){h+='<td class="diag">0</td>';}else{const id='m_'+i+'_'+j;h+='<td><input id="'+id+'" type="number" placeholder="-" step="any"'+(gT==='undirected'?' oninput="mir('+i+','+j+')"':'')+' onchange="mChg()"></td>';}}h+='</tr>';}
@@ -1368,7 +921,6 @@ function rAllDir(){const e=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)
 function clrMtx(){for(let i=0;i<N;i++)for(let j=0;j<N;j++)sV(i,j,null);mChg();draw();toast('Matrix cleared');}
 function rndMtx(){clrMtx();const d=gT==='undirected'?.5:.4;for(let i=0;i<N;i++)for(let j=(gT==='undirected'?i+1:0);j<N;j++){if(i===j)continue;if(Math.random()<d){const w=Math.floor(Math.random()*20)+1;sV(i,j,w);if(gT==='undirected')sV(j,i,w);}}mChg();draw();toast('Random matrix generated','success');}
 
-// ======================== PRESETS ========================
 function loadP(name){let d;
 if(name==='simple'){N=5;gT='undirected';lb=['A','B','C','D','E'];d=[[null,4,2,null,null],[4,null,1,5,null],[2,1,null,8,10],[null,5,8,null,2],[null,null,10,2,null]];}
 else if(name==='city'){N=6;gT='undirected';lb=['JKT','BDG','SMG','SBY','YGY','MLG'];d=[[null,150,450,800,null,null],[150,null,300,null,400,null],[450,300,null,350,100,null],[800,null,350,null,325,90],[null,400,100,325,null,400],[null,null,null,90,400,null]];}
@@ -1377,7 +929,6 @@ else if(name==='negative'){N=5;gT='directed';lb=['A','B','C','D','E'];d=[[null,6
 document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
 rebuildMtx();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d[i][j]);}mChg();fillSel();compLo(cLo);draw();toast('Preset "'+name+'" loaded','success');}
 
-// ======================== LAYOUT ========================
 function setLo(t,btn){document.querySelectorAll('.lo-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');cLo=t;compLo(t);drawCurrent();}
 function compLo(t){const cv=document.getElementById('cv');const W=cv.parentElement.clientWidth||800;const H=460;const cx=W/2,cy=H/2,r=Math.min(W,H)*.34;pos=[];
 if(t==='circle'){for(let i=0;i<N;i++){const a=2*Math.PI*i/N-Math.PI/2;pos.push({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});}}
@@ -1394,7 +945,6 @@ for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){let dx=pos[i].x-pos[j].x,dy=pos[i].y-
 edges.forEach(e=>{let dx=pos[e.to].x-pos[e.from].x,dy=pos[e.to].y-pos[e.from].y,d=Math.sqrt(dx*dx+dy*dy)||1,ff=.005*d;f[e.from].x+=dx/d*ff;f[e.from].y+=dy/d*ff;f[e.to].x-=dx/d*ff;f[e.to].y-=dy/d*ff;});
 for(let i=0;i<N;i++){f[i].x+=(W/2-pos[i].x)*.002;f[i].y+=(H/2-pos[i].y)*.002;vel[i].x=(vel[i].x+f[i].x)*.9*tmp;vel[i].y=(vel[i].y+f[i].y)*.9*tmp;pos[i].x=Math.max(pad,Math.min(W-pad,pos[i].x+vel[i].x));pos[i].y=Math.max(pad,Math.min(H-pad,pos[i].y+vel[i].y));}}}
 
-// ======================== DRAG ========================
 function setupDrag(){const cv=document.getElementById('cv');function xy(e){const r=cv.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX,cy=e.touches?e.touches[0].clientY:e.clientY;return{x:(cx-r.left)/sc,y:(cy-r.top)/sc};}
 function dn(e){const p=xy(e);for(let i=N-1;i>=0;i--){const dx=p.x-pos[i].x,dy=p.y-pos[i].y;if(dx*dx+dy*dy<600){di=i;dOff={x:dx,y:dy};e.preventDefault();return;}}}
 function mv(e){if(di<0)return;const p=xy(e);pos[di].x=p.x-dOff.x;pos[di].y=p.y-dOff.y;drawCurrent();e.preventDefault();}
@@ -1406,7 +956,6 @@ function zI(){sc=Math.min(2,sc+.15);drawCurrent();}
 function zO(){sc=Math.max(.5,sc-.15);drawCurrent();}
 function zR(){sc=1;compLo(cLo);drawCurrent();}
 
-// ======================== DRAW ========================
 function drawCurrent(){
     if(iterStates.length>0&&curIter>=0&&curIter<iterStates.length){
         const st=iterStates[curIter];
@@ -1418,18 +967,17 @@ function draw(hlE=[],hlN=[],pE=[],bloomE=[],bloomN=[],nodeLabels={},visitedN=[],
 const cv=document.getElementById('cv'),W=cv.parentElement.clientWidth,H=460;
 const dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+'px';
 const c=cv.getContext('2d');c.scale(dpr*sc,dpr*sc);const sW=W/sc,sH=H/sc;
-
-const bgColor=getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim()||'#fafafa';
-const dotColor=getComputedStyle(document.documentElement).getPropertyValue('--canvas-dot').trim()||'#e0e0e0';
-const nFill=getComputedStyle(document.documentElement).getPropertyValue('--node-fill').trim()||'#ffffff';
-const nStroke=getComputedStyle(document.documentElement).getPropertyValue('--node-stroke').trim()||'#d0d0d0';
-const eColor=getComputedStyle(document.documentElement).getPropertyValue('--edge-color').trim()||'#d0d0d0';
-const textColor=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#1a1a1a';
-const cardColor=getComputedStyle(document.documentElement).getPropertyValue('--card').trim()||'#ffffff';
+const cs=getComputedStyle(document.documentElement);
+const bgColor=cs.getPropertyValue('--canvas-bg').trim()||'#fafafa';
+const dotColor=cs.getPropertyValue('--canvas-dot').trim()||'#e0e0e0';
+const nFill=cs.getPropertyValue('--node-fill').trim()||'#ffffff';
+const nStroke=cs.getPropertyValue('--node-stroke').trim()||'#d0d0d0';
+const eColor=cs.getPropertyValue('--edge-color').trim()||'#d0d0d0';
+const textColor=cs.getPropertyValue('--text').trim()||'#1a1a1a';
+const cardColor=cs.getPropertyValue('--card').trim()||'#ffffff';
 
 c.fillStyle=bgColor;c.fillRect(0,0,sW,sH);
 c.fillStyle=dotColor;for(let x=0;x<sW;x+=24)for(let y=0;y<sH;y+=24){c.beginPath();c.arc(x,y,.5,0,6.28);c.fill();}
-
 if(!N||pos.length<N)return;
 const edges=rAllDir();const drawn=new Set();
 
@@ -1487,7 +1035,7 @@ c.fillText(L(i),p.x,p.y);
 const lbl=nodeLabels[i];
 if(lbl!==undefined){
     c.font='600 8px "JetBrains Mono",monospace';
-    const lblTxt=''+(lbl===Infinity?'∞':lbl);const lw=c.measureText(lblTxt).width+6;const ly=p.y+nr+10;
+    const lblTxt=''+(lbl===Infinity?'Inf':lbl);const lw=c.measureText(lblTxt).width+6;const ly=p.y+nr+10;
     c.fillStyle=isPerm?textColor:bgColor;c.strokeStyle=isPerm?textColor:(isDark?'#555':'#aaa');c.lineWidth=1;
     c.beginPath();const bx=p.x-lw/2,by=ly-6;
     if(c.roundRect)c.roundRect(bx,by,lw,12,2);else c.rect(bx,by,lw,12);
@@ -1504,70 +1052,69 @@ c.textAlign='right';c.textBaseline='bottom';c.fillText('RAD STRIX',sW-8,sH-6);
 
 function adjL(){const a=Array.from({length:N},()=>[]);for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;const v=gV(i,j);if(v!==Infinity)a[i].push({to:j,w:v});}return a;}
 
-// ======================== ALGORITHMS ========================
+// ===================== ALGORITHMS =====================
 
 function algD(src,tgt){
     const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),vis=Array(N).fill(false),al=adjL(),steps=[],states=[];
     dist[src]=0;
-    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0, sisanya ∞',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'INIT'});
-    states.push(makeState_D(dist,vis,prev,src,tgt,[],[],'Inisialisasi: dist['+L(src)+']=0'));
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0, sisanya Inf',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
+    states.push(mkSD(dist,vis,prev,src,tgt,[],[],'Inisialisasi: dist['+L(src)+']=0'));
 
     for(let it=0;it<N;it++){
         let u=-1;for(let i=0;i<N;i++)if(!vis[i]&&(u<0||dist[i]<dist[u]))u=i;
         if(u<0||dist[u]===Infinity)break;vis[u]=true;
-        const changes=['Node '+L(u)+' dipilih (jarak='+dist[u]+'), Sementara → Permanen'];
+        const ch=['Node '+L(u)+' dipilih (jarak='+dist[u]+'), Sementara -> Permanen'];
         steps.push({t:'Iterasi '+(it+1)+': Visit '+L(u),d:'Node '+L(u)+' permanen, jarak = '+dist[u],c:'Pilih '+L(u)+' (jarak min dari sementara)',a:'VISIT '+L(u)});
         al[u].forEach(({to:v,w})=>{if(!vis[v]&&dist[u]+w<dist[v]){const old=dist[v];dist[v]=dist[u]+w;prev[v]=u;
-        changes.push('dist['+L(v)+']: '+(old===Infinity?'∞':old)+' → '+dist[v]+' (via '+L(u)+', '+dist[u]+'+'+w+')');
-        steps.push({t:'  Relax '+L(u)+' → '+L(v),d:'dist['+L(v)+'] = min('+(old===Infinity?'∞':old)+', '+dist[u]+'+'+w+') = '+dist[v],c:'prev['+L(v)+']='+L(u),a:'RELAX'});}});
-        const permSF=[];for(let i=0;i<N;i++)if(vis[i])permSF.push(i);
-        states.push(makeState_D(dist,vis,prev,src,tgt,changes,permSF,'Iterasi '+(it+1)+': '+L(u)+' permanen'));
-        steps.push({t:'  Status',d:'Dist: ['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',c:'Permanen: ['+permSF.map(L).join(',')+']',a:'STATUS'});
+        ch.push('dist['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[v]+' (via '+L(u)+', '+dist[u]+'+'+w+')');
+        steps.push({t:'  Relax '+L(u)+' -> '+L(v),d:'dist['+L(v)+'] = min('+(old===Infinity?'Inf':old)+', '+dist[u]+'+'+w+') = '+dist[v],c:'prev['+L(v)+']='+L(u),a:'RELAX'});}});
+        const pSF=[];for(let i=0;i<N;i++)if(vis[i])pSF.push(i);
+        states.push(mkSD(dist,vis,prev,src,tgt,ch,pSF,'Iterasi '+(it+1)+': '+L(u)+' permanen'));
+        steps.push({t:'  Status',d:'Dist: ['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',c:'Permanen: ['+pSF.map(L).join(',')+']',a:'STATUS'});
     }
     const path=[];let cur=tgt;
     if(tgt>=0){while(cur>=0){path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
     const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
     const fc=['Algoritma selesai.'];
-    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' → ')+' (jarak: '+dist[tgt]+')');
+    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
     else if(tgt>=0)fc.push('Tidak ada path ke '+L(tgt));
     const fSt={hlEdges:[],hlNodes:path.length?path:[],pathEdges:[],bloomEdges:pe,bloomNodes:path.length?path:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir',connectedNodes:[...new Set(path)],unconnectedNodes:[],selectedEdges:pe};
     for(let i=0;i<N;i++){fSt.labels[i]=dist[i];fSt.tempLabels[i]=vis[i]?'P':'T';}
     states.push(fSt);
-    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' → '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'∞':dist[tgt]):'N/A'),c:'Final dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'RESULT',f:true});
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE')+' | Jarak: '+((tgt>=0)?(dist[tgt]===Infinity?'Inf':dist[tgt]):'N/A'),c:'Final dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'RESULT',f:true});
     return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Dijkstra'};
 }
 
-function makeState_D(dist,vis,prev,src,tgt,changes,permNodes,title){
+function mkSD(dist,vis,prev,src,tgt,changes,permNodes,title){
     const st={hlEdges:[],hlNodes:[...permNodes],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[...permNodes],tempLabels:{},changes:[...changes],title,connectedNodes:[...permNodes],unconnectedNodes:[],selectedEdges:[]};
     for(let i=0;i<N;i++){st.labels[i]=dist[i];if(vis[i])st.tempLabels[i]='P';else if(dist[i]<Infinity)st.tempLabels[i]='T';}
-    const unconn=[];for(let i=0;i<N;i++)if(!permNodes.includes(i))unconn.push(i);
-    st.unconnectedNodes=unconn;
-    const partE=[];for(let i=0;i<N;i++)if(prev[i]>=0&&vis[i])partE.push({from:prev[i],to:i});
-    st.hlEdges=partE;st.selectedEdges=partE;
+    const unc=[];for(let i=0;i<N;i++)if(!permNodes.includes(i))unc.push(i);
+    st.unconnectedNodes=unc;
+    const pE=[];for(let i=0;i<N;i++)if(prev[i]>=0&&vis[i])pE.push({from:prev[i],to:i});
+    st.hlEdges=pE;st.selectedEdges=pE;
     return st;
 }
 
 function algBF(src,tgt){
     const dist=Array(N).fill(Infinity),prev=Array(N).fill(-1),steps=[],states=[];
     const edges=rAllDir();dist[src]=0;
-    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0 | '+edges.length+' edges',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'INIT'});
+    steps.push({t:'Inisialisasi',d:'dist['+L(src)+']=0 | '+edges.length+' edges',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'INIT'});
     states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:['Inisialisasi: dist['+L(src)+']=0'],title:'Inisialisasi',connectedNodes:[src],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==src),selectedEdges:[]});
-
     let neg=false;
     for(let it=1;it<N;it++){
-        let upd=false;const changes=['Iterasi '+it+': relax semua '+edges.length+' edges'];
+        let upd=false;const ch=['Iterasi '+it+': relax semua '+edges.length+' edges'];
         steps.push({t:'Iterasi '+it+'/'+(N-1),d:'Relax semua edges',c:'',a:'ITER '+it});
         const relaxed=[];
         edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to]){const old=dist[e.to];dist[e.to]=dist[e.from]+e.weight;prev[e.to]=e.from;upd=true;
-        changes.push('dist['+L(e.to)+']: '+(old===Infinity?'∞':old)+' → '+dist[e.to]+' via '+L(e.from));
+        ch.push('dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to]+' via '+L(e.from));
         relaxed.push({from:e.from,to:e.to});
-        steps.push({t:'  Relax '+L(e.from)+' → '+L(e.to)+' (w='+e.weight+')',d:'dist['+L(e.to)+']: '+(old===Infinity?'∞':old)+' → '+dist[e.to],c:'via '+L(e.from),a:'RELAX'});}});
-        if(!upd)changes.push('Tidak ada perubahan.');
-        const activeN=[];for(let i=0;i<N;i++)if(dist[i]<Infinity)activeN.push(i);
-        const buildE=[];for(let i=0;i<N;i++)if(prev[i]>=0)buildE.push({from:prev[i],to:i});
-        const unconn=[];for(let i=0;i<N;i++)if(dist[i]===Infinity)unconn.push(i);
-        states.push({hlEdges:buildE,hlNodes:activeN,pathEdges:[],bloomEdges:relaxed,bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Iterasi '+it,connectedNodes:activeN,unconnectedNodes:unconn,selectedEdges:buildE});
-        steps.push({t:'  Status',d:upd?'Ada update':'Tidak ada update',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'∞':d)).join(', ')+']',a:'STATUS'});
+        steps.push({t:'  Relax '+L(e.from)+' -> '+L(e.to)+' (w='+e.weight+')',d:'dist['+L(e.to)+']: '+(old===Infinity?'Inf':old)+' -> '+dist[e.to],c:'via '+L(e.from),a:'RELAX'});}});
+        if(!upd)ch.push('Tidak ada perubahan.');
+        const actN=[];for(let i=0;i<N;i++)if(dist[i]<Infinity)actN.push(i);
+        const bE=[];for(let i=0;i<N;i++)if(prev[i]>=0)bE.push({from:prev[i],to:i});
+        const unc=[];for(let i=0;i<N;i++)if(dist[i]===Infinity)unc.push(i);
+        states.push({hlEdges:bE,hlNodes:actN,pathEdges:[],bloomEdges:relaxed,bloomNodes:[],labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:ch,title:'Iterasi '+it,connectedNodes:actN,unconnectedNodes:unc,selectedEdges:bE});
+        steps.push({t:'  Status',d:upd?'Ada update':'Tidak ada update',c:'dist=['+dist.map((d,i)=>L(i)+':'+(d===Infinity?'Inf':d)).join(', ')+']',a:'STATUS'});
         if(!upd){steps.push({t:'Early Stop',d:'Konvergen di iterasi '+it,c:'',a:'STOP'});break;}
     }
     edges.forEach(e=>{if(dist[e.from]!==Infinity&&dist[e.from]+e.weight<dist[e.to])neg=true;});
@@ -1575,10 +1122,10 @@ function algBF(src,tgt){
     const path=[];let cur=tgt;const vs=new Set();
     if(tgt>=0){while(cur>=0&&!vs.has(cur)){vs.add(cur);path.unshift(cur);cur=prev[cur];}if(path[0]!==src)path.length=0;}
     const pe=[];for(let i=0;i<path.length-1;i++)pe.push({from:path[i],to:path[i+1]});
-    const fc=['Algoritma selesai.'];if(neg)fc.push('⚠ Negative cycle terdeteksi.');
-    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' → ')+' (jarak: '+dist[tgt]+')');
+    const fc=['Algoritma selesai.'];if(neg)fc.push('PERINGATAN: Negative cycle terdeteksi.');
+    if(tgt>=0&&path.length)fc.push('Path: '+path.map(L).join(' -> ')+' (jarak: '+dist[tgt]+')');
     states.push({hlEdges:[],hlNodes:path,pathEdges:[],bloomEdges:pe,bloomNodes:path,labels:Object.fromEntries(dist.map((d,i)=>[i,d])),visitedNodes:[],permNodes:[],tempLabels:{},changes:fc,title:'Hasil Akhir',connectedNodes:[...new Set(path)],unconnectedNodes:[],selectedEdges:pe});
-    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' → '):'NONE'),c:'',a:'RESULT',f:true});
+    steps.push({t:'Hasil',d:'Path: '+(path.length?path.map(L).join(' -> '):'NONE'),c:'',a:'RESULT',f:true});
     return{dist,prev,path,pe,steps,states,src,tgt,type:'sp',method:'Bellman-Ford',neg};
 }
 
@@ -1586,26 +1133,24 @@ function algFW(){
     const d=[];for(let i=0;i<N;i++){d[i]=[];for(let j=0;j<N;j++)d[i][j]=gV(i,j);}
     const nxt=Array.from({length:N},(_,i)=>Array.from({length:N},(_,j)=>d[i][j]!==Infinity&&i!==j?j:-1));
     const steps=[],states=[];
-    steps.push({t:'Inisialisasi D⁰',d:'Matrix awal '+N+'×'+N,c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'INIT'});
-    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Matrix jarak awal dari adjacency matrix'],title:'D⁰ - Matrix Awal',connectedNodes:[],unconnectedNodes:Array.from({length:N},(_,i)=>i),selectedEdges:[]});
-
+    steps.push({t:'Inisialisasi D0',d:'Matrix awal '+N+'x'+N,c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'INIT'});
+    states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Matrix jarak awal dari adjacency matrix'],title:'D0 - Matrix Awal',connectedNodes:[],unconnectedNodes:Array.from({length:N},(_,i)=>i),selectedEdges:[]});
     for(let k=0;k<N;k++){
-        let u=[];const changes=['Intermediate k='+L(k)];const updatedPairs=[];
+        let u=[];const ch=['Intermediate k='+L(k)];const uPairs=[];
         for(let i=0;i<N;i++)for(let j=0;j<N;j++){
             if(d[i][k]!==Infinity&&d[k][j]!==Infinity&&d[i][k]+d[k][j]<d[i][j]){
-                u.push('d('+L(i)+','+L(j)+'): '+(d[i][j]===Infinity?'∞':d[i][j])+' → '+(d[i][k]+d[k][j]));
-                d[i][j]=d[i][k]+d[k][j];nxt[i][j]=nxt[i][k];
-                updatedPairs.push({from:i,to:j});
+                u.push('d('+L(i)+','+L(j)+'): '+(d[i][j]===Infinity?'Inf':d[i][j])+' -> '+(d[i][k]+d[k][j]));
+                d[i][j]=d[i][k]+d[k][j];nxt[i][j]=nxt[i][k];uPairs.push({from:i,to:j});
             }
         }
-        if(u.length)changes.push(u.length+' jarak diperbarui');
-        u.forEach(x=>changes.push(x));
-        if(!u.length)changes.push('Tidak ada perubahan.');
-        states.push({hlEdges:[],hlNodes:[k],pathEdges:[],bloomEdges:updatedPairs,bloomNodes:[k],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'D'+(k+1)+' via '+L(k),connectedNodes:[k],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==k),selectedEdges:updatedPairs});
-        steps.push({t:'k='+k+' ('+L(k)+')',d:'Via '+L(k)+': '+u.length+' updates',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'K='+k});
+        if(u.length)ch.push(u.length+' jarak diperbarui');
+        u.forEach(x=>ch.push(x));
+        if(!u.length)ch.push('Tidak ada perubahan.');
+        states.push({hlEdges:[],hlNodes:[k],pathEdges:[],bloomEdges:uPairs,bloomNodes:[k],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:ch,title:'D'+(k+1)+' via '+L(k),connectedNodes:[k],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==k),selectedEdges:uPairs});
+        steps.push({t:'k='+k+' ('+L(k)+')',d:'Via '+L(k)+': '+u.length+' updates',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'K='+k});
     }
     states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['All-pairs shortest path selesai.'],title:'Hasil Akhir',connectedNodes:Array.from({length:N},(_,i)=>i),unconnectedNodes:[],selectedEdges:[]});
-    steps.push({t:'Hasil All-Pairs',d:'Matrix jarak terpendek lengkap',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'∞':v).join(',')+']').join('\n'),a:'RESULT',f:true});
+    steps.push({t:'Hasil All-Pairs',d:'Matrix jarak terpendek lengkap',c:d.map((r,i)=>L(i)+': ['+r.map(v=>v===Infinity?'Inf':v).join(',')+']').join('\n'),a:'RESULT',f:true});
     return{dist:d,nxt,steps,states,type:'ap',method:'Floyd-Warshall'};
 }
 
@@ -1617,18 +1162,17 @@ function algK(){
     function union(a,b){const pa=find(a),pb=find(b);if(pa===pb)return false;if(rnk[pa]<rnk[pb])par[pa]=pb;else if(rnk[pa]>rnk[pb])par[pb]=pa;else{par[pb]=pa;rnk[pa]++;}return true;}
     steps.push({t:'Inisialisasi',d:edges.length+' edges diurutkan',c:edges.map((e,i)=>(i+1)+'. '+L(e.from)+'-'+L(e.to)+': '+e.weight).join('\n'),a:'INIT'});
     states.push({hlEdges:[],hlNodes:[],pathEdges:[],bloomEdges:[],bloomNodes:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['Edges sorted: '+edges.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', ')],title:'Inisialisasi',connectedNodes:[],unconnectedNodes:Array.from({length:N},(_,i)=>i),selectedEdges:[]});
-
     edges.forEach((e,idx)=>{
-        const rf=find(e.from),rt=find(e.to);const changes=[];
+        const rf=find(e.from),rt=find(e.to);const ch=[];
         if(rf!==rt){union(e.from,e.to);mst.push(e);tw+=e.weight;
-        changes.push('✓ Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITERIMA');
-        changes.push('Komponen digabung, MST: '+mst.length+'/'+(N-1)+', total='+tw);
-        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ✓',d:'Komponen berbeda. MST: '+mst.length+'/'+(N-1),c:'Total: '+tw,a:'ACCEPT'});}
-        else{changes.push('✗ Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') DITOLAK (cycle)');
-        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ✗',d:'Same component, skip',c:'',a:'REJECT'});}
+        ch.push('[ACCEPTED] Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+')');
+        ch.push('Komponen digabung, MST: '+mst.length+'/'+(N-1)+', total='+tw);
+        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') ACCEPTED',d:'Komponen berbeda. MST: '+mst.length+'/'+(N-1),c:'Total: '+tw,a:'ACCEPT'});}
+        else{ch.push('[REJECTED] Edge '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') - cycle');
+        steps.push({t:'#'+(idx+1)+': '+L(e.from)+'-'+L(e.to)+' ('+e.weight+') REJECTED',d:'Same component, skip',c:'',a:'REJECT'});}
         const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});
-        const unconn=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
-        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:rf!==rt?[e]:[],bloomNodes:rf!==rt?[e.from,e.to]:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes,title:'Edge #'+(idx+1),connectedNodes:[...mstN],unconnectedNodes:unconn,selectedEdges:[...mst]});
+        const unc=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
+        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:rf!==rt?[e]:[],bloomNodes:rf!==rt?[e.from,e.to]:[],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:ch,title:'Edge #'+(idx+1),connectedNodes:[...mstN],unconnectedNodes:unc,selectedEdges:[...mst]});
     });
     const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});
     states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total='+tw],title:'Hasil Akhir',connectedNodes:[...mstN],unconnectedNodes:[],selectedEdges:[...mst]});
@@ -1639,22 +1183,21 @@ function algK(){
 function algP(src){
     const al=adjL(),inM=Array(N).fill(false),key=Array(N).fill(Infinity),par=Array(N).fill(-1);
     const mst=[],steps=[],states=[];let tw=0;key[src]=0;
-    steps.push({t:'Inisialisasi',d:'Start: '+L(src),c:'key=['+key.map((k,i)=>L(i)+':'+(k===Infinity?'∞':k)).join(', ')+']',a:'INIT'});
+    steps.push({t:'Inisialisasi',d:'Start: '+L(src),c:'key=['+key.map((k,i)=>L(i)+':'+(k===Infinity?'Inf':k)).join(', ')+']',a:'INIT'});
     states.push({hlEdges:[],hlNodes:[src],pathEdges:[],bloomEdges:[],bloomNodes:[src],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[],tempLabels:{[src]:'T'},changes:['Mulai dari '+L(src)+', key=0'],title:'Inisialisasi',connectedNodes:[src],unconnectedNodes:Array.from({length:N},(_,i)=>i).filter(i=>i!==src),selectedEdges:[]});
-
     for(let it=0;it<N;it++){
         let u=-1;for(let i=0;i<N;i++)if(!inM[i]&&(u<0||key[i]<key[u]))u=i;
         if(u<0||key[u]===Infinity)break;inM[u]=true;
-        const changes=['Node '+L(u)+' ditambahkan ke MST (key='+key[u]+')'];
-        if(par[u]>=0){mst.push({from:par[u],to:u,weight:key[u]});tw+=key[u];changes.push('Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+'), total='+tw);}
+        const ch=['Node '+L(u)+' ditambahkan ke MST (key='+key[u]+')'];
+        if(par[u]>=0){mst.push({from:par[u],to:u,weight:key[u]});tw+=key[u];ch.push('Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+'), total='+tw);}
         steps.push({t:'Tambah '+L(u),d:par[u]>=0?'Edge '+L(par[u])+'-'+L(u)+' ('+key[u]+')':'Node awal',c:'MST weight: '+tw,a:'ADD '+L(u)});
         al[u].forEach(({to:v,w})=>{if(!inM[v]&&w<key[v]){const old=key[v];key[v]=w;par[v]=u;
-        changes.push('key['+L(v)+']: '+(old===Infinity?'∞':old)+' → '+w+' via '+L(u));
-        steps.push({t:'  Update key['+L(v)+']',d:(old===Infinity?'∞':old)+' → '+w+' via '+L(u),c:'',a:'KEY'});}});
+        ch.push('key['+L(v)+']: '+(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u));
+        steps.push({t:'  Update key['+L(v)+']',d:(old===Infinity?'Inf':old)+' -> '+w+' via '+L(u),c:'',a:'KEY'});}});
         const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
         const tl={};for(let i=0;i<N;i++){if(inM[i])tl[i]='P';else if(key[i]<Infinity)tl[i]='T';}
-        const unconn=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
-        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:par[u]>=0?[{from:par[u],to:u}]:[],bloomNodes:[u],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[...mstN],tempLabels:tl,changes,title:'Tambah '+L(u),connectedNodes:[...mstN],unconnectedNodes:unconn,selectedEdges:[...mst]});
+        const unc=Array.from({length:N},(_,i)=>i).filter(i=>!mstN.has(i));
+        states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:par[u]>=0?[{from:par[u],to:u}]:[],bloomNodes:[u],labels:Object.fromEntries(key.map((k,i)=>[i,k])),visitedNodes:[],permNodes:[...mstN],tempLabels:tl,changes:ch,title:'Tambah '+L(u),connectedNodes:[...mstN],unconnectedNodes:unc,selectedEdges:[...mst]});
     }
     const mstN=new Set();mst.forEach(m=>{mstN.add(m.from);mstN.add(m.to);});mstN.add(src);
     states.push({hlEdges:[...mst],hlNodes:[...mstN],pathEdges:[],bloomEdges:[...mst],bloomNodes:[...mstN],labels:{},visitedNodes:[],permNodes:[],tempLabels:{},changes:['MST selesai: '+mst.length+' edges, total='+tw],title:'Hasil Akhir',connectedNodes:[...mstN],unconnectedNodes:[],selectedEdges:[...mst]});
@@ -1662,7 +1205,7 @@ function algP(src){
     return{mst,tw,steps,states,src,type:'mst',method:'Prim'};
 }
 
-// ======================== RUN ========================
+// ===================== RUN =====================
 function run(){
     if(!M){toast('Pilih algoritma dulu','error');return;}
     if(!rEdges().length){toast('Isi matrix dulu','error');return;}
@@ -1670,15 +1213,14 @@ function run(){
     document.getElementById('ov').classList.add('show');
     document.getElementById('ovText').textContent='Menganalisis graph...';
     document.getElementById('pdfProgress').classList.remove('show');
-
     setTimeout(()=>{
         try{
-            let r;const tgtEnabled=document.getElementById('tgtToggle')&&document.getElementById('tgtToggle').checked;
+            let r;const tgtE=document.getElementById('tgtToggle')&&document.getElementById('tgtToggle').checked;
             switch(M){
-            case'dijkstra':{const s=+document.getElementById('sSrc').value,t=tgtEnabled?+document.getElementById('sTgt').value:-1;
+            case'dijkstra':{const s=+document.getElementById('sSrc').value,t=tgtE?+document.getElementById('sTgt').value:-1;
                 if(rEdges().some(e=>e.weight<0)){toast('Dijkstra: no negative weights','error');document.getElementById('ov').classList.remove('show');return;}
                 r=algD(s,t);break;}
-            case'bellman-ford':{const s=+document.getElementById('sSrc').value,t=tgtEnabled?+document.getElementById('sTgt').value:-1;r=algBF(s,t);break;}
+            case'bellman-ford':{const s=+document.getElementById('sSrc').value,t=tgtE?+document.getElementById('sTgt').value:-1;r=algBF(s,t);break;}
             case'floyd-warshall':r=algFW();break;
             case'kruskal':{if(gT==='directed'){toast('Kruskal: undirected only','error');document.getElementById('ov').classList.remove('show');return;}r=algK();break;}
             case'prim':{if(gT==='directed'){toast('Prim: undirected only','error');document.getElementById('ov').classList.remove('show');return;}r=algP(+document.getElementById('sSrc').value||0);break;}
@@ -1686,18 +1228,17 @@ function run(){
             res=r;iterStates=r.states||[];curIter=iterStates.length-1;
             showRes(r);setupIterCtrl();drawCurrent();showIterDetail();
             document.getElementById('legend').style.display='flex';
-            toast(r.method+' selesai!','success');
+            toast(r.method+' selesai','success');
         }catch(err){console.error(err);toast('Error: '+err.message,'error');}
         document.getElementById('ov').classList.remove('show');
     },350);
 }
 
-// ======================== ITERATION ========================
+// ===================== ITERATION =====================
 function setupIterCtrl(){
-    const ctrl=document.getElementById('iterCtrl'),pb=document.getElementById('playbackRow'),dp=document.getElementById('iterDetailPanel');
-    if(iterStates.length<=1){ctrl.style.display='none';pb.style.display='none';dp.style.display='none';return;}
-    ctrl.style.display='flex';pb.style.display='flex';dp.style.display='block';
-    updateIterUI();
+    const c=document.getElementById('iterCtrl'),pb=document.getElementById('playbackRow'),dp=document.getElementById('iterDetailPanel');
+    if(iterStates.length<=1){c.style.display='none';pb.style.display='none';dp.style.display='none';return;}
+    c.style.display='flex';pb.style.display='flex';dp.style.display='block';updateIterUI();
 }
 
 function iterGo(idx){
@@ -1724,7 +1265,6 @@ function showIterChanges(){
     h+='</div>';c.innerHTML=h;
 }
 
-// ======================== ITERATION DETAIL PANEL ========================
 function showIterDetail(){
     const panel=document.getElementById('iterDetailPanel');
     const body=document.getElementById('iterDetailBody');
@@ -1733,127 +1273,97 @@ function showIterDetail(){
     if(!iterStates.length||curIter<0){panel.style.display='none';return;}
     panel.style.display='block';
     const st=iterStates[curIter];
-    title.textContent='Detail — '+st.title;
+    title.textContent='Detail -- '+st.title;
     sub.textContent='Iterasi '+(curIter+1)+' / '+iterStates.length;
-
     const conn=st.connectedNodes||[];
     const unconn=st.unconnectedNodes||[];
     const selE=st.selectedEdges||[];
 
     let h='<div class="detail-grid">';
-
-    // Connected Nodes
     h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--green);"></div>Connected Nodes ('+conn.length+')</div>';
     if(conn.length){h+='<div class="node-list">';conn.forEach(n=>{h+='<span class="node-chip chip-connected">'+L(n)+'</span>';});h+='</div>';}
     else h+='<div style="font-size:.72em;color:var(--text3);">Belum ada</div>';
     h+='</div>';
 
-    // Unconnected Nodes
     h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--red);"></div>Unconnected Nodes ('+unconn.length+')</div>';
     if(unconn.length){h+='<div class="node-list">';unconn.forEach(n=>{h+='<span class="node-chip chip-unconnected">'+L(n)+'</span>';});h+='</div>';}
     else h+='<div style="font-size:.72em;color:var(--text3);">Semua terhubung</div>';
     h+='</div>';
 
-    // Selected Edges
     h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--blue);"></div>Selected Arcs/Edges ('+selE.length+')</div>';
-    if(selE.length){h+='<div class="node-list">';selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'→':'—')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});h+='</div>';}
+    if(selE.length){h+='<div class="node-list">';selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'->':'--')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});h+='</div>';}
     else h+='<div style="font-size:.72em;color:var(--text3);">Belum ada</div>';
-    h+='</div>';
+    h+='</div></div>';
 
-    h+='</div>';
-
-    // Distance table for SP algorithms
     if(st.labels&&Object.keys(st.labels).length){
         h+='<div style="margin-top:12px;"><div class="lbl">Tabel Jarak</div>';
         h+='<table class="detail-table"><thead><tr><th>Node</th><th>Jarak</th><th>Status</th></tr></thead><tbody>';
         for(let i=0;i<N;i++){
             const d=st.labels[i];const s=st.tempLabels?st.tempLabels[i]:'';
-            h+='<tr><td>'+L(i)+'</td><td>'+(d===Infinity?'∞':d===undefined?'-':d)+'</td><td>'+(s==='P'?'<span style="color:var(--green);font-weight:700;">Permanen</span>':s==='T'?'<span style="color:var(--amber);font-weight:700;">Sementara</span>':'-')+'</td></tr>';
+            h+='<tr><td>'+L(i)+'</td><td>'+(d===Infinity?'Inf':d===undefined?'-':d)+'</td><td>'+(s==='P'?'<span style="color:var(--green);font-weight:700;">Permanen</span>':s==='T'?'<span style="color:var(--amber);font-weight:700;">Sementara</span>':'-')+'</td></tr>';
         }
         h+='</tbody></table></div>';
     }
-
     body.innerHTML=h;
 }
 
-// ======================== BUILD ALL ITERATIONS TAB ========================
 function buildAllIterations(){
     const sec=document.getElementById('allIterSection');
     if(!iterStates.length){sec.innerHTML='<p style="color:var(--text3);font-size:.8em;">Jalankan algoritma untuk melihat detail iterasi.</p>';return;}
     let h='';
     iterStates.forEach((st,idx)=>{
-        const conn=st.connectedNodes||[];
-        const unconn=st.unconnectedNodes||[];
-        const selE=st.selectedEdges||[];
+        const conn=st.connectedNodes||[];const unconn=st.unconnectedNodes||[];const selE=st.selectedEdges||[];
         const isLast=idx===iterStates.length-1;
-
         h+='<div class="all-iter-card'+(isLast?' expanded':'')+'" id="aiterCard'+idx+'">';
         h+='<div class="all-iter-head" onclick="toggleIterCard('+idx+')">';
         h+='<div style="display:flex;align-items:center;"><span class="iter-num">'+(idx+1)+'</span><span class="iter-title">'+st.title+'</span></div>';
-        h+='<span class="chevron">▼</span></div>';
+        h+='<span class="chevron">v</span></div>';
         h+='<div class="all-iter-body">';
-
         h+='<div class="detail-grid">';
         h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--green);"></div>Connected ('+conn.length+')</div><div class="node-list">';
         conn.forEach(n=>{h+='<span class="node-chip chip-connected">'+L(n)+'</span>';});
-        if(!conn.length)h+='<span style="font-size:.7em;color:var(--text3)">—</span>';
+        if(!conn.length)h+='<span style="font-size:.7em;color:var(--text3)">--</span>';
         h+='</div></div>';
-
         h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--red);"></div>Unconnected ('+unconn.length+')</div><div class="node-list">';
         unconn.forEach(n=>{h+='<span class="node-chip chip-unconnected">'+L(n)+'</span>';});
         if(!unconn.length)h+='<span style="font-size:.7em;color:var(--text3)">All connected</span>';
         h+='</div></div>';
-
         h+='<div class="detail-card"><div class="detail-card-title"><div class="dot" style="background:var(--blue);"></div>Edges ('+selE.length+')</div><div class="node-list">';
-        selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'→':'—')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});
-        if(!selE.length)h+='<span style="font-size:.7em;color:var(--text3)">—</span>';
-        h+='</div></div>';
-        h+='</div>';
-
-        // Changes
+        selE.forEach(e=>{const w=gV(e.from,e.to);h+='<span class="node-chip chip-edge">'+L(e.from)+(gT==='directed'?'->':'--')+L(e.to)+(w!==Infinity&&w!==0?' ('+w+')':'')+'</span>';});
+        if(!selE.length)h+='<span style="font-size:.7em;color:var(--text3)">--</span>';
+        h+='</div></div></div>';
         if(st.changes&&st.changes.length){
             h+='<div style="margin-top:8px;font-size:.72em;color:var(--text2);">';
             st.changes.forEach(ch=>{h+='<div style="padding:1px 0 1px 10px;position:relative;"><span style="position:absolute;left:0;top:6px;width:4px;height:4px;background:var(--text3);border-radius:50%;"></span>'+ch+'</div>';});
             h+='</div>';
         }
-
-        h+='<div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="iterGo('+idx+');sTab(\'steps\',document.querySelector(\'.tab-btn\'))">🔍 Lihat di Visualisasi</button></div>';
+        h+='<div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="iterGo('+idx+');sTab(\'steps\',document.querySelector(\'.tab-btn\'))">Lihat di Visualisasi</button></div>';
         h+='</div></div>';
     });
     sec.innerHTML=h;
 }
 
-function toggleIterCard(idx){
-    const card=document.getElementById('aiterCard'+idx);
-    card.classList.toggle('expanded');
-}
+function toggleIterCard(idx){document.getElementById('aiterCard'+idx).classList.toggle('expanded');}
 
-// ======================== PLAYBACK ========================
-function togglePlayback(){
-    if(playInterval){stopPlayback();}
-    else{startPlayback();}
-}
+// ===================== PLAYBACK =====================
+function togglePlayback(){if(playInterval)stopPlayback();else startPlayback();}
 function startPlayback(){
     if(curIter>=iterStates.length-1)curIter=0;
     const btn=document.getElementById('playBtn');
-    document.getElementById('playIcon').textContent='⏸';
+    document.getElementById('playIcon').textContent='||';
     document.getElementById('playText').textContent='Pause';
     btn.classList.add('playing');
-    playInterval=setInterval(()=>{
-        if(curIter>=iterStates.length-1){stopPlayback();return;}
-        iterGo(curIter+1);
-    },playSpeed);
+    playInterval=setInterval(()=>{if(curIter>=iterStates.length-1){stopPlayback();return;}iterGo(curIter+1);},playSpeed);
 }
 function stopPlayback(){
-    if(playInterval)clearInterval(playInterval);
-    playInterval=null;
+    if(playInterval)clearInterval(playInterval);playInterval=null;
     const btn=document.getElementById('playBtn');
-    document.getElementById('playIcon').textContent='▶';
+    document.getElementById('playIcon').textContent='>';
     document.getElementById('playText').textContent='Auto Play';
     btn.classList.remove('playing');
 }
 
-// ======================== RESULTS ========================
+// ===================== RESULTS =====================
 function showRes(r){
     document.getElementById('results').classList.add('vis');
     setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),150);
@@ -1864,10 +1374,10 @@ function bStats(r){
     const c=document.getElementById('sRow');
     let h='<div class="stat"><div class="sv">'+r.method+'</div><div class="sl">Algoritma</div></div>';
     if(r.type==='sp'){const hasTgt=r.tgt>=0;const d=hasTgt?r.dist[r.tgt]:null;
-    if(hasTgt)h+='<div class="stat"><div class="sv">'+(d===Infinity?'∞':d)+'</div><div class="sl">Jarak Terpendek</div></div>';
+    if(hasTgt)h+='<div class="stat"><div class="sv">'+(d===Infinity?'Inf':d)+'</div><div class="sl">Jarak Terpendek</div></div>';
     h+='<div class="stat"><div class="sv">'+(r.path?r.path.length:0)+'</div><div class="sl">Nodes di Path</div></div>';}
     else if(r.type==='mst'){h+='<div class="stat"><div class="sv">'+r.tw+'</div><div class="sl">Total Weight</div></div>';h+='<div class="stat"><div class="sv">'+r.mst.length+'</div><div class="sl">Edges MST</div></div>';}
-    else{h+='<div class="stat"><div class="sv">'+N+'×'+N+'</div><div class="sl">Matrix</div></div>';}
+    else{h+='<div class="stat"><div class="sv">'+N+'x'+N+'</div><div class="sl">Matrix</div></div>';}
     h+='<div class="stat"><div class="sv">'+r.steps.length+'</div><div class="sl">Steps</div></div>';
     h+='<div class="stat"><div class="sv">'+iterStates.length+'</div><div class="sl">Iterasi</div></div>';
     c.innerHTML=h;
@@ -1875,10 +1385,10 @@ function bStats(r){
 
 function bPath(r){
     const c=document.getElementById('pDisp');
-    if(r.type==='sp'&&r.path&&r.path.length){c.innerHTML='<div class="lbl">Shortest Path</div><div class="path-row">'+r.path.map((n,i)=>'<span class="pnode">'+L(n)+'</span>'+(i<r.path.length-1?'<span class="parrow">→</span>':'')).join('')+'</div>';}
-    else if(r.type==='sp'&&r.tgt<0){let h='<div class="lbl">Jarak dari '+L(r.src)+'</div><div class="edge-pills">';for(let i=0;i<N;i++){if(i===r.src)continue;h+='<span class="epill">'+L(r.src)+'→'+L(i)+': '+(r.dist[i]===Infinity?'∞':r.dist[i])+'</span>';}h+='</div>';c.innerHTML=h;}
-    else if(r.type==='mst'){c.innerHTML='<div class="lbl">MST Edges — Total: '+r.tw+'</div><div class="edge-pills">'+r.mst.map(e=>'<span class="epill">'+L(e.from)+'—'+L(e.to)+': '+e.weight+'</span>').join('')+'</div>';}
-    else if(r.type==='ap'){let h='<div class="lbl">All-Pairs Distance</div><div class="mtx-wrap"><table class="mtx"><tr><th class="corner"></th>';for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr>';for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' class="diag"':v!==Infinity?' class="hv"':'')+'>'+(i===j?'0':v===Infinity?'∞':v)+'</td>';}h+='</tr>';}h+='</table></div>';c.innerHTML=h;}
+    if(r.type==='sp'&&r.path&&r.path.length){c.innerHTML='<div class="lbl">Shortest Path</div><div class="path-row">'+r.path.map((n,i)=>'<span class="pnode">'+L(n)+'</span>'+(i<r.path.length-1?'<span class="parrow">-></span>':'')).join('')+'</div>';}
+    else if(r.type==='sp'&&r.tgt<0){let h='<div class="lbl">Jarak dari '+L(r.src)+'</div><div class="edge-pills">';for(let i=0;i<N;i++){if(i===r.src)continue;h+='<span class="epill">'+L(r.src)+'->'+L(i)+': '+(r.dist[i]===Infinity?'Inf':r.dist[i])+'</span>';}h+='</div>';c.innerHTML=h;}
+    else if(r.type==='mst'){c.innerHTML='<div class="lbl">MST Edges -- Total: '+r.tw+'</div><div class="edge-pills">'+r.mst.map(e=>'<span class="epill">'+L(e.from)+'--'+L(e.to)+': '+e.weight+'</span>').join('')+'</div>';}
+    else if(r.type==='ap'){let h='<div class="lbl">All-Pairs Distance</div><div class="mtx-wrap"><table class="mtx"><tr><th class="corner"></th>';for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr>';for(let i=0;i<N;i++){h+='<tr><th>'+L(i)+'</th>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' class="diag"':v!==Infinity?' class="hv"':'')+'>'+(i===j?'0':v===Infinity?'Inf':v)+'</td>';}h+='</tr>';}h+='</table></div>';c.innerHTML=h;}
     else c.innerHTML='';
 }
 
@@ -1888,7 +1398,7 @@ function bTL(steps){
 
 function bTbl(r){
     const c=document.getElementById('rTbl');
-    if(r.type==='sp'){let h='<table class="rt"><thead><tr><th>#</th><th>Action</th><th>Detail</th>';for(let i=0;i<N;i++)h+='<th>d('+L(i)+')</th>';h+='</tr></thead><tbody>';let cd=Array(N).fill('∞');if(r.src!==undefined)cd[r.src]='0';
+    if(r.type==='sp'){let h='<table class="rt"><thead><tr><th>#</th><th>Action</th><th>Detail</th>';for(let i=0;i<N;i++)h+='<th>d('+L(i)+')</th>';h+='</tr></thead><tbody>';let cd=Array(N).fill('Inf');if(r.src!==undefined)cd[r.src]='0';
     r.steps.forEach((s,idx)=>{const m=s.c.match(/dist=\[([^\]]+)\]/);if(m)m[1].split(', ').forEach(p=>{const[l,v]=p.split(':');for(let i=0;i<N;i++)if(L(i)===l)cd[i]=v;});
     h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(idx+1)+'</td><td>'+s.a+'</td><td style="font-family:DM Sans;font-size:.75em;max-width:170px;overflow:hidden;text-overflow:ellipsis">'+s.d.substring(0,55)+'</td>'+cd.map(d=>'<td>'+d+'</td>').join('')+'</tr>';});
     h+='</tbody></table>';c.innerHTML=h;}
@@ -1897,38 +1407,40 @@ function bTbl(r){
     h+='<tr'+(s.f?' class="hl"':'')+'><td>'+(i+1)+'</td><td style="font-family:DM Sans;font-size:.78em">'+s.t.substring(0,32)+'</td><td>'+(w!==null?w:'-')+'</td><td>'+s.a+'</td><td>'+tw+'</td></tr>';});
     h+='</tbody></table>';c.innerHTML=h;}
     else{let h='<table class="rt"><thead><tr><th>From/To</th>';for(let j=0;j<N;j++)h+='<th>'+L(j)+'</th>';h+='</tr></thead><tbody>';
-    for(let i=0;i<N;i++){h+='<tr><td><strong>'+L(i)+'</strong></td>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' style="color:var(--text3)"':v!==Infinity?' style="font-weight:700"':' style="color:var(--text3)"')+'>'+(v===Infinity?'∞':v)+'</td>';}h+='</tr>';}
+    for(let i=0;i<N;i++){h+='<tr><td><strong>'+L(i)+'</strong></td>';for(let j=0;j<N;j++){const v=r.dist[i][j];h+='<td'+(i===j?' style="color:var(--text3)"':v!==Infinity?' style="font-weight:700"':' style="color:var(--text3)"')+'>'+(v===Infinity?'Inf':v)+'</td>';}h+='</tr>';}
     h+='</tbody></table>';c.innerHTML=h;}
 }
 
 function bAI(r){
     const c=document.getElementById('aiB');const edges=rEdges();
     const dens=gT==='undirected'?(2*edges.length)/(N*(N-1)):(edges.length)/(N*(N-1));
-    let h='<h3>📊 Analysis Report</h3>';
+    let h='<h3>Analysis Report</h3>';
     h+='<p><strong>Metode:</strong> '+r.method+' | <strong>Nodes:</strong> '+N+' | <strong>Edges:</strong> '+edges.length+' | <strong>Density:</strong> '+(dens*100).toFixed(1)+'% | <strong>Type:</strong> '+gT+'</p>';
-
     if(r.method==='Dijkstra'){
-        h+='<p>Dijkstra menggunakan greedy strategy: memilih node dengan jarak terkecil (label sementara), menjadikannya permanen, lalu update tetangga.</p>';
-        if(r.path&&r.path.length){h+='<ul>';for(let i=0;i<r.path.length-1;i++){const w=gV(r.path[i],r.path[i+1]);h+='<li>'+L(r.path[i])+' → '+L(r.path[i+1])+': '+w+'</li>';}h+='<li>Total: '+r.dist[r.tgt]+'</li></ul>';}
+        h+='<p>Dijkstra menggunakan greedy strategy: memilih node dengan jarak terkecil (label sementara), menjadikannya permanen, lalu update tetangga. Tidak mendukung bobot negatif.</p>';
+        if(r.path&&r.path.length){h+='<ul>';for(let i=0;i<r.path.length-1;i++){const w=gV(r.path[i],r.path[i+1]);h+='<li>'+L(r.path[i])+' -> '+L(r.path[i+1])+': '+w+'</li>';}h+='<li>Total jarak: '+r.dist[r.tgt]+'</li></ul>';}
+        h+='<p><strong>Complexity:</strong> O((V+E)logV)</p>';
     } else if(r.method==='Bellman-Ford'){
-        h+='<p>Bellman-Ford: V-1 iterasi relax semua edges. Support negative weights.</p>';
-        if(r.neg)h+='<p style="color:var(--red);font-weight:700;">⚠ Negative cycle terdeteksi!</p>';
+        h+='<p>Bellman-Ford: V-1 iterasi relax semua edges. Mendukung negative weights dan dapat mendeteksi negative cycle.</p>';
+        if(r.neg)h+='<p><strong>PERINGATAN: Negative cycle terdeteksi!</strong></p>';
+        h+='<p><strong>Complexity:</strong> O(V*E) = O('+(N*edges.length)+')</p>';
     } else if(r.method==='Floyd-Warshall'){
-        h+='<p>Floyd-Warshall: DP all-pairs via intermediate nodes k=0..V-1.</p>';
+        h+='<p>Floyd-Warshall: Dynamic programming all-pairs shortest path via intermediate nodes k=0..V-1.</p>';
+        h+='<p><strong>Complexity:</strong> O(V^3) = O('+(N*N*N)+')</p>';
     } else if(r.method==='Kruskal'){
-        h+='<p>Kruskal: sort edges, Union-Find untuk cycle detection.</p>';
+        h+='<p>Kruskal: sort edges ascending, tambahkan ke MST jika tidak membentuk cycle. Menggunakan Union-Find untuk deteksi cycle.</p>';
         h+='<ul><li>MST weight: '+r.tw+'</li><li>Edges in MST: '+r.mst.length+'</li></ul>';
+        h+='<p><strong>Complexity:</strong> O(E logE)</p>';
     } else if(r.method==='Prim'){
-        h+='<p>Prim: grow MST from start node, always pick cheapest crossing edge.</p>';
+        h+='<p>Prim: grow MST dari starting node, selalu pilih edge termurah yang menghubungkan MST ke node di luar MST.</p>';
         h+='<ul><li>Start: '+L(r.src)+'</li><li>MST weight: '+r.tw+'</li></ul>';
+        h+='<p><strong>Complexity:</strong> O((V+E)logV)</p>';
     }
-    h+='<p><strong>Complexity:</strong> ';
-    if(r.method==='Dijkstra')h+='O((V+E)logV) ≈ O('+((N+edges.length)*Math.ceil(Math.log2(N||2)))+')';
-    else if(r.method==='Bellman-Ford')h+='O(V·E) = O('+(N*edges.length)+')';
-    else if(r.method==='Floyd-Warshall')h+='O(V³) = O('+(N*N*N)+')';
-    else if(r.method==='Kruskal')h+='O(E logE) = O('+(edges.length*Math.ceil(Math.log2(edges.length||2)))+')';
-    else if(r.method==='Prim')h+='O((V+E)logV)';
-    h+='</p>';
+    h+='<p><strong>Rekomendasi:</strong></p><ul>';
+    if(dens>.5)h+='<li>Graph dense ('+(dens*100).toFixed(0)+'%), Floyd-Warshall efisien untuk all-pairs</li>';
+    else h+='<li>Graph sparse ('+(dens*100).toFixed(0)+'%), Dijkstra/Kruskal lebih efisien</li>';
+    if(edges.some(e=>e.weight<0))h+='<li>Ada bobot negatif, hanya Bellman-Ford dan Floyd-Warshall yang aman</li>';
+    h+='</ul>';
     c.innerHTML=h;
 }
 
@@ -1940,9 +1452,9 @@ function sTab(n,btn){
     document.getElementById('tp-'+n).classList.add('on');
 }
 
-// ======================== SHARE ========================
+// ===================== SHARE =====================
 function openShareModal(){
-    const modal=document.getElementById('shareModal');modal.classList.add('show');
+    document.getElementById('shareModal').classList.add('show');
     const state=encodeGraphState();
     const url=window.location.origin+window.location.pathname+'?g='+encodeURIComponent(state);
     document.getElementById('shareUrl').value=url;
@@ -1955,14 +1467,11 @@ function encodeGraphState(){
 
 function loadFromURL(){
     const params=new URLSearchParams(window.location.search);
-    const g=params.get('g');
-    if(!g)return;
+    const g=params.get('g');if(!g)return;
     try{
-        const d=JSON.parse(atob(g));
-        N=d.n;gT=d.t;lb=d.l;
+        const d=JSON.parse(atob(g));N=d.n;gT=d.t;lb=d.l;
         document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
-        rebuildMtx();
-        for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d.m[i][j]);}
+        rebuildMtx();for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,d.m[i][j]);}
         mChg();fillSel();compLo(cLo);draw();
         if(d.a){M=d.a;document.querySelectorAll('.m-card').forEach(c=>{if(c.querySelector('.nm').textContent.toLowerCase().replace(/[\s-]/g,'')===(d.a||'').replace(/-/g,''))pickM(d.a,c);});}
         toast('Graph loaded from URL','success');
@@ -1972,7 +1481,7 @@ function loadFromURL(){
 
 function copyShareUrl(){
     const inp=document.getElementById('shareUrl');inp.select();
-    navigator.clipboard.writeText(inp.value).then(()=>toast('URL copied!','success')).catch(()=>{document.execCommand('copy');toast('URL copied!','success');});
+    navigator.clipboard.writeText(inp.value).then(()=>toast('URL copied','success')).catch(()=>{document.execCommand('copy');toast('URL copied','success');});
 }
 
 function exportJSON(){
@@ -1988,219 +1497,145 @@ function importJSON(e){
     const reader=new FileReader();
     reader.onload=function(ev){
         try{
-            const d=JSON.parse(ev.target.result);
-            N=d.nodes||d.n;gT=d.type||d.t;lb=d.labels||d.l;
+            const d=JSON.parse(ev.target.result);N=d.nodes||d.n;gT=d.type||d.t;lb=d.labels||d.l;
             document.getElementById('inpN').value=N;document.getElementById('inpT').value=gT;document.getElementById('inpL').value=lb.join(',');
             rebuildMtx();const m=d.matrix||d.m;
             for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(i===j)continue;sV(i,j,m[i][j]);}
-            mChg();fillSel();compLo(cLo);draw();
-            toast('JSON imported','success');
+            mChg();fillSel();compLo(cLo);draw();toast('JSON imported','success');
         }catch(err){toast('Invalid JSON','error');}
-    };
-    reader.readAsText(file);
-    e.target.value='';
+    };reader.readAsText(file);e.target.value='';
 }
 
-// ======================== SCREENSHOT ========================
 function screenshotCanvas(){
-    const cv=document.getElementById('cv');
-    const link=document.createElement('a');
-    link.download='graph-screenshot-'+Date.now()+'.png';
-    link.href=cv.toDataURL('image/png');
-    link.click();
-    toast('Screenshot saved!','success');
+    const cv=document.getElementById('cv');const link=document.createElement('a');
+    link.download='graph-'+Date.now()+'.png';link.href=cv.toDataURL('image/png');link.click();
+    toast('Screenshot saved','success');
 }
 
-// ======================== PDF GENERATION ========================
+// ===================== PDF =====================
 async function printPDF(){
     if(!res||!iterStates.length){toast('Jalankan algoritma dulu','error');return;}
-
-    const overlay=document.getElementById('ov');
-    overlay.classList.add('show');
+    const overlay=document.getElementById('ov');overlay.classList.add('show');
     document.getElementById('ovText').textContent='Generating PDF...';
-    const prog=document.getElementById('pdfProgress');
-    prog.classList.add('show');
-    const bar=document.getElementById('pdfBar');
-    const status=document.getElementById('pdfStatus');
-
+    const prog=document.getElementById('pdfProgress');prog.classList.add('show');
+    const bar=document.getElementById('pdfBar');const status=document.getElementById('pdfStatus');
     await new Promise(r=>setTimeout(r,100));
-
     try{
         const{jsPDF}=window.jspdf;
         const pdf=new jsPDF('p','mm','a4');
-        const pw=210,ph=297;
-        const margin=15;
-        const cw=pw-2*margin;
+        const pw=210,ph=297,margin=15,cw=pw-2*margin;
         let y=margin;
 
-        function addWatermark(){
-            pdf.setFontSize(48);pdf.setTextColor(230,230,230);
-            pdf.text('RAD STRIX',pw/2,ph/2,{align:'center',angle:45});
-            pdf.setTextColor(0,0,0);
-        }
+        function addWM(){pdf.setFontSize(48);pdf.setTextColor(230,230,230);pdf.text('RAD STRIX',pw/2,ph/2,{align:'center',angle:45});pdf.setTextColor(0,0,0);}
+        function chkP(need){if(y+need>ph-margin){pdf.addPage();addWM();y=margin;return true;}return false;}
 
-        function checkPage(need){
-            if(y+need>ph-margin){pdf.addPage();addWatermark();y=margin;return true;}
-            return false;
-        }
-
-        // Page 1: Title
-        addWatermark();
-        pdf.setFontSize(22);pdf.setFont(undefined,'bold');
-        pdf.text('Graph Algorithm Report',pw/2,y+8,{align:'center'});
-        y+=16;
-        pdf.setFontSize(10);pdf.setFont(undefined,'normal');
-        pdf.setTextColor(100);
-        pdf.text('Generated: '+new Date().toLocaleString('id-ID'),pw/2,y,{align:'center'});
-        y+=5;
+        addWM();
+        pdf.setFontSize(20);pdf.setFont(undefined,'bold');
+        pdf.text('Graph Algorithm Report',pw/2,y+8,{align:'center'});y+=16;
+        pdf.setFontSize(9);pdf.setFont(undefined,'normal');pdf.setTextColor(100);
+        pdf.text('Generated: '+new Date().toLocaleString('id-ID'),pw/2,y,{align:'center'});y+=5;
         pdf.text('Algorithm: '+res.method+' | Nodes: '+N+' | Edges: '+rEdges().length+' | Type: '+gT,pw/2,y,{align:'center'});
-        pdf.setTextColor(0);
-        y+=10;
-
-        // Separator
+        pdf.setTextColor(0);y+=10;
         pdf.setDrawColor(200);pdf.line(margin,y,pw-margin,y);y+=8;
 
         status.textContent='Capturing graph...';bar.style.width='10%';
 
-        // Capture current canvas (final state)
         const savedIter=curIter;
         iterGo(iterStates.length-1);
         await new Promise(r=>setTimeout(r,200));
         const cv=document.getElementById('cv');
         const cvImg=cv.toDataURL('image/png',1.0);
         const cvAspect=cv.height/cv.width;
-        const imgW=cw;const imgH=imgW*cvAspect;
+        const imgW=cw;const imgH=Math.min(imgW*cvAspect,100);
 
-        checkPage(imgH+10);
-        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
+        chkP(imgH+10);
+        pdf.setFontSize(11);pdf.setFont(undefined,'bold');
         pdf.text('Final Graph Visualization',margin,y);y+=6;
-        pdf.addImage(cvImg,'PNG',margin,y,imgW,Math.min(imgH,100));
-        y+=Math.min(imgH,100)+8;
+        pdf.addImage(cvImg,'PNG',margin,y,imgW,imgH);y+=imgH+8;
 
-        // Summary stats
-        checkPage(30);
-        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
-        pdf.text('Summary',margin,y);y+=6;
-        pdf.setFontSize(9);pdf.setFont(undefined,'normal');
-
+        // Summary
+        chkP(25);
+        pdf.setFontSize(11);pdf.setFont(undefined,'bold');pdf.text('Summary',margin,y);y+=6;
+        pdf.setFontSize(8);pdf.setFont(undefined,'normal');
         if(res.type==='sp'&&res.path&&res.path.length){
-            pdf.text('Shortest Path: '+res.path.map(L).join(' → '),margin,y);y+=5;
-            pdf.text('Distance: '+(res.dist[res.tgt]===Infinity?'∞':res.dist[res.tgt]),margin,y);y+=5;
+            pdf.text('Shortest Path: '+res.path.map(L).join(' -> '),margin,y);y+=4;
+            pdf.text('Distance: '+(res.dist[res.tgt]===Infinity?'Inf':res.dist[res.tgt]),margin,y);y+=4;
         }else if(res.type==='mst'){
-            pdf.text('MST Total Weight: '+res.tw,margin,y);y+=5;
-            pdf.text('MST Edges: '+res.mst.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', '),margin,y);y+=5;
+            pdf.text('MST Total Weight: '+res.tw,margin,y);y+=4;
+            pdf.text('MST Edges: '+res.mst.map(e=>L(e.from)+'-'+L(e.to)+'('+e.weight+')').join(', '),margin,y);y+=4;
         }
-        y+=5;
+        y+=5;pdf.setDrawColor(200);pdf.line(margin,y,pw-margin,y);y+=8;
 
         // Iterations
-        pdf.setDrawColor(200);pdf.line(margin,y,pw-margin,y);y+=8;
-        pdf.setFontSize(12);pdf.setFont(undefined,'bold');
-        pdf.text('Iteration Details',margin,y);y+=8;
-
+        pdf.setFontSize(11);pdf.setFont(undefined,'bold');pdf.text('Iteration Details',margin,y);y+=8;
         const totalIter=iterStates.length;
         for(let idx=0;idx<totalIter;idx++){
             const pct=10+Math.round((idx/totalIter)*80);
             bar.style.width=pct+'%';
             status.textContent='Processing iteration '+(idx+1)+'/'+totalIter+'...';
-
             const st=iterStates[idx];
-            const conn=st.connectedNodes||[];
-            const unconn=st.unconnectedNodes||[];
-            const selE=st.selectedEdges||[];
+            const conn=st.connectedNodes||[];const unconn=st.unconnectedNodes||[];const selE=st.selectedEdges||[];
+            chkP(50);
 
-            checkPage(55);
+            pdf.setFillColor(240,240,240);pdf.rect(margin,y-3,cw,7,'F');
+            pdf.setFontSize(9);pdf.setFont(undefined,'bold');pdf.setTextColor(30);
+            pdf.text('Iteration '+(idx+1)+': '+st.title,margin+2,y+1);y+=9;
+            pdf.setFontSize(7.5);pdf.setFont(undefined,'normal');pdf.setTextColor(60);
 
-            // Iteration header
-            pdf.setFillColor(240,240,240);
-            pdf.rect(margin,y-3,cw,8,'F');
-            pdf.setFontSize(10);pdf.setFont(undefined,'bold');
-            pdf.setTextColor(30);
-            pdf.text('Iteration '+(idx+1)+': '+st.title,margin+2,y+2);
-            y+=10;
-
-            pdf.setFontSize(8);pdf.setFont(undefined,'normal');pdf.setTextColor(60);
-
-            // Connected
             pdf.setFont(undefined,'bold');pdf.text('Connected Nodes ('+conn.length+'):',margin,y);
-            pdf.setFont(undefined,'normal');
-            pdf.text(conn.length?conn.map(L).join(', '):'None',margin+40,y);y+=4.5;
+            pdf.setFont(undefined,'normal');pdf.text(conn.length?conn.map(L).join(', '):'None',margin+38,y);y+=4;
 
-            // Unconnected
             pdf.setFont(undefined,'bold');pdf.text('Unconnected ('+unconn.length+'):',margin,y);
-            pdf.setFont(undefined,'normal');
-            pdf.text(unconn.length?unconn.map(L).join(', '):'All connected',margin+40,y);y+=4.5;
+            pdf.setFont(undefined,'normal');pdf.text(unconn.length?unconn.map(L).join(', '):'All connected',margin+38,y);y+=4;
 
-            // Selected edges
             pdf.setFont(undefined,'bold');pdf.text('Selected Edges ('+selE.length+'):',margin,y);
             pdf.setFont(undefined,'normal');
-            const edgeStr=selE.map(e=>{const w=gV(e.from,e.to);return L(e.from)+'-'+L(e.to)+(w!==Infinity&&w!==0?'('+w+')':'');}).join(', ');
-            const edgeLines=pdf.splitTextToSize(edgeStr||'None',cw-42);
-            pdf.text(edgeLines,margin+40,y);y+=edgeLines.length*4;y+=1;
+            const eStr=selE.map(e=>{const w=gV(e.from,e.to);return L(e.from)+'-'+L(e.to)+(w!==Infinity&&w!==0?'('+w+')':'');}).join(', ');
+            const eLines=pdf.splitTextToSize(eStr||'None',cw-40);
+            pdf.text(eLines,margin+38,y);y+=eLines.length*3.5+1;
 
-            // Distance labels if available
             if(st.labels&&Object.keys(st.labels).length&&idx>0){
                 pdf.setFont(undefined,'bold');pdf.text('Distances:',margin,y);
                 pdf.setFont(undefined,'normal');
-                const distStr=Array.from({length:N},(_,i)=>L(i)+':'+(st.labels[i]===Infinity?'∞':st.labels[i]!==undefined?st.labels[i]:'-')).join('  ');
-                pdf.text(distStr,margin+40,y);y+=4.5;
+                const dStr=Array.from({length:N},(_,i)=>L(i)+':'+(st.labels[i]===Infinity?'Inf':st.labels[i]!==undefined?st.labels[i]:'-')).join('  ');
+                pdf.text(dStr,margin+38,y);y+=4;
             }
 
-            // Changes
             if(st.changes&&st.changes.length){
-                checkPage(st.changes.length*4+5);
-                pdf.setFont(undefined,'bold');pdf.text('Changes:',margin,y);y+=4;
+                chkP(st.changes.length*3.5+4);
+                pdf.setFont(undefined,'bold');pdf.text('Changes:',margin,y);y+=3.5;
                 pdf.setFont(undefined,'normal');pdf.setTextColor(80);
-                st.changes.forEach(ch=>{
-                    checkPage(5);
-                    const lines=pdf.splitTextToSize('• '+ch,cw-4);
-                    pdf.text(lines,margin+4,y);y+=lines.length*3.5;
-                });
+                st.changes.forEach(ch=>{chkP(4);const lines=pdf.splitTextToSize('- '+ch,cw-4);pdf.text(lines,margin+4,y);y+=lines.length*3.2;});
                 pdf.setTextColor(60);
             }
 
-            // Capture iteration graph snapshot
-            if(idx<totalIter-1&&(idx%3===0||idx===0)){
-                iterGo(idx);
-                await new Promise(r=>setTimeout(r,150));
-                const snapImg=cv.toDataURL('image/png',0.85);
-                const snapH=Math.min(imgH,55);
-                checkPage(snapH+5);
-                pdf.addImage(snapImg,'PNG',margin,y,cw,snapH);
-                y+=snapH+3;
+            // Graph snapshot every few iterations
+            if(totalIter<=8||idx%Math.ceil(totalIter/6)===0||idx===totalIter-1){
+                iterGo(idx);await new Promise(r=>setTimeout(r,120));
+                const snapImg=cv.toDataURL('image/png',0.8);
+                const snapH=Math.min(imgH,50);
+                chkP(snapH+4);
+                pdf.addImage(snapImg,'PNG',margin,y,cw,snapH);y+=snapH+3;
             }
 
-            y+=4;
-            pdf.setDrawColor(220);pdf.line(margin,y,pw-margin,y);y+=5;
+            y+=3;pdf.setDrawColor(220);pdf.line(margin,y,pw-margin,y);y+=4;
         }
 
-        // Restore iteration
         iterGo(savedIter);
+        bar.style.width='95%';status.textContent='Finalizing...';
 
-        bar.style.width='95%';
-        status.textContent='Finalizing...';
+        pdf.setFontSize(6.5);pdf.setTextColor(150);
+        pdf.text('Generated by Graph Algorithm Visualizer -- RAD STRIX -- '+new Date().toISOString(),pw/2,ph-8,{align:'center'});
 
-        // Footer on last page
-        pdf.setFontSize(7);pdf.setTextColor(150);
-        pdf.text('Generated by Graph Algorithm Visualizer — RAD STRIX — '+new Date().toISOString(),pw/2,ph-8,{align:'center'});
-
-        bar.style.width='100%';
-        status.textContent='Done!';
-
+        bar.style.width='100%';status.textContent='Done!';
         await new Promise(r=>setTimeout(r,300));
-
         pdf.save('graph-report-'+res.method+'-'+new Date().toISOString().split('T')[0]+'.pdf');
-        toast('PDF saved!','success');
-    }catch(err){
-        console.error('PDF Error:',err);
-        toast('PDF generation failed: '+err.message,'error');
-    }finally{
-        overlay.classList.remove('show');
-        prog.classList.remove('show');
-        bar.style.width='0%';
-    }
+        toast('PDF saved','success');
+    }catch(err){console.error('PDF Error:',err);toast('PDF generation failed: '+err.message,'error');}
+    finally{overlay.classList.remove('show');prog.classList.remove('show');bar.style.width='0%';}
 }
 
-// ======================== RESET ========================
+// ===================== RESET =====================
 function resetAll(){
     M=null;res=null;N=5;gT='undirected';sc=1;curIter=0;iterStates=[];
     stopPlayback();
@@ -2213,7 +1648,7 @@ function resetAll(){
     document.getElementById('iterChanges').innerHTML='';
     document.getElementById('legend').style.display='none';
     document.getElementById('results').classList.remove('vis');
-    gLb();rebuildMtx();compLo('circle');draw();toast('Reset','info');
+    gLb();rebuildMtx();compLo('circle');draw();toast('Reset complete');
 }
 </script>
 </body>
