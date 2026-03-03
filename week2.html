@@ -9,41 +9,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f5f5f5;
-  --card:#fff;
-  --text:#1a1a1a;
-  --accent:#333;
-  --border:#e0e0e0;
-  --sub:#888;
-  --green:#2d7d46;
-  --red:#c0392b;
-  --amber:#e67e22;
-  --blue:#2980b9;
-  --node-fill:#fff;
-  --node-stroke:#1a1a1a;
-  --edge-color:#999;
-  --canvas-bg:#fafafa;
-  --radius:10px;
-  --plexus-dot:rgba(26,26,26,.15);
-  --glass:rgba(255,255,255,.45);
+  --bg:#f5f5f5;--card:#fff;--text:#1a1a1a;--accent:#333;
+  --border:#e0e0e0;--sub:#888;--green:#2d7d46;--red:#c0392b;
+  --amber:#e67e22;--blue:#2980b9;--node-fill:#fff;--node-stroke:#1a1a1a;
+  --edge-color:#999;--canvas-bg:#fafafa;--radius:10px;
+  --plexus-dot:rgba(26,26,26,.15);--glass:rgba(255,255,255,.45);
   --glass-border:rgba(255,255,255,.2);
 }
 [data-theme="dark"]{
-  --bg:#0f0f0f;
-  --card:#161616;
-  --text:#e8e8e8;
-  --accent:#ccc;
-  --border:#2a2a2a;
-  --sub:#666;
-  --green:#3aaa5c;
-  --red:#e74c3c;
-  --amber:#f39c12;
-  --blue:#3498db;
-  --node-fill:#1a1a1a;
-  --node-stroke:#e8e8e8;
-  --edge-color:#555;
-  --canvas-bg:#111;
-  --glass:rgba(22,22,22,.55);
+  --bg:#0f0f0f;--card:#161616;--text:#e8e8e8;--accent:#ccc;
+  --border:#2a2a2a;--sub:#666;--green:#3aaa5c;--red:#e74c3c;
+  --amber:#f39c12;--blue:#3498db;--node-fill:#1a1a1a;--node-stroke:#e8e8e8;
+  --edge-color:#555;--canvas-bg:#111;--glass:rgba(22,22,22,.55);
   --glass-border:rgba(255,255,255,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -61,32 +38,24 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 @keyframes splashFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes splashBarFill{0%{width:0%}100%{width:100%}}
 
-/* PLEXUS BG */
 #plexusBg{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-/* ONLINE */
 .online-indicator{position:fixed;top:14px;left:16px;z-index:999;font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px}
 .online-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* WATERMARK */
 .watermark{position:fixed;bottom:14px;right:16px;z-index:999;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sub);opacity:.4;letter-spacing:2px}
 
-/* TOAST */
 #toast{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast-item{background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transform:translateX(120%);transition:transform .3s;pointer-events:auto;max-width:300px}
+.toast-item{background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;transform:translateX(120%);transition:transform .3s;pointer-events:auto;max-width:300px}
 .toast-item.show{transform:translateX(0)}
 .toast-item.err{background:var(--red)}
 .toast-item.ok{background:var(--green)}
 
-/* OVERLAY */
 #ov{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #ov.on{display:flex}
 .spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .55s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .ov-txt{color:#fff;font-size:13px;font-family:'JetBrains Mono',monospace}
 
-/* SHORTCUTS PANEL */
 .shortcuts-panel{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
 .shortcuts-panel.on{display:flex}
 .sc-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:400px;width:90%}
@@ -95,150 +64,55 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .sc-row:last-child{border:none}
 .sc-key{font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:12px}
 
-/* TOP BAR */
 .top-bar{position:sticky;top:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(245,245,245,.75);backdrop-filter:blur(14px) saturate(160%);border-bottom:1px solid var(--border);transition:background .3s}
 [data-theme="dark"] .top-bar{background:rgba(15,15,15,.75)}
 .top-bar-left{display:flex;align-items:center;gap:10px}
 .top-bar-logo{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px;opacity:.7}
-.top-bar-right{display:flex;align-items:center;gap:8px}
-.tb-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s}
+.top-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
 .tb-btn:hover{background:var(--text);color:var(--bg)}
 .week-badge{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--text);color:var(--bg);border-radius:4px;padding:2px 7px;letter-spacing:.5px}
 
-/* SHELL */
 .shell{max-width:1100px;margin:0 auto;padding:24px 20px;position:relative;z-index:1}
-
-/* HERO */
 .hero{margin-bottom:28px}
 .hero h1{font-size:clamp(22px,4vw,36px);font-weight:700;letter-spacing:-1px;line-height:1.15}
 .hero p{color:var(--sub);font-size:14px;margin-top:6px;max-width:600px;line-height:1.6}
 
-/* SECTION */
 .section{background:var(--glass);backdrop-filter:blur(16px) saturate(180%);border:1px solid var(--glass-border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.3)}
 [data-theme="dark"] .section{box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
 .sec-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
-
-/* STEP BADGE */
 .step-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--text);color:var(--bg);border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0}
 
-/* NIM INPUT */
-.nim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.nim-input-wrap{position:relative;flex:1;min-width:200px;max-width:340px}
+/* NIM */
+.nim-input-wrap{position:relative;flex:1;min-width:200px}
 .nim-input-wrap input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:3px;outline:none;transition:border-color .2s}
 .nim-input-wrap input:focus{border-color:var(--text)}
 .nim-input-wrap label{position:absolute;top:-9px;left:10px;background:var(--card);padding:0 4px;font-size:11px;color:var(--sub);font-family:'DM Sans',sans-serif}
-.nim-hint{font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-top:6px}
 
-/* LOCATIONS DISPLAY */
+/* LOC GRID */
 .loc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
 .loc-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;transition:all .2s}
-.loc-card.active{border-color:var(--text);box-shadow:0 0 0 2px var(--text)}
+.loc-card.active{border-color:var(--text)}
 .loc-badge{width:28px;height:28px;background:var(--text);color:var(--bg);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:8px}
 .loc-type{font-size:10px;color:var(--sub);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
 .loc-name{font-size:12px;font-weight:600;line-height:1.3}
 
-/* ROUTE DISPLAY */
-.route-vis{display:flex;align-items:center;gap:0;overflow-x:auto;padding:16px 0;margin-top:12px}
-.rv-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
-.rv-circle{width:36px;height:36px;border-radius:50%;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
-.rv-circle.start{background:var(--green);color:#fff}
-.rv-circle.end{background:var(--red);color:#fff}
-.rv-label{font-size:10px;color:var(--sub);font-family:'JetBrains Mono',monospace;white-space:nowrap;max-width:70px;text-align:center;overflow:hidden;text-overflow:ellipsis}
-.rv-arrow{flex:1;min-width:30px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
-.rv-line{height:2px;background:var(--border);width:100%;position:relative}
-.rv-line::after{content:'';position:absolute;right:-4px;top:-3px;width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--border)}
-.rv-seg-label{font-size:9px;color:var(--sub);font-family:'JetBrains Mono',monospace;white-space:nowrap}
-
-/* SEGMENT TABLE */
-.seg-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-.seg-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500}
-.seg-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
-.seg-table tr:last-child td{border-bottom:none}
-.seg-table input,
-.seg-table select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);width:100%;outline:none;transition:border-color .2s}
-.seg-table input:focus,
-.seg-table select:focus{border-color:var(--text)}
-.seg-from-to{font-weight:600;font-size:12px;font-family:'JetBrains Mono',monospace}
-.seg-sub{font-size:10px;color:var(--sub);margin-top:2px}
-
 /* TABS */
-.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0}
-.tab-btn{padding:8px 16px;font-size:12px;font-family:'DM Sans',sans-serif;border:none;background:none;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;font-weight:500}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0;flex-wrap:wrap}
+.tab-btn{padding:8px 16px;font-size:12px;font-family:'DM Sans',sans-serif;border:none;background:none;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;font-weight:500;white-space:nowrap}
 .tab-btn.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
-/* COMPARISON TABLE */
-.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
-.cmp-table th{padding:10px 12px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500;text-align:left}
-.cmp-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
-.cmp-table tr:last-child td{border:none;font-weight:600}
-.cmp-winner{background:var(--green);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;margin-left:8px}
-.cmp-loser{background:var(--red);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;margin-left:8px}
-
-/* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 12px}
-.stat-val{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px}
-.stat-lbl{font-size:10px;color:var(--sub);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
-.stat.highlight{background:var(--text);color:var(--bg)}
-.stat.highlight .stat-val{color:inherit}
-.stat.highlight .stat-lbl{color:rgba(255,255,255,.5)}
-[data-theme="dark"] .stat.highlight .stat-lbl{color:rgba(0,0,0,.5)}
-
-/* TIMELINE */
-.tl-wrap{position:relative;padding-left:28px}
-.tl-wrap::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:var(--border)}
-.tl-item{position:relative;margin-bottom:16px;cursor:pointer}
-.tl-item::before{content:'';position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--card);transition:all .2s}
-.tl-item.active::before{background:var(--text);border-color:var(--text)}
-.tl-item.active{border-left:2px solid var(--text);padding-left:8px;margin-left:-2px}
-.tl-title{font-size:13px;font-weight:600;margin-bottom:4px}
-.tl-detail{font-size:12px;color:var(--sub);line-height:1.5}
-.tl-meta{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
-.tl-tag{font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--sub)}
-.tl-tag.green{background:rgba(45,125,70,.1);border-color:var(--green);color:var(--green)}
-.tl-tag.blue{background:rgba(41,128,185,.1);border-color:var(--blue);color:var(--blue)}
-.tl-tag.amber{background:rgba(230,126,34,.1);border-color:var(--amber);color:var(--amber)}
-
-/* CANVAS */
-#cvWrap{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--canvas-bg)}
-#cv{display:block;width:100%;touch-action:none}
-.cv-controls{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
-
-/* ITER CONTROLS */
-.iter-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
-.iter-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);cursor:pointer;transition:all .2s}
-.iter-btn:hover:not(:disabled){background:var(--text);color:var(--bg)}
-.iter-btn:disabled{opacity:.35;cursor:not-allowed}
-.iter-badge{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--sub);min-width:40px;text-align:center}
-.iter-label{font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iter-changes{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;font-size:12px;line-height:1.7;max-height:140px;overflow-y:auto;font-family:'DM Sans',sans-serif}
-
-/* ALL ITER ACCORDION */
-.all-iter-card{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
-.all-iter-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;background:var(--card);transition:background .2s}
-.all-iter-hd:hover{background:var(--bg)}
-.all-iter-hd-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
-.all-iter-bd{padding:14px;border-top:1px solid var(--border);display:none;font-size:12px;line-height:1.7;color:var(--sub)}
-.all-iter-bd.open{display:block}
-.chevron{font-style:normal;font-size:12px;transition:transform .2s;font-family:'JetBrains Mono',monospace}
-.all-iter-hd.open .chevron{transform:rotate(90deg)}
-
-/* RECOMMENDATION BOX */
-.rec-box{border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--card);margin-top:16px}
-.rec-header{font-size:13px;font-weight:600;margin-bottom:10px}
-.rec-content{font-size:13px;line-height:1.7;color:var(--sub)}
-.rec-highlight{color:var(--text);font-weight:600}
-.rec-winner-badge{display:inline-flex;align-items:center;gap:6px;background:var(--text);color:var(--bg);border-radius:6px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin:10px 0}
-
-/* SCHEDULE TABLE */
-.sched-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
-.sched-table th{padding:8px 10px;border-bottom:2px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500;text-align:left}
-.sched-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
-.sched-table tr:last-child td{border:none}
-.sched-time{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;white-space:nowrap}
-.sched-mode{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 6px;white-space:nowrap}
+/* SEG TABLE */
+.seg-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.seg-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500}
+.seg-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.seg-table tr:last-child td{border-bottom:none}
+.seg-table input,.seg-table select,.seg-table textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);width:100%;outline:none;transition:border-color .2s;resize:vertical}
+.seg-table input:focus,.seg-table select:focus,.seg-table textarea:focus{border-color:var(--text)}
+.seg-from-to{font-weight:600;font-size:12px;font-family:'JetBrains Mono',monospace}
+.seg-sub{font-size:10px;color:var(--sub);margin-top:2px}
 
 /* TOGGLE */
 .toggle-row{display:flex;align-items:center;gap:10px;font-size:13px}
@@ -249,67 +123,136 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
 .toggle input:checked~.toggle-thumb{transform:translateX(16px)}
 
-/* BUTTONS */
+/* BTNS */
 .btn-primary{background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:opacity .2s}
 .btn-primary:hover{opacity:.8}
 .btn-ghost{background:none;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 22px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-ghost:hover{background:var(--text);color:var(--bg)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-/* DETAIL GRID */
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.detail-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px}
-.detail-box-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
-.detail-item{font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
-.detail-item:last-child{border:none}
-.detail-item-val{font-family:'JetBrains Mono',monospace;font-weight:600}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 12px}
+.stat-val{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px}
+.stat-lbl{font-size:10px;color:var(--sub);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
+.stat.hl{background:var(--text);color:var(--bg)}
+.stat.hl .stat-lbl{color:rgba(128,128,128,.7)}
 
-/* MUSIC PLAYER */
-.music-player{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px}
+/* CMP TABLE */
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table th{padding:10px 12px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500;text-align:left}
+.cmp-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.cmp-winner{background:var(--green);color:#fff;border-radius:4px;padding:2px 7px;font-size:10px;font-family:'JetBrains Mono',monospace;margin-left:6px}
+
+/* CANVAS */
+#cvWrap{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--canvas-bg)}
+#cv{display:block;width:100%;touch-action:none}
+.cv-controls{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+
+/* ITER */
+.iter-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.iter-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);cursor:pointer;transition:all .2s}
+.iter-btn:hover:not(:disabled){background:var(--text);color:var(--bg)}
+.iter-btn:disabled{opacity:.35;cursor:not-allowed}
+.iter-badge{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--sub);min-width:40px;text-align:center}
+.iter-label{font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iter-changes{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;font-size:12px;line-height:1.7;max-height:140px;overflow-y:auto}
+
+/* TIMELINE */
+.tl-wrap{position:relative;padding-left:28px}
+.tl-wrap::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:16px;cursor:pointer}
+.tl-item::before{content:'';position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--card);transition:all .2s}
+.tl-item.active::before{background:var(--text);border-color:var(--text)}
+.tl-item.active{border-left:2px solid var(--text);padding-left:8px;margin-left:-2px}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.tl-detail{font-size:12px;color:var(--sub);line-height:1.5}
+.tl-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.tl-tag{font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--sub)}
+.tl-tag.green{background:rgba(45,125,70,.1);border-color:var(--green);color:var(--green)}
+.tl-tag.blue{background:rgba(41,128,185,.1);border-color:var(--blue);color:var(--blue)}
+.tl-tag.amber{background:rgba(230,126,34,.1);border-color:var(--amber);color:var(--amber)}
+
+/* REC BOX */
+.rec-box{border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--card);margin-top:16px}
+.rec-header{font-size:13px;font-weight:600;margin-bottom:10px}
+.rec-content{font-size:13px;line-height:1.7;color:var(--sub)}
+.rec-winner-badge{display:inline-flex;align-items:center;gap:6px;background:var(--text);color:var(--bg);border-radius:6px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin:10px 0}
+
+/* ============================================================
+   OUTPUT TABLE — mirip format PDF
+   ============================================================ */
+.output-section{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.output-header{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
+.output-header-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.output-header-sub{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}
+
+.out-table{width:100%;border-collapse:collapse;font-size:13px}
+.out-table th{padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);background:var(--bg)}
+.out-table th:last-child{text-align:right;white-space:nowrap;width:130px}
+.out-table td{padding:0;border-bottom:1px solid var(--border);vertical-align:top}
+.out-table tr:last-child td{border-bottom:none}
+
+.out-row-time{width:90px;min-width:90px;padding:14px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;vertical-align:top;border-right:1px solid var(--border);white-space:nowrap;color:var(--text)}
+.out-row-act{padding:14px 14px;vertical-align:top;line-height:1.7;font-size:13px}
+.out-row-cost{width:120px;min-width:120px;padding:14px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;vertical-align:top;border-left:1px solid var(--border);color:var(--text);white-space:nowrap}
+
+.out-act-title{font-weight:600;margin-bottom:6px;color:var(--text)}
+.out-act-body{color:var(--sub);font-size:12px;line-height:1.7}
+.out-jalur-dipilih{margin-top:6px;font-size:12px;font-style:italic;color:var(--text)}
+.out-catatan{margin-top:8px;font-size:12px;color:var(--sub)}
+.out-catatan-item{display:flex;gap:6px;margin-top:3px}
+.out-catatan-item::before{content:'';width:4px;height:4px;background:var(--sub);border-radius:50%;flex-shrink:0;margin-top:7px}
+.out-total-row td{background:var(--bg);font-weight:700;font-size:14px;font-family:'JetBrains Mono',monospace;padding:14px !important;border-top:2px solid var(--border) !important}
+
+/* Visit info card */
+.visit-card{background:var(--bg);border-radius:6px;padding:10px 12px;margin-top:6px;font-size:12px;color:var(--sub);line-height:1.6}
+.visit-card-title{font-weight:600;color:var(--text);margin-bottom:4px;font-size:12px}
+
+/* Summary info */
+.info-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.info-block-title{font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--sub);margin-bottom:10px}
+.info-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border:none}
+.info-label{color:var(--sub)}
+.info-val{font-weight:600;font-family:'JetBrains Mono',monospace}
+
+/* NIM TABLE dalam output */
+.nim-tbl{width:auto;border-collapse:collapse;font-size:13px;margin:10px 0}
+.nim-tbl th{padding:7px 14px;border:1px solid var(--border);background:var(--bg);font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--sub)}
+.nim-tbl td{padding:7px 14px;border:1px solid var(--border);font-size:13px}
+.nim-tbl td:first-child{font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center}
+.nim-tbl td:nth-child(2){font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center}
+
+/* MUSIC */
+.music-player{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px}
 .music-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
 .music-dot.paused{background:var(--sub);animation:none}
-.music-title{flex:1;font-size:12px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'JetBrains Mono',monospace}
-.music-vol{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sub)}
-.music-vol input[type=range]{width:70px;accent-color:var(--text)}
+.music-title{font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.music-vol input[type=range]{width:55px;accent-color:var(--text)}
 
-/* MODAL */
-.modal-backdrop{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
-.modal-backdrop.on{display:flex}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:440px;width:90%;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:15px;font-weight:700;margin-bottom:16px}
-.modal-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:var(--sub);margin-top:-4px;font-family:'JetBrains Mono',monospace}
-
-/* ROUTE CANVAS */
-#routeCanvas{display:block;width:100%;border-radius:8px;border:1px solid var(--border);background:var(--canvas-bg);touch-action:none}
-
-/* UTILITY */
-.hidden{display:none}
-.mono{font-family:'JetBrains Mono',monospace}
-.sub{color:var(--sub)}
-.flex{display:flex;align-items:center;gap:8px}
-.mt8{margin-top:8px}
-.mt16{margin-top:16px}
-.mt12{margin-top:12px}
 .sep{height:1px;background:var(--border);margin:16px 0}
-.badge{display:inline-block;font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--sub)}
+.mono{font-family:'JetBrains Mono',monospace}
+.hidden{display:none}
 
-/* RESPONSIVE */
+/* PRINT — output mirip PDF */
+@media print{
+  .top-bar,.online-indicator,.watermark,#plexusBg,#toast,#ov,.btn-primary,.btn-ghost,.tb-btn,
+  #inputSection,#visSection,.iter-controls,.cv-controls,.music-player{display:none!important}
+  body{background:#fff;color:#000}
+  .section{box-shadow:none;border:1px solid #ddd;background:#fff}
+  .out-table{font-size:12px}
+  .shell{padding:0}
+}
+
 @media(max-width:768px){
   .shell{padding:10px}
   .section{padding:14px}
   .loc-grid{grid-template-columns:1fr 1fr}
   .stats-row{grid-template-columns:1fr 1fr}
-  .detail-grid{grid-template-columns:1fr}
   .top-bar{padding:6px 10px}
-  .cmp-table{font-size:12px}
-  .seg-table{font-size:12px}
-}
-
-/* PRINT */
-@media print{
-  .top-bar,.online-indicator,.watermark,#plexusBg,#toast,#ov,.btn-primary,.btn-ghost,.tb-btn{display:none!important}
-  .section{box-shadow:none;border:1px solid #ddd}
-  body{background:#fff}
+  .top-bar-right{gap:4px}
+  .tb-btn{padding:5px 8px;font-size:11px}
 }
 </style>
 </head>
@@ -325,22 +268,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
 </div>
 
-<!-- PLEXUS -->
 <canvas id="plexusBg"></canvas>
-
-<!-- ONLINE -->
 <div class="online-indicator"><div class="online-dot"></div><span id="onlineCnt">—</span> online</div>
-
-<!-- WATERMARK -->
 <div class="watermark">RAD STRIX</div>
-
-<!-- TOAST -->
 <div id="toast"></div>
-
-<!-- OVERLAY -->
 <div id="ov"><div class="spin"></div><div class="ov-txt" id="ovTxt">Memproses...</div></div>
 
-<!-- SHORTCUTS PANEL -->
+<!-- SHORTCUTS -->
 <div class="shortcuts-panel" id="scPanel" onclick="if(event.target===this)closeShortcuts()">
   <div class="sc-box">
     <h3>Keyboard Shortcuts</h3>
@@ -354,19 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <div class="sc-row"><span>Export PDF</span><span class="sc-key">Ctrl+P</span></div>
     <div class="sc-row"><span>Shortcut panel</span><span class="sc-key">?</span></div>
     <div class="sc-row"><span>Tutup panel</span><span class="sc-key">Esc</span></div>
-    <div class="mt16 btn-row"><button class="btn-ghost" onclick="closeShortcuts()" style="padding:7px 16px;font-size:12px">Tutup</button></div>
-  </div>
-</div>
-
-<!-- MODAL EXPORT -->
-<div class="modal-backdrop" id="exportModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('exportModal')">x</button>
-    <div class="modal-title">Export / Share</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn-primary" onclick="printPDF();closeModal('exportModal')">Export PDF</button>
-      <button class="btn-ghost" onclick="copyShareURL();closeModal('exportModal')">Copy Share URL</button>
-    </div>
+    <div style="margin-top:16px"><button class="btn-ghost" onclick="closeShortcuts()" style="padding:7px 16px;font-size:12px">Tutup</button></div>
   </div>
 </div>
 
@@ -378,220 +300,180 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <span style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace">Tokyo Tour Optimizer</span>
   </div>
   <div class="top-bar-right">
-    <div class="music-player" id="musicPlayer" style="padding:6px 10px">
+    <div class="music-player">
       <div class="music-dot paused" id="musicDot"></div>
-      <span class="music-title" id="musicTitle">chill lo-fi</span>
-      <button class="tb-btn" id="musicToggleBtn" onclick="toggleMusic()" style="padding:4px 8px;font-size:11px">play</button>
-      <div class="music-vol">
-        <span style="font-size:10px;font-family:'JetBrains Mono',monospace">vol</span>
-        <input type="range" min="0" max="100" value="35" id="volSlider" oninput="setVol(this.value)" style="width:55px">
+      <span class="music-title" id="musicTitle">lo-fi</span>
+      <button class="tb-btn" id="musicBtn" onclick="toggleMusic()" style="padding:4px 8px;font-size:11px">play</button>
+      <div class="music-vol" style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sub)">vol</span>
+        <input type="range" min="0" max="100" value="35" id="volSlider" style="width:50px;accent-color:var(--text)">
       </div>
     </div>
     <button class="tb-btn" onclick="toggleDark()" id="darkBtn">dark</button>
-    <button class="tb-btn" onclick="openModal('exportModal')">export</button>
+    <button class="tb-btn" onclick="printPDF()">export pdf</button>
     <button class="tb-btn" onclick="showShortcuts()">?</button>
-    <a href="index.html" class="tb-btn" style="text-decoration:none">week 1</a>
+    <a href="index.html" class="tb-btn">week 1</a>
   </div>
 </div>
 
-<!-- HIDDEN YOUTUBE IFRAME -->
+<!-- YOUTUBE HIDDEN -->
 <div style="position:fixed;width:1px;height:1px;bottom:-10px;left:-10px;overflow:hidden;opacity:0;pointer-events:none" aria-hidden="true">
-  <iframe id="ytFrame"
-    src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=0&loop=1&playlist=jfKfPfyJRdk&controls=0&mute=0&start=0"
-    allow="autoplay"
-    frameborder="0"
-    id="ytFrame"></iframe>
+  <iframe id="ytFrame" src="" allow="autoplay" frameborder="0"></iframe>
 </div>
 
-<!-- MAIN -->
 <div class="shell">
 
   <!-- HERO -->
   <div class="hero">
     <h1>Tokyo One Day Tour</h1>
-    <p>Optimasi rute perjalanan wisata berdasarkan NIM. Bandingkan dua alternatif rute dengan analisis waktu, biaya, dan efisiensi transportasi.</p>
+    <p>Optimasi rute perjalanan wisata berdasarkan NIM. Input data dari Google Maps, bandingkan dua alternatif rute, lihat output rencana perjalanan lengkap.</p>
   </div>
 
-  <!-- SECTION 1: NIM -->
+  <!-- SECTION 1: NIM & IDENTITAS -->
   <div class="section">
     <div class="sec-title"><span class="step-badge">1</span>Identitas & NIM</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
       <div>
-        <div class="nim-input-wrap" style="max-width:100%">
-          <label>Nama Mahasiswa</label>
-          <input type="text" id="studentName" placeholder="Nama lengkap" style="font-family:'DM Sans',sans-serif;letter-spacing:0">
-        </div>
+        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">NAMA MAHASISWA</div>
+        <input type="text" id="studentName" placeholder="Nama lengkap"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
       </div>
       <div>
-        <div class="nim-input-wrap" style="max-width:100%">
-          <label>NIM</label>
-          <input type="text" id="nimInput" placeholder="contoh: 102052406000" oninput="onNimInput(this.value)" maxlength="20">
-        </div>
-        <div class="nim-hint" id="nimHint">Masukkan NIM — 4 digit terakhir menentukan lokasi</div>
+        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">KELAS</div>
+        <input type="text" id="studentClass" placeholder="contoh: TI-47-01"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">NIM</div>
+        <input type="text" id="nimInput" placeholder="102012305000" oninput="onNimInput(this.value)"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;outline:none">
+        <div style="font-size:11px;color:var(--sub);margin-top:4px;font-family:'JetBrains Mono',monospace" id="nimHint">4 digit terakhir NIM menentukan lokasi</div>
       </div>
     </div>
 
-    <!-- Lokasi A -->
-    <div style="margin-bottom:12px">
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">LOKASI DARI NIM — DIGIT ABCD</div>
-      <div class="loc-grid" id="locGrid">
-        <div class="loc-card" id="lcA"><div class="loc-badge">A</div><div class="loc-type">Stasiun / Hotel</div><div class="loc-name" id="lcAname">—</div></div>
-        <div class="loc-card" id="lcB"><div class="loc-badge">B</div><div class="loc-type">Taman</div><div class="loc-name" id="lcBname">—</div></div>
-        <div class="loc-card" id="lcC"><div class="loc-badge">C</div><div class="loc-type">Landmark / Bersejarah</div><div class="loc-name" id="lcCname">—</div></div>
-        <div class="loc-card" id="lcD"><div class="loc-badge">D</div><div class="loc-type">Pusat Perbelanjaan</div><div class="loc-name" id="lcDname">—</div></div>
-      </div>
-    </div>
-
-    <div class="sep"></div>
-
-    <!-- Tanggal + Mulai -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
       <div>
         <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">TANGGAL PERJALANAN</div>
-        <input type="date" id="tourDate" value="2026-03-01" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none">
+        <input type="date" id="tourDate" value="2026-03-01"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none"
+          onchange="updateDateDisplay()">
+        <div style="font-size:11px;color:var(--sub);margin-top:4px;font-family:'JetBrains Mono',monospace" id="dateDisplay"></div>
       </div>
       <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">JAM MULAI TOUR</div>
-        <input type="time" id="startTime" value="08:00" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none">
+        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">JAM MULAI</div>
+        <input type="time" id="startTime" value="08:00"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none">
       </div>
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">KAMPUS / FORMAT NIM</div>
-        <select id="campusSel" onchange="onNimInput(document.getElementById('nimInput').value)" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
-          <option value="sby">Kampus Surabaya</option>
-          <option value="bdg">Kampus Bandung</option>
-          <option value="pwt">Kampus Purwokerto</option>
-        </select>
-      </div>
+    </div>
+
+    <!-- LOC CARDS -->
+    <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">LOKASI BERDASARKAN NIM</div>
+    <div class="loc-grid" id="locGrid">
+      <div class="loc-card" id="lcA"><div class="loc-badge">A</div><div class="loc-type">Stasiun / Hotel</div><div class="loc-name" id="lcAname">—</div></div>
+      <div class="loc-card" id="lcB"><div class="loc-badge">B</div><div class="loc-type">Taman</div><div class="loc-name" id="lcBname">—</div></div>
+      <div class="loc-card" id="lcC"><div class="loc-badge">C</div><div class="loc-type">Landmark</div><div class="loc-name" id="lcCname">—</div></div>
+      <div class="loc-card" id="lcD"><div class="loc-badge">D</div><div class="loc-type">Pusat Perbelanjaan</div><div class="loc-name" id="lcDname">—</div></div>
     </div>
   </div>
 
-  <!-- SECTION 2: INPUT SEGMEN -->
-  <div class="section" id="inputSection" style="display:none">
-    <div class="sec-title"><span class="step-badge">2</span>Input Data Perjalanan Per Segmen</div>
-
+  <!-- SECTION 2: INPUT DATA -->
+  <div class="section hidden" id="inputSection">
+    <div class="sec-title"><span class="step-badge">2</span>Input Data Perjalanan</div>
     <div style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:14px">
-      Isi data waktu tempuh, biaya, dan moda transportasi untuk setiap segmen perjalanan.
-      Gunakan Google Maps dengan "depart at" sesuai jadwal dan tanggal <span class="mono" style="font-size:11px" id="dateHint">Minggu, 1 Maret 2026</span>.
+      Buka Google Maps, set <strong style="color:var(--text)">"Depart at"</strong> sesuai tanggal dan jam masing-masing segmen.
+      Catat durasi, biaya, moda transport, dan jalur alternatif yang dipilih.
     </div>
 
-    <!-- Dua Rute Tab -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchInputTab(0,this)">Rute 1: A-B-C-D-A</button>
-      <button class="tab-btn" onclick="switchInputTab(1,this)">Rute 2: A-C-B-D-A</button>
+      <button class="tab-btn active" onclick="switchTab2(0,this)">Rute 1 — A-B-C-D-A</button>
+      <button class="tab-btn" onclick="switchTab2(1,this)">Rute 2 — A-C-B-D-A</button>
     </div>
 
-    <!-- Rute 1 -->
-    <div class="tab-pane active" id="inputTab0">
-      <div style="margin-bottom:12px">
-        <div class="route-vis" id="rvR1"></div>
-      </div>
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">DATA SEGMEN — RUTE 1 (A-B-C-D-A)</div>
+    <!-- INPUT RUTE 1 -->
+    <div class="tab-pane active" id="inp0">
+      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">SEGMEN RUTE 1 (A-B-C-D-A)</div>
       <div style="overflow-x:auto">
-        <table class="seg-table" id="segTableR1">
-          <thead>
-            <tr>
-              <th>Segmen</th>
-              <th>Waktu Keberangkatan</th>
-              <th>Durasi Tempuh</th>
-              <th>Biaya (JPY)</th>
-              <th>Moda Transport</th>
-              <th>Jumlah Transfer</th>
-              <th>Jalan Kaki (mnt)</th>
-            </tr>
-          </thead>
-          <tbody id="segBodyR1"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="font-weight:600;font-size:12px;padding:10px;font-family:'JetBrains Mono',monospace">TOTAL RUTE 1</td>
-              <td><span id="r1TotalDur" class="mono" style="font-weight:700">—</span></td>
-              <td><span id="r1TotalCost" class="mono" style="font-weight:700">—</span></td>
-              <td colspan="3"></td>
-            </tr>
-          </tfoot>
+        <table class="seg-table" id="segT0">
+          <thead><tr>
+            <th style="width:140px">Segmen</th>
+            <th>Dep.</th>
+            <th>Durasi (mnt)</th>
+            <th>Biaya (JPY)</th>
+            <th>Moda</th>
+            <th>Transfer</th>
+            <th>Jalan Kaki (mnt)</th>
+            <th>Jalur Dipilih (keterangan)</th>
+          </tr></thead>
+          <tbody id="segBody0"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Rute 2 -->
-    <div class="tab-pane" id="inputTab1">
-      <div style="margin-bottom:12px">
-        <div class="route-vis" id="rvR2"></div>
-      </div>
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">DATA SEGMEN — RUTE 2 (A-C-B-D-A)</div>
+    <!-- INPUT RUTE 2 -->
+    <div class="tab-pane" id="inp1">
+      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">SEGMEN RUTE 2 (A-C-B-D-A)</div>
       <div style="overflow-x:auto">
-        <table class="seg-table" id="segTableR2">
-          <thead>
-            <tr>
-              <th>Segmen</th>
-              <th>Waktu Keberangkatan</th>
-              <th>Durasi Tempuh</th>
-              <th>Biaya (JPY)</th>
-              <th>Moda Transport</th>
-              <th>Jumlah Transfer</th>
-              <th>Jalan Kaki (mnt)</th>
-            </tr>
-          </thead>
-          <tbody id="segBodyR2"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="font-weight:600;font-size:12px;padding:10px;font-family:'JetBrains Mono',monospace">TOTAL RUTE 2</td>
-              <td><span id="r2TotalDur" class="mono" style="font-weight:700">—</span></td>
-              <td><span id="r2TotalCost" class="mono" style="font-weight:700">—</span></td>
-              <td colspan="3"></td>
-            </tr>
-          </tfoot>
+        <table class="seg-table" id="segT1">
+          <thead><tr>
+            <th style="width:140px">Segmen</th>
+            <th>Dep.</th>
+            <th>Durasi (mnt)</th>
+            <th>Biaya (JPY)</th>
+            <th>Moda</th>
+            <th>Transfer</th>
+            <th>Jalan Kaki (mnt)</th>
+            <th>Jalur Dipilih (keterangan)</th>
+          </tr></thead>
+          <tbody id="segBody1"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Visit time -->
     <div class="sep"></div>
-    <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">WAKTU KUNJUNGAN DI LOKASI (menit)</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="visitTimeGrid"></div>
+
+    <!-- VISIT TIME + ADMISSION + NOTES -->
+    <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">DETAIL KUNJUNGAN PER LOKASI</div>
+    <div id="visitDetailGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
 
     <div class="sep"></div>
     <div class="btn-row">
-      <button class="btn-primary" onclick="runAnalysis()">Analisis Kedua Rute</button>
-      <button class="btn-ghost" onclick="clearInputs()">Reset Input</button>
-      <label class="toggle-row" style="margin-left:auto">
-        <span style="font-size:12px;color:var(--sub)">Tampilkan contoh data</span>
-        <label class="toggle"><input type="checkbox" id="demoToggle" onchange="toggleDemo(this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-      </label>
+      <button class="btn-primary" onclick="runAnalysis()">Analisis & Generate Output</button>
+      <button class="btn-ghost" onclick="fillDemo()">Isi Contoh Data</button>
+      <button class="btn-ghost" onclick="clearAll()" style="margin-left:auto">Reset</button>
     </div>
   </div>
 
   <!-- SECTION 3: VISUALISASI -->
   <div class="section hidden" id="visSection">
     <div class="sec-title"><span class="step-badge">3</span>Visualisasi Jaringan</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="routeHighlightBtns">
-      <button class="tb-btn" id="hlR1Btn" onclick="highlightRoute(0)">Tampilkan Rute 1</button>
-      <button class="tb-btn" id="hlR2Btn" onclick="highlightRoute(1)">Tampilkan Rute 2</button>
-      <button class="tb-btn" onclick="highlightRoute(-1)">Semua Edge</button>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="iter-btn" onclick="hlRoute(0)" id="hlR1btn">Rute 1</button>
+      <button class="iter-btn" onclick="hlRoute(1)" id="hlR2btn">Rute 2</button>
+      <button class="iter-btn" onclick="hlRoute(-1)">Semua</button>
     </div>
-    <div id="cvWrap">
-      <canvas id="cv" height="420"></canvas>
-    </div>
+    <div id="cvWrap"><canvas id="cv" height="400"></canvas></div>
     <div class="cv-controls">
       <button class="iter-btn" onclick="zI()">+</button>
       <button class="iter-btn" onclick="zO()">-</button>
       <button class="iter-btn" onclick="zReset()">reset</button>
-      <span style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-left:6px">drag node untuk geser</span>
-      <button class="iter-btn" onclick="exportCanvasPNG()" style="margin-left:auto">simpan gambar</button>
+      <span style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-left:4px">drag node untuk geser</span>
+      <button class="iter-btn" onclick="savePNG()" style="margin-left:auto">simpan gambar</button>
     </div>
 
-    <!-- Iter controls -->
+    <!-- ITER CTRL -->
     <div id="iterCtrlWrap" class="hidden">
       <div class="sep"></div>
       <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">NAVIGASI LANGKAH</div>
       <div class="iter-controls">
-        <button class="iter-btn" id="iBtnFirst" onclick="iterGo(0)">|&lt;</button>
-        <button class="iter-btn" id="iBtnPrev" onclick="iterGo(curIter-1)">&lt;</button>
+        <button class="iter-btn" id="iBF" onclick="iterGo(0)">|&lt;</button>
+        <button class="iter-btn" id="iBP" onclick="iterGo(curIter-1)">&lt;</button>
         <span class="iter-badge" id="iterBadge">—</span>
-        <button class="iter-btn" id="iBtnNext" onclick="iterGo(curIter+1)">&gt;</button>
-        <button class="iter-btn" id="iBtnLast" onclick="iterGo(iterStates.length-1)">&gt;|</button>
+        <button class="iter-btn" id="iBN" onclick="iterGo(curIter+1)">&gt;</button>
+        <button class="iter-btn" id="iBL" onclick="iterGo(iterStates.length-1)">&gt;|</button>
         <span class="iter-label" id="iterLabel"></span>
-        <button class="iter-btn" id="playBtn" onclick="togglePlayback()">play</button>
-        <select id="speedSel" onchange="setSpeed(this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text)">
+        <button class="iter-btn" id="playBtn" onclick="togglePlay()">play</button>
+        <select id="speedSel" onchange="setSpd(this.value)"
+          style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text)">
           <option value="2000">0.5x</option>
           <option value="1200" selected>1x</option>
           <option value="700">2x</option>
@@ -602,54 +484,60 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     </div>
   </div>
 
-  <!-- SECTION 4: HASIL -->
+  <!-- SECTION 4: HASIL ANALISIS -->
   <div class="section hidden" id="resultsSection">
     <div class="sec-title"><span class="step-badge">4</span>Hasil Analisis</div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchResultTab(0,this)">Perbandingan</button>
-      <button class="tab-btn" onclick="switchResultTab(1,this)">Jadwal</button>
-      <button class="tab-btn" onclick="switchResultTab(2,this)">Langkah</button>
-      <button class="tab-btn" onclick="switchResultTab(3,this)">Analisis</button>
+      <button class="tab-btn active" onclick="switchTabR(0,this)">Perbandingan</button>
+      <button class="tab-btn" onclick="switchTabR(1,this)">Langkah</button>
+      <button class="tab-btn" onclick="switchTabR(2,this)">Analisis</button>
     </div>
 
-    <!-- TAB 0: Perbandingan -->
-    <div class="tab-pane active" id="resTab0">
+    <div class="tab-pane active" id="rTab0">
       <div class="stats-row" id="summaryStats"></div>
-      <div style="overflow-x:auto">
-        <table class="cmp-table" id="cmpTable"></table>
-      </div>
+      <div style="overflow-x:auto"><table class="cmp-table" id="cmpTable"></table></div>
       <div class="rec-box" id="recBox"></div>
     </div>
 
-    <!-- TAB 1: Jadwal -->
-    <div class="tab-pane" id="resTab1">
-      <div class="tabs" style="margin-top:0">
-        <button class="tab-btn active" onclick="switchScheduleTab(0,this)">Rute 1: A-B-C-D-A</button>
-        <button class="tab-btn" onclick="switchScheduleTab(1,this)">Rute 2: A-C-B-D-A</button>
-      </div>
-      <div class="tab-pane active" id="schedTab0">
-        <table class="sched-table" id="schedTableR1"></table>
-      </div>
-      <div class="tab-pane" id="schedTab1">
-        <table class="sched-table" id="schedTableR2"></table>
-      </div>
-    </div>
-
-    <!-- TAB 2: Langkah -->
-    <div class="tab-pane" id="resTab2">
+    <div class="tab-pane" id="rTab1">
       <div class="tl-wrap" id="tlWrap"></div>
     </div>
 
-    <!-- TAB 3: Analisis -->
-    <div class="tab-pane" id="resTab3">
+    <div class="tab-pane" id="rTab2">
       <div id="analysisContent"></div>
     </div>
 
     <div class="sep"></div>
     <div class="btn-row">
       <button class="btn-primary" onclick="printPDF()">Export PDF</button>
-      <button class="btn-ghost" onclick="exportCanvasPNG()">Simpan Peta</button>
+      <button class="btn-ghost" onclick="savePNG()">Simpan Peta</button>
+    </div>
+  </div>
+
+  <!-- SECTION 5: OUTPUT — format mirip PDF tugas -->
+  <div class="section hidden" id="outputSection">
+    <div class="sec-title"><span class="step-badge">5</span>Output — Rencana Perjalanan</div>
+
+    <div style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:14px">
+      Format output sesuai tugas. Berisi tabel Waktu | Kegiatan | Biaya Transportasi untuk kedua rute, lengkap dengan jalur yang dipilih, catatan admission fee, dan total biaya.
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTabO(0,this)">Rute 1 — A-B-C-D-A</button>
+      <button class="tab-btn" onclick="switchTabO(1,this)">Rute 2 — A-C-B-D-A</button>
+    </div>
+
+    <div class="tab-pane active" id="oTab0">
+      <div id="outR1"></div>
+    </div>
+    <div class="tab-pane" id="oTab1">
+      <div id="outR2"></div>
+    </div>
+
+    <div class="sep"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="printPDF()">Export PDF</button>
     </div>
   </div>
 
@@ -657,113 +545,89 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 
 <script>
 // ============================================================
-// SPLASH SCREEN
+// SPLASH
 // ============================================================
 (function(){
-  var cv=document.getElementById('splashCanvas');
-  var c=cv.getContext('2d');
-  var pts=[];
+  var cv=document.getElementById('splashCanvas'),c=cv.getContext('2d'),pts=[];
   function resize(){cv.width=innerWidth;cv.height=innerHeight;}
-  resize();
-  window.addEventListener('resize',resize);
-  for(var i=0;i<90;i++){
-    pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-      vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,
-      r:Math.random()*1.5+.5,br:Math.random()*.5+.5});
-  }
-  function frame(){
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<90;i++)pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.5,br:Math.random()*.5+.5});
+  function fr(){
     c.clearRect(0,0,cv.width,cv.height);
-    var grd=c.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,Math.min(cv.width,cv.height)*.6);
-    grd.addColorStop(0,'rgba(30,30,30,.3)');
-    grd.addColorStop(1,'rgba(0,0,0,0)');
-    c.fillStyle=grd;c.fillRect(0,0,cv.width,cv.height);
+    var g=c.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,Math.min(cv.width,cv.height)*.6);
+    g.addColorStop(0,'rgba(30,30,30,.3)');g.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=g;c.fillRect(0,0,cv.width,cv.height);
     pts.forEach(function(p){
       p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0||p.x>cv.width)p.vx*=-1;
-      if(p.y<0||p.y>cv.height)p.vy*=-1;
+      if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;
       pts.forEach(function(q){
         var dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
-        if(d<120){
-          c.beginPath();c.strokeStyle='rgba(255,255,255,'+(1-d/120)*.18+')';
-          c.lineWidth=.5;c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke();
-        }
+        if(d<120){c.beginPath();c.strokeStyle='rgba(255,255,255,'+(1-d/120)*.18+')';
+          c.lineWidth=.5;c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke();}
       });
       c.beginPath();c.arc(p.x,p.y,p.r,0,Math.PI*2);
       c.fillStyle='rgba(255,255,255,'+p.br*.4+')';c.fill();
     });
-    requestAnimationFrame(frame);
+    requestAnimationFrame(fr);
   }
-  frame();
-
-  // Audio
+  fr();
   try{
-    var ac=new(window.AudioContext||window.webkitAudioContext)();
-    var g=ac.createGain();g.gain.setValueAtTime(0,ac.currentTime);
-    g.gain.linearRampToValueAtTime(.06,ac.currentTime+.5);
-    g.gain.linearRampToValueAtTime(.04,ac.currentTime+2.5);
-    g.gain.linearRampToValueAtTime(0,ac.currentTime+3.2);
-    g.connect(ac.destination);
+    var ac=new(window.AudioContext||window.webkitAudioContext)(),g2=ac.createGain();
+    g2.gain.setValueAtTime(0,ac.currentTime);
+    g2.gain.linearRampToValueAtTime(.06,ac.currentTime+.5);
+    g2.gain.linearRampToValueAtTime(0,ac.currentTime+3.2);
+    g2.connect(ac.destination);
     [220,330].forEach(function(f){
-      var o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(f,ac.currentTime);
+      var o=ac.createOscillator();o.type='sine';
+      o.frequency.setValueAtTime(f,ac.currentTime);
       o.frequency.linearRampToValueAtTime(f*2,ac.currentTime+3);
-      o.connect(g);o.start();o.stop(ac.currentTime+3.3);
+      o.connect(g2);o.start();o.stop(ac.currentTime+3.3);
     });
   }catch(e){}
-
-  setTimeout(function(){
-    document.getElementById('splashScreen').classList.add('hidden');
-  },3200);
+  setTimeout(function(){document.getElementById('splashScreen').classList.add('hidden');},3200);
 })();
 
 // ============================================================
-// PLEXUS BACKGROUND
+// PLEXUS
 // ============================================================
-var plxCv=document.getElementById('plexusBg');
-var plxCtx=plxCv.getContext('2d');
-var plxPts=[];
-function initPlexus(){
-  plxCv.width=innerWidth;plxCv.height=innerHeight;
-  plxPts=[];
-  for(var i=0;i<55;i++){
-    plxPts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-      vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12});
-  }
+var plxCv=document.getElementById('plexusBg'),plxCtx=plxCv.getContext('2d'),plxPts=[];
+function initPlx(){
+  plxCv.width=innerWidth;plxCv.height=innerHeight;plxPts=[];
+  for(var i=0;i<55;i++)plxPts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12});
 }
-function animPlexus(){
-  var dark=document.documentElement.getAttribute('data-theme')==='dark';
+function animPlx(){
+  var dk=document.documentElement.getAttribute('data-theme')==='dark';
   plxCtx.clearRect(0,0,plxCv.width,plxCv.height);
   plxPts.forEach(function(p){
     p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0||p.x>plxCv.width)p.vx*=-1;
-    if(p.y<0||p.y>plxCv.height)p.vy*=-1;
+    if(p.x<0||p.x>plxCv.width)p.vx*=-1;if(p.y<0||p.y>plxCv.height)p.vy*=-1;
     plxPts.forEach(function(q){
       var dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
       if(d<140){
         plxCtx.beginPath();
-        var op=(1-d/140)*(dark?.08:.06);
-        plxCtx.strokeStyle=dark?'rgba(255,255,255,'+op+')':'rgba(26,26,26,'+op+')';
+        var op=(1-d/140)*(dk?.08:.06);
+        plxCtx.strokeStyle=dk?'rgba(255,255,255,'+op+')':'rgba(26,26,26,'+op+')';
         plxCtx.lineWidth=.8;plxCtx.moveTo(p.x,p.y);plxCtx.lineTo(q.x,q.y);plxCtx.stroke();
       }
     });
-    plxCtx.beginPath();
-    plxCtx.arc(p.x,p.y,1.5,0,Math.PI*2);
-    plxCtx.fillStyle=dark?'rgba(255,255,255,.12)':'rgba(26,26,26,.1)';
-    plxCtx.fill();
+    plxCtx.beginPath();plxCtx.arc(p.x,p.y,1.5,0,Math.PI*2);
+    plxCtx.fillStyle=dk?'rgba(255,255,255,.12)':'rgba(26,26,26,.1)';plxCtx.fill();
   });
-  requestAnimationFrame(animPlexus);
+  requestAnimationFrame(animPlx);
 }
-initPlexus();animPlexus();
-window.addEventListener('resize',function(){initPlexus();});
+initPlx();animPlx();
+window.addEventListener('resize',initPlx);
 
 // ============================================================
-// ONLINE INDICATOR
+// ONLINE
 // ============================================================
 (function(){
-  var base=Math.floor(Math.random()*8)+3;
-  document.getElementById('onlineCnt').textContent=base;
+  var b=Math.floor(Math.random()*8)+3;
+  document.getElementById('onlineCnt').textContent=b;
   setInterval(function(){
-    var j=base+Math.floor(Math.random()*5)-2;
-    if(j<1)j=1;
+    var j=b+Math.floor(Math.random()*5)-2;if(j<1)j=1;
     document.getElementById('onlineCnt').textContent=j;
   },8000);
 })();
@@ -786,26 +650,12 @@ function toast(msg,type){
   var t=document.getElementById('toast');
   var d=document.createElement('div');
   d.className='toast-item'+(type==='error'?' err':type==='ok'?' ok':'');
-  d.textContent=msg;
-  t.appendChild(d);
+  d.textContent=msg;t.appendChild(d);
   setTimeout(function(){d.classList.add('show');},10);
   setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},400);},3000);
 }
-
-// ============================================================
-// OVERLAY
-// ============================================================
-function showOv(txt){
-  document.getElementById('ov').classList.add('on');
-  document.getElementById('ovTxt').textContent=txt||'Memproses...';
-}
+function showOv(t){document.getElementById('ov').classList.add('on');document.getElementById('ovTxt').textContent=t||'Memproses...';}
 function hideOv(){document.getElementById('ov').classList.remove('on');}
-
-// ============================================================
-// MODAL / SHORTCUTS
-// ============================================================
-function openModal(id){document.getElementById(id).classList.add('on');}
-function closeModal(id){document.getElementById(id).classList.remove('on');}
 function showShortcuts(){document.getElementById('scPanel').classList.add('on');}
 function closeShortcuts(){document.getElementById('scPanel').classList.remove('on');}
 
@@ -819,7 +669,7 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='ArrowLeft')iterGo(curIter-1);
   else if(e.key==='Home')iterGo(0);
   else if(e.key==='End')iterGo(iterStates.length-1);
-  else if(e.key===' '){e.preventDefault();togglePlayback();}
+  else if(e.key===' '){e.preventDefault();togglePlay();}
   else if(e.key==='?')showShortcuts();
   else if(e.key==='Escape')closeShortcuts();
   else if(e.key==='d'||e.key==='D')toggleDark();
@@ -828,287 +678,232 @@ document.addEventListener('keydown',function(e){
 });
 
 // ============================================================
-// LOKASI DATABASE
+// DATABASE LOKASI
 // ============================================================
 var LOCS={
-  A:['Shibuya Station','Ikebukuro Station','Ueno Station','Shinjuku Station','Akihabara Station','Shinagawa Station','Tokyo Station','Gotanda Station','Daikan-Yama Station','Ochanomizu Station'],
-  B:['Yoyogi Park','Rikugien Gardens','Shinjuku Gyoen National Garden','Odaiba Seaside Park','Imperial Palace East National Gardens','Hamarikyu Gardens','Kyu-Shiba-rikyu Gardens','Kasai Rinkai Park','Koishikawa Korakuen Gardens','Rinshi-no-mori Park'],
-  C:['Senso-ji Temple','Hie-jinja Shrine','Yasukuni-jinja Shrine','Tokyo Tower','The Japanese Sword Museum','Sengaku-ji','Shibuya Crossing','The National Art Center, Tokyo','Fukagawa Edo Museum','Meiji Jingu'],
-  D:['Tokyu Plaza Omotesando "OMOKADO"','Tokyo Midtown','Yodobashi Akiba','DECKS Tokyo Beach','KITTE Marunouchi','Nihombashi Mitsukoshi Main Store','Mitsukoshi Ginza','Yodobashi Akiba','Ginza Six','DiverCity Tokyo Plaza']
+  A:['Shibuya Station','Ikebukuro Station','Ueno Station','Shinjuku Station',
+     'Akihabara Station','Shinagawa Station','Tokyo Station','Gotanda Station',
+     'Daikan-Yama Station','Ochanomizu Station'],
+  B:['Yoyogi Park','Rikugien Gardens','Shinjuku Gyoen National Garden',
+     'Odaiba Seaside Park','Imperial Palace East Gardens','Hamarikyu Gardens',
+     'Kyu-Shiba-rikyu Gardens','Kasai Rinkai Park',
+     'Koishikawa Korakuen Gardens','Rinshi-no-mori Park'],
+  C:['Senso-ji Temple','Hie-jinja Shrine','Yasukuni-jinja Shrine',
+     'Tokyo Tower','The Japanese Sword Museum','Sengaku-ji',
+     'Shibuya Crossing','The National Art Center Tokyo',
+     'Fukagawa Edo Museum','Meiji Jingu'],
+  D:['Tokyu Plaza Omotesando','Tokyo Midtown','Yodobashi Akiba',
+     'DECKS Tokyo Beach','KITTE Marunouchi','Nihombashi Mitsukoshi',
+     'Mitsukoshi Ginza','DiverCity Tokyo Plaza',
+     'Ginza Six','DiverCity Tokyo Plaza']
 };
 
-var MODES=['Kereta/Train','Subway','Bus','Jalan Kaki'];
+// Admission fee default per lokasi
+var ADMISSION={
+  A:{fee:0,note:''},
+  B:{fee:300,note:'admission fee ¥300'},
+  C:{fee:0,note:'admission fee ¥0'},
+  D:{fee:0,note:'admission fee ¥0'}
+};
+
+// Deskripsi aktivitas default per lokasi
+var ACTIVITIES={
+  A:'Kembali ke titik keberangkatan.',
+  B:'Berjalan mengitari area, berfoto.',
+  C:'Berjalan mengitari area, berfoto, berbelanja souvenir.',
+  D:'Berjalan mengitari area, berfoto, berbelanja.'
+};
+
+var MODES=['Kereta/Train','Subway','Bus','Jalan Kaki','Taksi/Grab'];
 
 // ============================================================
 // STATE GLOBAL
 // ============================================================
-var nimDigits={A:0,B:0,C:0,D:0};
 var locNames={A:'',B:'',C:'',D:''};
-var iterStates=[];
-var curIter=0;
-var playInterval=null;
-var playSpeed=1200;
-var sc=1;
-var di=-1;
-var dOff={x:0,y:0};
+var nimDigits={A:0,B:0,C:0,D:0};
+var iterStates=[],curIter=0,playInterval=null,playSpd=1200,_playing=false;
+var sc=1,di=-1,dOff={x:0,y:0};
 var nodePos=[];
-var analysisResult=null;
-
-// Canvas
-var cv=null,c=null;
-var W=0,H=420;
+var canvasNodes=[],canvasEdges=[];
+var analysisRes=null;
+var cv_el=null,ctx=null;
+var CVH=400,CVW=0;
 
 // ============================================================
-// NIM PARSING
+// NIM
 // ============================================================
 function onNimInput(val){
   val=val.trim();
-  var campus=document.getElementById('campusSel').value;
-  var digits=extractNimDigits(val,campus);
-  if(!digits){
-    document.getElementById('nimHint').textContent='Format NIM belum dikenali — periksa pilihan kampus';
-    resetLocCards();
-    return;
-  }
-  nimDigits=digits;
-  locNames.A=LOCS.A[digits.A];
-  locNames.B=LOCS.B[digits.B];
-  locNames.C=LOCS.C[digits.C];
-  locNames.D=LOCS.D[digits.D];
-
-  document.getElementById('nimHint').textContent='Digit ABCD: '+digits.A+digits.B+digits.C+digits.D+' — lokasi terdeteksi';
-  document.getElementById('lcAname').textContent=locNames.A;
-  document.getElementById('lcBname').textContent=locNames.B;
-  document.getElementById('lcCname').textContent=locNames.C;
-  document.getElementById('lcDname').textContent=locNames.D;
-  ['A','B','C','D'].forEach(function(l){document.getElementById('lc'+l).classList.add('active');});
-
-  // Update visit time grid
-  buildVisitTimeGrid();
-  // Build segment tables
-  buildSegmentTables();
-  // Show input section
-  document.getElementById('inputSection').style.display='block';
-  // Build route visualizations
-  buildRouteVis('rvR1',['A','B','C','D','A']);
-  buildRouteVis('rvR2',['A','C','B','D','A']);
-  // Update date hint
-  var d=new Date(document.getElementById('tourDate').value);
-  document.getElementById('dateHint').textContent=formatDateID(d);
-}
-
-function extractNimDigits(nim,campus){
-  // Format: 4 digit terakhir = ABCD
-  nim=nim.replace(/\s/g,'');
-  if(nim.length<4)return null;
-  var s=nim.slice(-4);
-  var digits={};
+  if(val.length<4){document.getElementById('nimHint').textContent='Minimal 4 karakter NIM';return;}
+  var last4=val.slice(-4);
+  var ok=true;
   ['A','B','C','D'].forEach(function(l,i){
-    var d=parseInt(s[i]);
-    if(isNaN(d))d=0;
-    digits[l]=d%10;
+    var d=parseInt(last4[i]);
+    if(isNaN(d)){ok=false;return;}
+    nimDigits[l]=d%10;
+    locNames[l]=LOCS[l][d%10];
   });
-  return digits;
-}
+  if(!ok){document.getElementById('nimHint').textContent='Digit NIM tidak valid';return;}
 
-function resetLocCards(){
+  document.getElementById('nimHint').textContent=
+    'Digit: '+nimDigits.A+nimDigits.B+nimDigits.C+nimDigits.D+
+    ' — lokasi terdeteksi';
+
   ['A','B','C','D'].forEach(function(l){
-    document.getElementById('lc'+l+'name').textContent='—';
-    document.getElementById('lc'+l).classList.remove('active');
+    document.getElementById('lc'+l+'name').textContent=locNames[l];
+    document.getElementById('lc'+l).classList.add('active');
   });
+
+  buildSegTables();
+  buildVisitDetailGrid();
+  document.getElementById('inputSection').classList.remove('hidden');
 }
 
 // ============================================================
-// BUILD UI COMPONENTS
+// BUILD SEGMENT TABLES
 // ============================================================
-function buildRouteVis(containerId,seq){
-  var el=document.getElementById(containerId);
-  el.innerHTML='';
-  seq.forEach(function(l,i){
-    var nodeEl=document.createElement('div');
-    nodeEl.className='rv-node';
-    var isStart=i===0;
-    var isEnd=i===seq.length-1;
-    nodeEl.innerHTML='<div class="rv-circle'+(isStart?' start':isEnd?' end':'')+'">'+(l==='A'&&isEnd?'A':l)+'</div>'
-      +'<div class="rv-label">'+(locNames[l]||l)+'</div>';
-    el.appendChild(nodeEl);
-    if(i<seq.length-1){
-      var arrEl=document.createElement('div');
-      arrEl.className='rv-arrow';
-      arrEl.innerHTML='<div class="rv-line"></div><div class="rv-seg-label" id="rvseg_'+containerId+'_'+i+'">—</div>';
-      el.appendChild(arrEl);
-    }
+var SEQS=[
+  [['A','B'],['B','C'],['C','D'],['D','A']],
+  [['A','C'],['C','B'],['B','D'],['D','A']]
+];
+
+function buildSegTables(){
+  [0,1].forEach(function(ri){
+    var tb=document.getElementById('segBody'+ri);
+    tb.innerHTML='';
+    SEQS[ri].forEach(function(seg,si){
+      var f=seg[0],t=seg[1];
+      var tr=document.createElement('tr');
+      tr.innerHTML=
+        '<td><div class="seg-from-to">'+f+' → '+t+'</div>'
+          +'<div class="seg-sub" style="font-size:10px;color:var(--sub);margin-top:2px">'
+            +(locNames[f]||f)+' ke '+(locNames[t]||t)
+          +'</div></td>'
+        +'<td><input type="time" id="r'+ri+'_dep_'+si+'" value="'+defDep(ri,si)+'"></td>'
+        +'<td><input type="number" id="r'+ri+'_dur_'+si+'" placeholder="mnt" min="0"></td>'
+        +'<td><input type="number" id="r'+ri+'_cost_'+si+'" placeholder="0" min="0"></td>'
+        +'<td><select id="r'+ri+'_mode_'+si+'">'
+          +MODES.map(function(m){return '<option>'+m+'</option>';}).join('')
+        +'</select></td>'
+        +'<td><input type="number" id="r'+ri+'_trans_'+si+'" placeholder="0" min="0" style="width:55px"></td>'
+        +'<td><input type="number" id="r'+ri+'_walk_'+si+'" placeholder="0" min="0" style="width:65px"></td>'
+        +'<td><textarea id="r'+ri+'_jalur_'+si+'" placeholder="contoh: Jalur yang dipilih adalah alternatif pertama (¥208, walk 4 min)." rows="2" style="min-width:200px"></textarea></td>';
+      tb.appendChild(tr);
+    });
   });
 }
 
-function buildSegmentTables(){
-  var r1segs=[['A','B'],['B','C'],['C','D'],['D','A']];
-  var r2segs=[['A','C'],['C','B'],['B','D'],['D','A']];
-  buildSegBody('segBodyR1',r1segs,'r1');
-  buildSegBody('segBodyR2',r2segs,'r2');
-}
-
-function buildSegBody(tbodyId,segs,prefix){
-  var tb=document.getElementById(tbodyId);
-  tb.innerHTML='';
-  segs.forEach(function(seg,i){
-    var from=seg[0],to=seg[1];
-    var tr=document.createElement('tr');
-    tr.innerHTML=
-      '<td><div class="seg-from-to">'+from+' → '+to+'</div>'
-        +'<div class="seg-sub">'+(locNames[from]||from)+' ke '+(locNames[to]||to)+'</div></td>'
-      +'<td><input type="time" id="'+prefix+'_dep_'+i+'" value="'+getDefaultDepTime(prefix,i)+'" onchange="updateRouteTotals()"></td>'
-      +'<td><input type="number" id="'+prefix+'_dur_'+i+'" placeholder="menit" min="0" oninput="updateRouteTotals()"></td>'
-      +'<td><input type="number" id="'+prefix+'_cost_'+i+'" placeholder="0" min="0" oninput="updateRouteTotals()"></td>'
-      +'<td><select id="'+prefix+'_mode_'+i+'">'
-        +MODES.map(function(m){return '<option>'+m+'</option>';}).join('')
-      +'</select></td>'
-      +'<td><input type="number" id="'+prefix+'_trans_'+i+'" placeholder="0" min="0" style="width:60px"></td>'
-      +'<td><input type="number" id="'+prefix+'_walk_'+i+'" placeholder="0" min="0" style="width:60px"></td>';
-    tb.appendChild(tr);
-  });
-}
-
-function getDefaultDepTime(prefix,i){
+function defDep(ri,si){
   var base=document.getElementById('startTime')?document.getElementById('startTime').value:'08:00';
-  var h=parseInt(base.split(':')[0])||8;
-  var m=parseInt(base.split(':')[1])||0;
-  // rough default spacing
-  var offsets=[0,90,180,300];
-  var tot=(h*60+m+offsets[i]);
-  return pad2(Math.floor(tot/60)%24)+':'+pad2(tot%60);
+  var h=parseInt(base.split(':')[0])||8,m=parseInt(base.split(':')[1])||0;
+  var offs=[[0,90,180,300],[0,90,180,300]];
+  var tot=h*60+m+offs[ri][si];
+  return p2(Math.floor(tot/60)%24)+':'+p2(tot%60);
 }
 
-function buildVisitTimeGrid(){
-  var g=document.getElementById('visitTimeGrid');
+// ============================================================
+// BUILD VISIT DETAIL GRID
+// ============================================================
+function buildVisitDetailGrid(){
+  var g=document.getElementById('visitDetailGrid');
   g.innerHTML='';
-  ['A','B','C','D'].forEach(function(l){
-    var defaults={A:30,B:60,C:90,D:120};
+  // B, C, D (A tidak dikunjungi, hanya start/finish)
+  ['B','C','D'].forEach(function(l){
+    var defTime={B:121,C:153,D:276}; // default dari PDF: B 08:29-10:30 = 121mnt, C 10:57-13:37=160, D 14:24-19:00=276
+    var defAdm={B:300,C:0,D:0};
+    var defNote={
+      B:'',
+      C:'Makan siang di area '+locNames[l]+'. Catatan: biaya makan siang ¥1000-¥1500.',
+      D:'Pukul 15.00 atau 17.00 dapat menyaksikan pertunjukan atau event di area ini. Jika diperlukan, tersedia pilihan restoran untuk makan malam. Catatan: biaya makan malam ¥1000-¥1500.'
+    };
     var div=document.createElement('div');
-    div.innerHTML='<div style="font-size:11px;color:var(--sub);font-family:\'JetBrains Mono\',monospace;margin-bottom:4px">'+l+' — '+(locNames[l]||l)+'</div>'
-      +'<input type="number" id="vt_'+l+'" value="'+defaults[l]+'" min="5" max="300" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-family:\'JetBrains Mono\',monospace;font-size:13px;outline:none">'
-      +'<div style="font-size:10px;color:var(--sub);margin-top:2px;font-family:\'JetBrains Mono\',monospace">menit</div>';
+    div.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px';
+    div.innerHTML=
+      '<div style="font-size:11px;font-family:\'JetBrains Mono\',monospace;font-weight:600;margin-bottom:10px;color:var(--text)">'+l+' — '+(locNames[l]||l)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">LAMA KUNJUNGAN (mnt)</div>'
+      +'<input type="number" id="vt_'+l+'" value="'+(defTime[l]||60)+'" min="5" max="600" '
+        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'JetBrains Mono\',monospace;font-size:13px;outline:none;margin-bottom:8px">'
+      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">ADMISSION FEE (JPY)</div>'
+      +'<input type="number" id="adm_'+l+'" value="'+(defAdm[l]||0)+'" min="0" '
+        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'JetBrains Mono\',monospace;font-size:13px;outline:none;margin-bottom:8px">'
+      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">CATATAN TAMBAHAN</div>'
+      +'<textarea id="note_'+l+'" rows="3" '
+        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;resize:vertical">'
+        +(defNote[l]||'')+'</textarea>';
     g.appendChild(div);
   });
 }
 
 // ============================================================
-// UPDATE TOTALS
+// DATE DISPLAY
 // ============================================================
-function updateRouteTotals(){
-  ['r1','r2'].forEach(function(p,ri){
-    var n=4;
-    var totDur=0,totCost=0;
-    for(var i=0;i<n;i++){
-      var dur=parseFloat(document.getElementById(p+'_dur_'+i)?.value)||0;
-      var cost=parseFloat(document.getElementById(p+'_cost_'+i)?.value)||0;
-      totDur+=dur;totCost+=cost;
-    }
-    document.getElementById((p==='r1'?'r1':'r2')+'TotalDur').textContent=totDur?totDur+' mnt':'—';
-    document.getElementById((p==='r1'?'r1':'r2')+'TotalCost').textContent=totCost?'¥'+totCost.toLocaleString():'—';
-  });
+function updateDateDisplay(){
+  var d=new Date(document.getElementById('tourDate').value+'T12:00:00');
+  document.getElementById('dateDisplay').textContent=formatDateID(d);
 }
-
-function toggleDemo(on){
-  if(!on)return;
-  // Demo data untuk rute 1
-  var demoR1=[[35,200],[28,170],[22,150],[40,220]];
-  var demoR2=[[42,220],[25,180],[30,160],[38,210]];
-  demoR1.forEach(function(d,i){
-    var el=document.getElementById('r1_dur_'+i);
-    var ec=document.getElementById('r1_cost_'+i);
-    if(el)el.value=d[0];
-    if(ec)ec.value=d[1];
-  });
-  demoR2.forEach(function(d,i){
-    var el=document.getElementById('r2_dur_'+i);
-    var ec=document.getElementById('r2_cost_'+i);
-    if(el)el.value=d[0];
-    if(ec)ec.value=d[1];
-  });
-  // Visit times
-  var vtDemo={A:30,B:75,C:90,D:120};
-  Object.keys(vtDemo).forEach(function(l){
-    var el=document.getElementById('vt_'+l);
-    if(el)el.value=vtDemo[l];
-  });
-  updateRouteTotals();
-  toast('Contoh data diisi','ok');
+function formatDateID(d){
+  var days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  var months=['Januari','Februari','Maret','April','Mei','Juni',
+    'Juli','Agustus','September','Oktober','November','Desember'];
+  return days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
 }
-
-function clearInputs(){
-  ['r1','r2'].forEach(function(p){
-    for(var i=0;i<4;i++){
-      ['dur','cost','trans','walk'].forEach(function(f){
-        var el=document.getElementById(p+'_'+f+'_'+i);
-        if(el)el.value='';
-      });
-    }
-  });
-  updateRouteTotals();
-  document.getElementById('demoToggle').checked=false;
-  toast('Input direset');
-}
+updateDateDisplay();
 
 // ============================================================
-// READ DATA FROM INPUTS
+// READ DATA
 // ============================================================
-function readRouteData(prefix){
+function readRoute(ri){
   var segs=[];
-  var r1segs=[['A','B'],['B','C'],['C','D'],['D','A']];
-  var r2segs=[['A','C'],['C','B'],['B','D'],['D','A']];
-  var seqMap={r1:r1segs,r2:r2segs};
-  var seq=seqMap[prefix];
-  for(var i=0;i<4;i++){
-    var dur=parseFloat(document.getElementById(prefix+'_dur_'+i)?.value)||0;
-    var cost=parseFloat(document.getElementById(prefix+'_cost_'+i)?.value)||0;
-    var mode=document.getElementById(prefix+'_mode_'+i)?.value||'Kereta';
-    var trans=parseInt(document.getElementById(prefix+'_trans_'+i)?.value)||0;
-    var walk=parseInt(document.getElementById(prefix+'_walk_'+i)?.value)||0;
-    var dep=document.getElementById(prefix+'_dep_'+i)?.value||'08:00';
-    segs.push({from:seq[i][0],to:seq[i][1],dur:dur,cost:cost,mode:mode,trans:trans,walk:walk,dep:dep});
+  for(var si=0;si<4;si++){
+    var f=SEQS[ri][si][0],t=SEQS[ri][si][1];
+    segs.push({
+      from:f,to:t,
+      dep:gv('r'+ri+'_dep_'+si)||'08:00',
+      dur:parseFloat(gv('r'+ri+'_dur_'+si))||0,
+      cost:parseFloat(gv('r'+ri+'_cost_'+si))||0,
+      mode:gv('r'+ri+'_mode_'+si)||'Kereta',
+      trans:parseInt(gv('r'+ri+'_trans_'+si))||0,
+      walk:parseInt(gv('r'+ri+'_walk_'+si))||0,
+      jalur:gv('r'+ri+'_jalur_'+si)||''
+    });
   }
   return segs;
 }
 
-function readVisitTimes(){
-  var vt={};
-  ['A','B','C','D'].forEach(function(l){
-    vt[l]=parseInt(document.getElementById('vt_'+l)?.value)||0;
-  });
-  return vt;
+function gv(id){
+  var el=document.getElementById(id);
+  return el?el.value:'';
 }
+
+function readVT(l){return parseInt(gv('vt_'+l))||60;}
+function readAdm(l){return parseInt(gv('adm_'+l))||0;}
+function readNote(l){return gv('note_'+l)||'';}
 
 // ============================================================
 // MAIN ANALYSIS
 // ============================================================
 function runAnalysis(){
   if(!locNames.A){toast('Masukkan NIM terlebih dahulu','error');return;}
-  var r1=readRouteData('r1');
-  var r2=readRouteData('r2');
-  var vt=readVisitTimes();
+  var r0=readRoute(0),r1=readRoute(1);
+  var hasData=r0.some(function(s){return s.dur>0||s.cost>0;})||r1.some(function(s){return s.dur>0||s.cost>0;});
+  if(!hasData){toast('Isi data perjalanan terlebih dahulu','error');return;}
 
-  // Validasi
-  var hasData=r1.some(function(s){return s.dur>0||s.cost>0;})||r2.some(function(s){return s.dur>0||s.cost>0;});
-  if(!hasData){
-    toast('Isi data perjalanan terlebih dahulu','error');
-    return;
-  }
-
-  showOv('Menghitung analisis...');
+  showOv('Memproses...');
   setTimeout(function(){
     try{
-      analysisResult=compute(r1,r2,vt);
-      renderResults(analysisResult);
-      buildCanvas(r1,r2);
-      buildIterStates(analysisResult);
+      analysisRes=compute(r0,r1);
+      renderResults(analysisRes);
+      renderOutput(analysisRes);
+      buildCanvas(r0,r1);
+      buildIterStates(analysisRes);
       document.getElementById('visSection').classList.remove('hidden');
       document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('outputSection').classList.remove('hidden');
       document.getElementById('visSection').scrollIntoView({behavior:'smooth',block:'start'});
       toast('Analisis selesai','ok');
-    }catch(e){
-      toast('Error: '+e.message,'error');
-      console.error(e);
+    }catch(err){
+      toast('Error: '+err.message,'error');
+      console.error(err);
     }
     hideOv();
   },300);
@@ -1117,617 +912,575 @@ function runAnalysis(){
 // ============================================================
 // COMPUTE
 // ============================================================
-function compute(r1segs,r2segs,vt){
-  var startTime=document.getElementById('startTime').value||'08:00';
-  var startMin=timeToMin(startTime);
+function compute(r0segs,r1segs){
+  var startMin=timeToMin(document.getElementById('startTime').value||'08:00');
+  var vt={B:readVT('B'),C:readVT('C'),D:readVT('D')};
+  var adm={B:readAdm('B'),C:readAdm('C'),D:readAdm('D')};
+  var note={B:readNote('B'),C:readNote('C'),D:readNote('D')};
 
   function calcRoute(segs,seq){
-    var totalTransport=0,totalCost=0,totalWalk=0,totalTransfers=0;
-    segs.forEach(function(s){totalTransport+=s.dur;totalCost+=s.cost;totalWalk+=s.walk;totalTransfers+=s.trans;});
-    // Visit time (exclude start A dan end A)
-    var visitSeq=seq.slice(1,-1); // B,C,D atau C,B,D
-    var totalVisit=0;
-    visitSeq.forEach(function(l){totalVisit+=vt[l]||0;});
-    var totalTime=totalTransport+totalVisit;
-    return{totalTransport:totalTransport,totalCost:totalCost,totalWalk:totalWalk,totalTransfers:totalTransfers,totalVisit:totalVisit,totalTime:totalTime,segs:segs,seq:seq};
+    var totTrans=0,totCost=0,totWalk=0,totTransfer=0;
+    segs.forEach(function(s){totTrans+=s.dur;totCost+=s.cost;totWalk+=s.walk;totTransfer+=s.trans;});
+    var visitSeq=seq.slice(1,-1);
+    var totVisit=0;
+    visitSeq.forEach(function(l){totVisit+=(vt[l]||0);});
+    var totAdm=0;
+    visitSeq.forEach(function(l){totAdm+=(adm[l]||0);});
+    return{segs:segs,seq:seq,totTrans:totTrans,totCost:totCost,totWalk:totWalk,
+      totTransfer:totTransfer,totVisit:totVisit,totAdm:totAdm,
+      totTime:totTrans+totVisit,vt:vt,adm:adm,note:note};
   }
 
-  var r1=calcRoute(r1segs,['A','B','C','D','A']);
-  var r2=calcRoute(r2segs,['A','C','B','D','A']);
-
-  var winnerCost=r1.totalCost<=r2.totalCost?'r1':'r2';
-  var winnerTime=r1.totalTime<=r2.totalTime?'r1':'r2';
-  var winnerWalk=r1.totalWalk<=r2.totalWalk?'r1':'r2';
-  var winnerTrans=r1.totalTransfers<=r2.totalTransfers?'r1':'r2';
-
-  // Score: tiap kategori +1 untuk rute lebih baik
-  var sc1=0,sc2=0;
-  [winnerCost,winnerTime,winnerWalk,winnerTrans].forEach(function(w){
-    if(w==='r1')sc1++;else sc2++;
-  });
-  var recommended=sc1>=sc2?'r1':'r2';
+  var R0=calcRoute(r0segs,['A','B','C','D','A']);
+  var R1=calcRoute(r1segs,['A','C','B','D','A']);
 
   // Build schedule
-  function buildSchedule(segs,seq,vtimes,startM){
-    var schedule=[];
-    var cur=startM;
-    // Start location A
-    schedule.push({time:minToTime(cur),event:'Berangkat dari '+locNames[seq[0]]+' ('+seq[0]+')',type:'depart',duration:0});
+  function buildSched(segs,seq,startM){
+    var sched=[],cur=startM;
+    sched.push({type:'depart',time:minToTime(cur),timeTo:null,
+      label:'Mulai dari '+locNames[seq[0]]+' ('+seq[0]+')',cost:0,
+      jalur:'',notes:[]});
+
     segs.forEach(function(s,i){
-      // transport
-      schedule.push({time:minToTime(cur),event:'Perjalanan '+s.from+' → '+s.to+' via '+s.mode,type:'transit',duration:s.dur,cost:s.cost,walk:s.walk,trans:s.trans});
-      cur+=s.dur;
-      // arrive + visit (except last return to A)
+      var arrTime=cur+s.dur;
+      // transport segment
+      sched.push({
+        type:'transport',
+        time:minToTime(cur),timeTo:minToTime(arrTime),
+        timeRange:minToTime(cur)+'-'+minToTime(arrTime),
+        label:'Perjalanan '+locNames[s.from]+' → '+locNames[s.to],
+        cost:s.cost,mode:s.mode,walk:s.walk,trans:s.trans,
+        jalur:s.jalur,notes:[]
+      });
+      cur=arrTime;
+
       if(i<segs.length-1){
         var dest=s.to;
-        schedule.push({time:minToTime(cur),event:'Tiba di '+locNames[dest]+' ('+dest+')',type:'arrive',duration:0});
-        var visitDur=vtimes[dest]||0;
-        if(visitDur>0){
-          // check lunch
-          var lunchNeeded=(cur<780&&cur+visitDur>780);
-          if(lunchNeeded){
-            var beforeLunch=780-cur;
-            schedule.push({time:minToTime(cur),event:'Kunjungan '+locNames[dest]+' (sebelum makan siang)',type:'visit',duration:beforeLunch});
-            cur+=beforeLunch;
-            schedule.push({time:minToTime(cur),event:'Istirahat makan siang',type:'lunch',duration:45});
-            cur+=45;
-            var afterLunch=visitDur-beforeLunch;
-            if(afterLunch>0){
-              schedule.push({time:minToTime(cur),event:'Melanjutkan kunjungan '+locNames[dest],type:'visit',duration:afterLunch});
-              cur+=afterLunch;
-            }
-          }else{
-            schedule.push({time:minToTime(cur),event:'Kunjungan '+locNames[dest]+' (~'+visitDur+' mnt)',type:'visit',duration:visitDur});
-            cur+=visitDur;
+        var visitDur=vt[dest]||0;
+        var admFee=adm[dest]||0;
+        var noteText=note[dest]||'';
+        var visitEnd=cur+visitDur;
+
+        // Check makan siang (sekitar 12:00 = 720 mnt)
+        var lunchAt=750; // 12:30
+        var lunchDur=45;
+        var lunchInserted=false;
+        var schedEntries=[];
+
+        if(cur<lunchAt&&visitEnd>lunchAt+30){
+          // split visit: sebelum makan siang
+          var dur1=lunchAt-cur;
+          var dur2=visitDur-dur1;
+          schedEntries.push({
+            type:'visit',time:minToTime(cur),timeTo:minToTime(cur+dur1),
+            timeRange:minToTime(cur)+'-'+minToTime(cur+dur1),
+            label:'Berjalan mengitari area '+locNames[dest]+', berfoto'+(dest==='C'?', berbelanja souvenir':dest==='D'?', berbelanja':'')+'.',
+            cost:0,notes:buildNotes(admFee,noteText,false,true)
+          });
+          cur+=dur1;
+          // makan
+          schedEntries.push({
+            type:'lunch',time:minToTime(cur),timeTo:minToTime(cur+lunchDur),
+            timeRange:minToTime(cur)+'-'+minToTime(cur+lunchDur),
+            label:'Makan siang di area '+locNames[dest]+(dest==='B'?' ('+locNames[dest]+' atau sekitarnya)':'')+'.',
+            cost:0,notes:[]
+          });
+          cur+=lunchDur;
+          lunchInserted=true;
+          if(dur2>0){
+            schedEntries.push({
+              type:'visit',time:minToTime(cur),timeTo:minToTime(cur+dur2),
+              timeRange:minToTime(cur)+'-'+minToTime(cur+dur2),
+              label:'Melanjutkan kunjungan di '+locNames[dest]+(dest==='D'?'. '+getDspecial():'')+'.',
+              cost:0,notes:buildNotes(0,'',false,false)
+            });
+            cur+=dur2;
           }
+        }else{
+          schedEntries.push({
+            type:'visit',time:minToTime(cur),timeTo:minToTime(cur+visitDur),
+            timeRange:minToTime(cur)+'-'+minToTime(cur+visitDur),
+            label:'Berjalan mengitari area '+locNames[dest]+', berfoto'+(dest==='C'?', berbelanja souvenir.':dest==='D'?', berbelanja. '+getDspecial():'.'),
+            cost:0,notes:buildNotes(admFee,noteText,cur>700,cur>700)
+          });
+          cur+=visitDur;
         }
+
+        sched=sched.concat(schedEntries);
       }else{
-        schedule.push({time:minToTime(cur),event:'Kembali ke '+locNames[seq[0]]+' ('+seq[0]+')',type:'arrive',duration:0});
+        // Segment terakhir: pulang ke A
+        sched.push({
+          type:'arrive',time:minToTime(cur-s.dur),timeTo:minToTime(cur),
+          timeRange:minToTime(cur-s.dur)+'-'+minToTime(cur),
+          label:'Kembali ke '+locNames[seq[0]]+' ('+seq[0]+')',
+          cost:0,notes:[]
+        });
       }
     });
-    return schedule;
+    return sched;
   }
 
-  var sched1=buildSchedule(r1segs,['A','B','C','D','A'],vt,startMin);
-  var sched2=buildSchedule(r2segs,['A','C','B','D','A'],vt,startMin);
+  function buildNotes(admFee,noteText,hasMakan,afterMakan){
+    var notes=[];
+    if(admFee>0)notes.push('admission fee ¥'+admFee.toLocaleString()+'.');
+    else notes.push('admission fee ¥0.');
+    if(hasMakan||afterMakan){
+      if(afterMakan)notes.push('biaya makan siang ¥1000-¥1500.');
+      else notes.push('biaya makan malam ¥1000-¥1500.');
+    }
+    if(noteText&&noteText.trim())notes.push(noteText.trim());
+    return notes;
+  }
 
-  return{r1:r1,r2:r2,winnerCost:winnerCost,winnerTime:winnerTime,winnerTrans:winnerTrans,winnerWalk:winnerWalk,
-    recommended:recommended,sc1:sc1,sc2:sc2,sched1:sched1,sched2:sched2,vt:vt,startMin:startMin};
+  function getDspecial(){
+    return 'Area di sekitar '+locNames['D']+' dapat dieksplorasi dengan berjalan kaki.';
+  }
+
+  var sched0=buildSched(r0segs,['A','B','C','D','A'],startMin);
+  var sched1=buildSched(r1segs,['A','C','B','D','A'],startMin);
+
+  var winCost=R0.totCost<=R1.totCost?'r0':'r1';
+  var winTime=R0.totTime<=R1.totTime?'r0':'r1';
+  var winWalk=R0.totWalk<=R1.totWalk?'r0':'r1';
+  var winTrans=R0.totTransfer<=R1.totTransfer?'r0':'r1';
+  var sc0=0,sc1=0;
+  [winCost,winTime,winWalk,winTrans].forEach(function(w){if(w==='r0')sc0++;else sc1++;});
+
+  return{R0:R0,R1:R1,sched0:sched0,sched1:sched1,
+    winCost:winCost,winTime:winTime,winWalk:winWalk,winTrans:winTrans,
+    sc0:sc0,sc1:sc1,recommended:sc0>=sc1?'r0':'r1',vt:vt,adm:adm,note:note};
 }
 
 // ============================================================
-// RENDER RESULTS
+// RENDER RESULTS (Tab Perbandingan, Langkah, Analisis)
 // ============================================================
 function renderResults(res){
-  renderSummaryStats(res);
-  renderCmpTable(res);
-  renderRecBox(res);
-  renderScheduleTables(res);
-  renderTimeline(res);
-  renderAnalysis(res);
+  // Stats
+  var costDiff=Math.abs(res.R0.totCost-res.R1.totCost);
+  var timeDiff=Math.abs(res.R0.totTime-res.R1.totTime);
+  document.getElementById('summaryStats').innerHTML=
+    mStat('¥'+res.R0.totCost.toLocaleString(),'Total Biaya Rute 1',res.recommended==='r0'?'hl':'')+
+    mStat('¥'+res.R1.totCost.toLocaleString(),'Total Biaya Rute 2',res.recommended==='r1'?'hl':'')+
+    mStat('¥'+costDiff.toLocaleString(),'Selisih Biaya','')+
+    mStat(timeDiff+' mnt','Selisih Waktu Total','');
+
+  // CMP Table
+  var rows=[
+    {lbl:'Urutan Rute',v0:'A-B-C-D-A',v1:'A-C-B-D-A',key:''},
+    {lbl:'Biaya Transport',v0:'¥'+res.R0.totCost.toLocaleString(),v1:'¥'+res.R1.totCost.toLocaleString(),key:'cost'},
+    {lbl:'Waktu Transport',v0:res.R0.totTrans+' mnt',v1:res.R1.totTrans+' mnt',key:'trans'},
+    {lbl:'Waktu Kunjungan',v0:res.R0.totVisit+' mnt',v1:res.R1.totVisit+' mnt',key:''},
+    {lbl:'Total Waktu',v0:res.R0.totTime+' mnt',v1:res.R1.totTime+' mnt',key:'time'},
+    {lbl:'Jalan Kaki',v0:res.R0.totWalk+' mnt',v1:res.R1.totWalk+' mnt',key:'walk'},
+    {lbl:'Jumlah Transfer',v0:res.R0.totTransfer+'x',v1:res.R1.totTransfer+'x',key:'transf'},
+  ];
+  var winMap={cost:{r0:res.R0.totCost,r1:res.R1.totCost},trans:{r0:res.R0.totTrans,r1:res.R1.totTrans},
+    time:{r0:res.R0.totTime,r1:res.R1.totTime},walk:{r0:res.R0.totWalk,r1:res.R1.totWalk},
+    transf:{r0:res.R0.totTransfer,r1:res.R1.totTransfer}};
+  var html='<thead><tr><th>Kriteria</th><th>Rute 1 (A-B-C-D-A)</th><th>Rute 2 (A-C-B-D-A)</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var w=r.key&&winMap[r.key];
+    var w0=w&&w.r0<=w.r1;var w1=w&&w.r1<w.r0;
+    html+='<tr><td style="font-weight:500">'+r.lbl+'</td>'
+      +'<td>'+r.v0+(w0?'<span class="cmp-winner">lebih baik</span>':'')+'</td>'
+      +'<td>'+r.v1+(w1?'<span class="cmp-winner">lebih baik</span>':'')+'</td></tr>';
+  });
+  html+='<tr style="background:var(--bg)"><td style="font-weight:700;font-family:\'JetBrains Mono\',monospace">Rekomendasi</td>'
+    +'<td colspan="2" style="font-weight:700;font-family:\'JetBrains Mono\',monospace">'
+    +(res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')
+    +' — skor '+(res.recommended==='r0'?res.sc0:res.sc1)+'/4 kriteria</td></tr>';
+  html+='</tbody>';
+  document.getElementById('cmpTable').innerHTML=html;
+
+  // Rec box
+  var rName=res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)';
+  var reasons=[];
+  if(res.winCost===res.recommended)reasons.push('biaya lebih hemat (selisih ¥'+Math.abs(res.R0.totCost-res.R1.totCost).toLocaleString()+')');
+  if(res.winTime===res.recommended)reasons.push('total waktu lebih singkat (selisih '+Math.abs(res.R0.totTime-res.R1.totTime)+' menit)');
+  if(res.winTrans===res.recommended)reasons.push('jumlah transfer lebih sedikit');
+  if(res.winWalk===res.recommended)reasons.push('waktu berjalan kaki lebih pendek');
+  document.getElementById('recBox').innerHTML=
+    '<div class="rec-header">Rekomendasi</div>'
+    +'<div class="rec-winner-badge">'+rName+'</div>'
+    +'<div class="rec-content">Berdasarkan analisis empat kriteria, '
+    +'<strong style="color:var(--text)">'+rName+'</strong> lebih optimal '
+    +(reasons.length?'dengan keunggulan pada '+reasons.join(', ')+'.':'.')
+    +'</div>';
+
+  // Analisis
+  document.getElementById('analysisContent').innerHTML=buildAnalysis(res);
 }
 
-function renderSummaryStats(res){
-  var costDiff=Math.abs(res.r1.totalCost-res.r2.totalCost);
-  var timeDiff=Math.abs(res.r1.totalTime-res.r2.totalTime);
-  var el=document.getElementById('summaryStats');
-  el.innerHTML=
-    mkStat('¥'+res.r1.totalCost.toLocaleString(),'Total Biaya Rute 1',res.recommended==='r1'?'highlight':'')+
-    mkStat('¥'+res.r2.totalCost.toLocaleString(),'Total Biaya Rute 2',res.recommended==='r2'?'highlight':'')+
-    mkStat('¥'+costDiff.toLocaleString(),'Selisih Biaya','')+
-    mkStat(timeDiff+' mnt','Selisih Waktu Total','');
-}
-
-function mkStat(val,lbl,cls){
+function mStat(val,lbl,cls){
   return '<div class="stat '+(cls||'')+'"><div class="stat-val">'+val+'</div><div class="stat-lbl">'+lbl+'</div></div>';
 }
 
-function renderCmpTable(res){
-  var el=document.getElementById('cmpTable');
-  var rows=[
-    ['Urutan Rute','A-B-C-D-A','A-C-B-D-A'],
-    ['Total Biaya Transport','¥'+res.r1.totalCost.toLocaleString(),'¥'+res.r2.totalCost.toLocaleString(),'cost'],
-    ['Total Waktu Transport',''+res.r1.totalTransport+' mnt',''+res.r2.totalTransport+' mnt','transtime'],
-    ['Total Waktu Kunjungan',''+res.r1.totalVisit+' mnt',''+res.r2.totalVisit+' mnt'],
-    ['Total Waktu Keseluruhan',''+res.r1.totalTime+' mnt',''+res.r2.totalTime+' mnt','time'],
-    ['Total Jalan Kaki',''+res.r1.totalWalk+' mnt',''+res.r2.totalWalk+' mnt','walk'],
-    ['Total Transfer Moda',''+res.r1.totalTransfers+'x',''+res.r2.totalTransfers+'x','trans'],
-  ];
-
-  var winMap={
-    cost:{r1:res.r1.totalCost,r2:res.r2.totalCost,lower:true},
-    transtime:{r1:res.r1.totalTransport,r2:res.r2.totalTransport,lower:true},
-    time:{r1:res.r1.totalTime,r2:res.r2.totalTime,lower:true},
-    walk:{r1:res.r1.totalWalk,r2:res.r2.totalWalk,lower:true},
-    trans:{r1:res.r1.totalTransfers,r2:res.r2.totalTransfers,lower:true},
-  };
-
-  var html='<thead><tr>'
-    +'<th>Kriteria</th>'
-    +'<th>Rute 1 (A-B-C-D-A)</th>'
-    +'<th>Rute 2 (A-C-B-D-A)</th>'
-    +'</tr></thead><tbody>';
-
-  rows.forEach(function(r){
-    var key=r[3];
-    var w=key&&winMap[key];
-    var r1win=w&&(w.lower?w.r1<=w.r2:w.r1>=w.r2);
-    var r2win=w&&(w.lower?w.r2<w.r1:w.r2>w.r1);
-    html+='<tr><td style="font-weight:500">'+r[0]+'</td>'
-      +'<td>'+r[1]+(r1win?'<span class="cmp-winner">lebih baik</span>':'')+'</td>'
-      +'<td>'+r[2]+(r2win?'<span class="cmp-winner">lebih baik</span>':'')+'</td>'
-      +'</tr>';
-  });
-
-  html+='<tr style="background:var(--bg)">'
-    +'<td style="font-weight:700;font-family:\'JetBrains Mono\',monospace">Rekomendasi</td>'
-    +'<td colspan="2" style="font-weight:700;font-family:\'JetBrains Mono\',monospace">'
-      +(res.recommended==='r1'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')
-      +' — skor '+res[res.recommended==='r1'?'sc1':'sc2']+' dari 4 kriteria'
-    +'</td></tr>';
-
-  html+='</tbody>';
-  el.innerHTML=html;
-}
-
-function renderRecBox(res){
-  var el=document.getElementById('recBox');
-  var rName=res.recommended==='r1'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)';
-  var other=res.recommended==='r1'?'r2':'r1';
-  var costDiff=Math.abs(res.r1.totalCost-res.r2.totalCost);
-  var timeDiff=Math.abs(res.r1.totalTime-res.r2.totalTime);
-  var reasons=[];
-  if(res.winnerCost===res.recommended)reasons.push('biaya transportasi lebih hemat (selisih ¥'+costDiff.toLocaleString()+')');
-  if(res.winnerTime===res.recommended)reasons.push('total waktu lebih singkat (selisih '+timeDiff+' menit)');
-  if(res.winnerTrans===res.recommended)reasons.push('jumlah transfer moda lebih sedikit');
-  if(res.winnerWalk===res.recommended)reasons.push('waktu berjalan kaki lebih pendek');
-
-  el.innerHTML='<div class="rec-header">Rekomendasi</div>'
-    +'<div class="rec-winner-badge">'+rName+'</div>'
-    +'<div class="rec-content">'
-    +'Berdasarkan analisis komparatif terhadap empat kriteria (biaya, waktu, transfer moda, dan jalan kaki), '
-    +'<span class="rec-highlight">'+rName+'</span> merupakan pilihan yang lebih optimal '
-    +'dengan keunggulan pada '+reasons.join(', ')+'. '
-    +(costDiff>0?'Selisih biaya transportasi antara kedua rute adalah <span class="rec-highlight">¥'+costDiff.toLocaleString()+'</span>. ':'' )
-    +'Urutan kunjungan pada rute ini juga mempertimbangkan efisiensi geografis sehingga perpindahan antar lokasi lebih teratur.'
+function buildAnalysis(res){
+  var costDiff=Math.abs(res.R0.totCost-res.R1.totCost);
+  var timeDiff=Math.abs(res.R0.totTime-res.R1.totTime);
+  return '<div style="line-height:1.8;font-size:13px;color:var(--sub)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Konteks</div>'
+    +'<p style="margin-bottom:14px">Perjalanan one day tour di Tokyo dengan titik start dan finish di <strong style="color:var(--text)">'+locNames.A+'</strong>. Urutan kunjungan taman (<strong style="color:var(--text)">'+locNames.B+'</strong>), landmark (<strong style="color:var(--text)">'+locNames.C+'</strong>), dan pusat perbelanjaan (<strong style="color:var(--text)">'+locNames.D+'</strong>) menentukan efisiensi rute.</p>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Biaya Transportasi</div>'
+    +'<p style="margin-bottom:14px">Rute 1: <strong style="color:var(--text)">¥'+res.R0.totCost.toLocaleString()+'</strong> | Rute 2: <strong style="color:var(--text)">¥'+res.R1.totCost.toLocaleString()+'</strong>. Selisih <strong style="color:var(--text)">¥'+costDiff.toLocaleString()+'</strong>. '+(res.winCost==='r0'?'Rute 1':'Rute 2')+' lebih hemat.</p>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Waktu</div>'
+    +'<p style="margin-bottom:14px">Total waktu Rute 1: <strong style="color:var(--text)">'+res.R0.totTime+' mnt</strong> | Rute 2: <strong style="color:var(--text)">'+res.R1.totTime+' mnt</strong>. Selisih '+timeDiff+' menit. '+(res.winTime==='r0'?'Rute 1':'Rute 2')+' lebih efisien.</p>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Kesimpulan</div>'
+    +'<p><strong style="color:var(--text)">'+(res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')+'</strong> direkomendasikan dengan skor '+(res.recommended==='r0'?res.sc0:res.sc1)+' dari 4 kriteria evaluasi.</p>'
     +'</div>';
 }
 
-function renderScheduleTables(res){
-  renderSchedTable('schedTableR1',res.sched1);
-  renderSchedTable('schedTableR2',res.sched2);
+// ============================================================
+// RENDER OUTPUT — FORMAT MIRIP PDF TUGAS
+// ============================================================
+function renderOutput(res){
+  renderOutRoute(res,'r0',0);
+  renderOutRoute(res,'r1',1);
 }
 
-function renderSchedTable(id,sched){
-  var el=document.getElementById(id);
-  var typeColors={depart:'var(--blue)',arrive:'var(--green)',transit:'var(--amber)',visit:'var(--text)',lunch:'var(--red)'};
-  var html='<thead><tr>'
-    +'<th>Waktu</th><th>Aktivitas</th><th>Durasi</th><th>Keterangan</th>'
-    +'</tr></thead><tbody>';
+function renderOutRoute(res,rk,ri){
+  var R=ri===0?res.R0:res.R1;
+  var sched=ri===0?res.sched0:res.sched1;
+  var seq=ri===0?['A','B','C','D','A']:['A','C','B','D','A'];
+  var rName='Alternatif '+(ri+1)+' ('+(ri===0?'A-B-C-D-A':'A-C-B-D-A')+')';
+  var dateStr=formatDateID(new Date(document.getElementById('tourDate').value+'T12:00:00'));
+
+  var html='';
+
+  // Header block
+  html+='<div class="info-block" style="margin-bottom:16px">'
+    +'<div style="text-align:center;margin-bottom:14px">'
+      +'<div style="font-size:15px;font-weight:700;margin-bottom:4px">Rencana Perjalanan '+rName+'</div>'
+      +'<div style="font-size:13px;font-weight:600;margin-bottom:4px">'+dateStr+'</div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13px;margin-bottom:14px">'
+      +'<span style="color:var(--sub)">Disusun oleh</span><span>:</span>'
+      +'<span style="color:var(--sub)">Nama</span><span>: <strong>'+(document.getElementById('studentName').value||'—')+'</strong></span>'
+      +'<span style="color:var(--sub)">Kelas</span><span>: '+(document.getElementById('studentClass').value||'—')+'</span>'
+      +'<span style="color:var(--sub)">NIM</span><span>: <span class="mono">'+(document.getElementById('nimInput').value||'—')+'</span></span>'
+    +'</div>'
+    // Tabel lokasi NIM
+    +'<table class="nim-tbl">'
+      +'<thead><tr><th>Angka NIM</th><th>Lokasi</th><th></th></tr></thead>'
+      +'<tbody>'
+      +['A','B','C','D'].map(function(l){
+        return '<tr><td>'+nimDigits[l]+'</td><td>'+l+'</td><td style="font-weight:600">'+locNames[l]+'</td></tr>';
+      }).join('')
+      +'</tbody>'
+    +'</table>'
+    +'</div>';
+
+  // OUTPUT TABLE
+  html+='<div class="output-section">'
+    +'<table class="out-table">'
+    +'<thead><tr>'
+      +'<th style="width:90px">Waktu</th>'
+      +'<th>Kegiatan</th>'
+      +'<th style="width:130px;text-align:right">Biaya Transportasi</th>'
+    +'</tr></thead>'
+    +'<tbody>';
+
+  var totalCost=0;
+
   sched.forEach(function(s){
-    var dur=s.duration?s.duration+' mnt':'—';
-    var info='';
-    if(s.type==='transit'){
-      info=(s.cost?'¥'+s.cost.toLocaleString():'—');
-      if(s.walk)info+=' | jalan '+s.walk+' mnt';
-      if(s.trans)info+=' | '+s.trans+'x transfer';
+    if(s.type==='depart')return; // skip depart row (sudah implisit)
+
+    var timeCell=s.timeRange||s.time||'';
+    var costCell='';
+    if(s.type==='transport'&&s.cost>0){
+      costCell='¥'+s.cost.toLocaleString();
+      totalCost+=s.cost;
     }
-    var modeEl=s.type==='transit'?'<span class="sched-mode">'+s.event.split(' via ').pop()+'</span>':'';
+
+    var actHtml='';
+
+    if(s.type==='transport'){
+      // Judul perjalanan
+      actHtml+='<div class="out-act-title">'+s.label+'</div>';
+      // Jalur alternatif (dari input user)
+      if(s.jalur&&s.jalur.trim()){
+        actHtml+='<div class="out-act-body">Alternatif jalur:</div>';
+        actHtml+='<div class="out-jalur-dipilih">'+escHtml(s.jalur.trim())+'</div>';
+      }
+      if(s.walk){
+        actHtml+='<div style="font-size:12px;color:var(--sub);margin-top:4px">Waktu berjalan kaki: '+s.walk+' mnt</div>';
+      }
+      if(s.trans){
+        actHtml+='<div style="font-size:12px;color:var(--sub)">Jumlah transfer: '+s.trans+'x</div>';
+      }
+    } else if(s.type==='visit'){
+      actHtml+='<div class="out-act-title">'+s.label+'</div>';
+      if(s.notes&&s.notes.length){
+        actHtml+='<div class="out-catatan">Catatan:</div>';
+        s.notes.forEach(function(n){
+          actHtml+='<div class="out-catatan-item">'+escHtml(n)+'</div>';
+        });
+      }
+    } else if(s.type==='lunch'){
+      actHtml+='<div class="out-act-title">'+s.label+'</div>';
+      actHtml+='<div style="font-size:12px;color:var(--sub);margin-top:4px">Catatan: biaya makan siang ¥1000-¥1500.</div>';
+    } else if(s.type==='arrive'){
+      actHtml+='<div class="out-act-title">'+s.label+'</div>';
+    }
+
     html+='<tr>'
-      +'<td class="sched-time">'+s.time+'</td>'
-      +'<td>'+s.event+(modeEl?'':'')+'</td>'
-      +'<td class="mono">'+dur+'</td>'
-      +'<td class="mono" style="font-size:11px;color:var(--sub)">'+info+'</td>'
+      +'<td class="out-row-time">'+timeCell+'</td>'
+      +'<td class="out-row-act">'+actHtml+'</td>'
+      +'<td class="out-row-cost">'+costCell+'</td>'
       +'</tr>';
   });
-  html+='</tbody>';
-  el.innerHTML=html;
+
+  // Total row
+  html+='<tr class="out-total-row">'
+    +'<td class="out-row-time" colspan="2" style="text-align:right;border-left:none;padding:14px">Total Biaya:</td>'
+    +'<td class="out-row-cost" style="font-size:15px">¥'+totalCost.toLocaleString()+'</td>'
+    +'</tr>';
+
+  html+='</tbody></table></div>';
+
+  document.getElementById('outR'+ri).innerHTML=html;
 }
 
-function renderTimeline(res){
-  var el=document.getElementById('tlWrap');
-  el.innerHTML='';
-  iterStates.forEach(function(st,i){
-    var div=document.createElement('div');
-    div.className='tl-item'+(i===curIter?' active':'');
-    div.onclick=(function(idx){return function(){iterGo(idx);};})(i);
-    var tags=st.tags||[];
-    var tagsHtml=tags.map(function(t){return '<span class="tl-tag '+t.cls+'">'+t.text+'</span>';}).join('');
-    div.innerHTML='<div class="tl-title">'+st.title+'</div>'
-      +'<div class="tl-detail">'+st.summary+'</div>'
-      +'<div class="tl-meta">'+tagsHtml+'</div>';
-    el.appendChild(div);
-  });
-}
-
-function renderAnalysis(res){
-  var el=document.getElementById('analysisContent');
-  var costDiff=Math.abs(res.r1.totalCost-res.r2.totalCost);
-  var timeDiff=Math.abs(res.r1.totalTime-res.r2.totalTime);
-  var cheaper=res.r1.totalCost<=res.r2.totalCost?'Rute 1':'Rute 2';
-  var faster=res.r1.totalTime<=res.r2.totalTime?'Rute 1':'Rute 2';
-
-  el.innerHTML='<div style="line-height:1.8;font-size:13px;color:var(--sub)">'
-
-    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Konteks Permasalahan</div>'
-    +'<p style="margin-bottom:12px">Perjalanan one day tour di Tokyo pada Minggu, 1 Maret 2026 dengan titik start dan finish di <strong style="color:var(--text)">'+locNames.A+'</strong>. Tujuan wisata: Taman (<strong style="color:var(--text)">'+locNames.B+'</strong>), Landmark (<strong style="color:var(--text)">'+locNames.C+'</strong>), dan Pusat Perbelanjaan (<strong style="color:var(--text)">'+locNames.D+'</strong>). Pusat perbelanjaan selalu dikunjungi terakhir sebelum kembali ke stasiun awal.</p>'
-
-    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Perbandingan Biaya</div>'
-    +'<p style="margin-bottom:12px">Total biaya transportasi Rute 1 adalah <strong style="color:var(--text)">¥'+res.r1.totalCost.toLocaleString()+'</strong> sedangkan Rute 2 adalah <strong style="color:var(--text)">¥'+res.r2.totalCost.toLocaleString()+'</strong>. Selisih biaya antara kedua rute sebesar <strong style="color:var(--text)">¥'+costDiff.toLocaleString()+'</strong>. '+cheaper+' lebih hemat dari sisi biaya transportasi.</p>'
-
-    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Perbandingan Waktu</div>'
-    +'<p style="margin-bottom:12px">Total waktu keseluruhan (transport + kunjungan) Rute 1 adalah <strong style="color:var(--text)">'+res.r1.totalTime+' menit ('+minToHHMM(res.r1.totalTime)+')</strong> dan Rute 2 adalah <strong style="color:var(--text)">'+res.r2.totalTime+' menit ('+minToHHMM(res.r2.totalTime)+')</strong>. Selisih '+timeDiff+' menit. '+faster+' lebih efisien dari sisi waktu.</p>'
-
-    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Faktor Kenyamanan</div>'
-    +'<p style="margin-bottom:12px">Transfer moda transportasi memengaruhi kenyamanan perjalanan. Rute 1 memerlukan total <strong style="color:var(--text)">'+res.r1.totalTransfers+'x</strong> perpindahan, Rute 2 memerlukan <strong style="color:var(--text)">'+res.r2.totalTransfers+'x</strong> perpindahan. Waktu berjalan kaki pada Rute 1 adalah <strong style="color:var(--text)">'+res.r1.totalWalk+' menit</strong> dan Rute 2 adalah <strong style="color:var(--text)">'+res.r2.totalWalk+' menit</strong>.</p>'
-
-    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Kesimpulan</div>'
-    +'<p>Mempertimbangkan keempat kriteria evaluasi, <strong style="color:var(--text)">'+(res.recommended==='r1'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')+'</strong> merupakan pilihan yang direkomendasikan dengan skor '+res[res.recommended==='r1'?'sc1':'sc2']+' dari 4 kriteria penilaian.</p>'
-
-    +'</div>';
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ============================================================
 // ITER STATES
 // ============================================================
 function buildIterStates(res){
-  iterStates=[];
-  curIter=0;
+  iterStates=[];curIter=0;
 
-  // State 0: Overview
-  iterStates.push(mkState(
-    'Inisialisasi — Titik Perjalanan',
-    'Empat lokasi ditentukan berdasarkan digit NIM. Terdapat dua alternatif rute: A-B-C-D-A dan A-C-B-D-A.',
-    [{text:'4 lokasi',cls:''},{text:'2 rute alternatif',cls:'blue'}],
-    [],[],-1,-1
-  ));
+  iterStates.push(mkSt('Inisialisasi — 4 Titik Perjalanan',
+    'Empat lokasi ditentukan dari digit NIM. Dua rute alternatif: A-B-C-D-A dan A-C-B-D-A.',
+    [{text:'4 lokasi',cls:''},{text:'2 rute',cls:'blue'}],[],[],-1,-1));
 
-  // State 1-4: Rute 1 per segmen
-  var r1segs=res.r1.segs;
-  var r1seq=['A','B','C','D','A'];
+  var r0segs=res.R0.segs,r1segs=res.R1.segs;
+
+  r0segs.forEach(function(s,i){
+    iterStates.push(mkSt(
+      'Rute 1 — Seg '+(i+1)+': '+s.from+' ke '+s.to,
+      locNames[s.from]+' → '+locNames[s.to]+' | '+s.dur+' mnt | ¥'+s.cost.toLocaleString()+(s.walk?' | jalan '+s.walk+' mnt':''),
+      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'}],
+      [i,i+1],[s.from,s.to],0,i));
+  });
+
+  iterStates.push(mkSt('Rute 1 — Selesai',
+    'Total biaya: ¥'+res.R0.totCost.toLocaleString()+' | Total waktu: '+res.R0.totTime+' mnt',
+    [{text:'¥'+res.R0.totCost.toLocaleString(),cls:'amber'},{text:res.R0.totTime+' mnt',cls:'blue'}],
+    [0,1,2,3,4],[],0,-1));
+
   r1segs.forEach(function(s,i){
-    iterStates.push(mkState(
-      'Rute 1 — Segmen '+(i+1)+': '+s.from+' ke '+s.to,
-      locNames[s.from]+' → '+locNames[s.to]+' via '+s.mode+'. Durasi: '+s.dur+' menit. Biaya: ¥'+s.cost.toLocaleString()+(s.walk?' | Jalan kaki: '+s.walk+' mnt':'')+(s.trans?' | Transfer: '+s.trans+'x':'')+'.',
-      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'},{text:s.mode,cls:''}],
-      [i,i+1],[s.from,s.to],0,i
-    ));
+    iterStates.push(mkSt(
+      'Rute 2 — Seg '+(i+1)+': '+s.from+' ke '+s.to,
+      locNames[s.from]+' → '+locNames[s.to]+' | '+s.dur+' mnt | ¥'+s.cost.toLocaleString()+(s.walk?' | jalan '+s.walk+' mnt':''),
+      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'}],
+      [i,i+1],[s.from,s.to],1,i));
   });
 
-  // State 5: Rute 1 summary
-  iterStates.push(mkState(
-    'Rute 1 — Ringkasan A-B-C-D-A',
-    'Total biaya: ¥'+res.r1.totalCost.toLocaleString()+' | Total waktu transport: '+res.r1.totalTransport+' menit | Total waktu kunjungan: '+res.r1.totalVisit+' menit | Grand total: '+res.r1.totalTime+' menit.',
-    [{text:'¥'+res.r1.totalCost.toLocaleString(),cls:'amber'},{text:res.r1.totalTime+' mnt total',cls:'blue'}],
-    [0,1,2,3,4],[],0,-1
-  ));
+  iterStates.push(mkSt('Rute 2 — Selesai',
+    'Total biaya: ¥'+res.R1.totCost.toLocaleString()+' | Total waktu: '+res.R1.totTime+' mnt',
+    [{text:'¥'+res.R1.totCost.toLocaleString(),cls:'amber'},{text:res.R1.totTime+' mnt',cls:'blue'}],
+    [0,1,2,3,4],[],1,-1));
 
-  // State 6-9: Rute 2 per segmen
-  var r2segs=res.r2.segs;
-  var r2seq=['A','C','B','D','A'];
-  r2segs.forEach(function(s,i){
-    iterStates.push(mkState(
-      'Rute 2 — Segmen '+(i+1)+': '+s.from+' ke '+s.to,
-      locNames[s.from]+' → '+locNames[s.to]+' via '+s.mode+'. Durasi: '+s.dur+' menit. Biaya: ¥'+s.cost.toLocaleString()+(s.walk?' | Jalan kaki: '+s.walk+' mnt':'')+(s.trans?' | Transfer: '+s.trans+'x':'')+'.',
-      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'},{text:s.mode,cls:''}],
-      [i,i+1],[s.from,s.to],1,i
-    ));
+  iterStates.push(mkSt('Perbandingan & Rekomendasi',
+    (res.recommended==='r0'?'Rute 1':'Rute 2')+' direkomendasikan — skor '+(res.recommended==='r0'?res.sc0:res.sc1)+'/4 kriteria',
+    [{text:'rekomendasi',cls:'green'}],[0,1,2,3,4],[],res.recommended==='r0'?0:1,-1));
+
+  // Build timeline
+  var tl=document.getElementById('tlWrap');
+  tl.innerHTML='';
+  iterStates.forEach(function(st,i){
+    var d=document.createElement('div');
+    d.className='tl-item'+(i===curIter?' active':'');
+    d.onclick=(function(idx){return function(){iterGo(idx);};})(i);
+    var tags=st.tags.map(function(t){return '<span class="tl-tag '+t.cls+'">'+t.text+'</span>';}).join('');
+    d.innerHTML='<div class="tl-title">'+st.title+'</div>'
+      +'<div class="tl-detail">'+st.summary+'</div>'
+      +'<div class="tl-meta">'+tags+'</div>';
+    tl.appendChild(d);
   });
-
-  // State 10: Rute 2 summary
-  iterStates.push(mkState(
-    'Rute 2 — Ringkasan A-C-B-D-A',
-    'Total biaya: ¥'+res.r2.totalCost.toLocaleString()+' | Total waktu transport: '+res.r2.totalTransport+' menit | Total waktu kunjungan: '+res.r2.totalVisit+' menit | Grand total: '+res.r2.totalTime+' menit.',
-    [{text:'¥'+res.r2.totalCost.toLocaleString(),cls:'amber'},{text:res.r2.totalTime+' mnt total',cls:'blue'}],
-    [0,1,2,3,4],[],1,-1
-  ));
-
-  // State 11: Perbandingan
-  var costDiff=Math.abs(res.r1.totalCost-res.r2.totalCost);
-  iterStates.push(mkState(
-    'Perbandingan Kedua Rute',
-    'Selisih biaya: ¥'+costDiff.toLocaleString()+'. Rute lebih murah: '+(res.winnerCost==='r1'?'Rute 1':'Rute 2')+'. Rute lebih cepat: '+(res.winnerTime==='r1'?'Rute 1':'Rute 2')+'.',
-    [{text:'selisih ¥'+costDiff.toLocaleString(),cls:'amber'},{text:'perbandingan',cls:'blue'}],
-    [0,1,2,3,4],[],- 1,-1
-  ));
-
-  // State 12: Rekomendasi
-  iterStates.push(mkState(
-    'Rekomendasi — '+(res.recommended==='r1'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)'),
-    'Berdasarkan skor '+res[res.recommended==='r1'?'sc1':'sc2']+' dari 4 kriteria evaluasi, '+(res.recommended==='r1'?'Rute 1':'Rute 2')+' direkomendasikan sebagai rute perjalanan optimal.',
-    [{text:'rekomendasi',cls:'green'},{text:'skor '+(res.recommended==='r1'?res.sc1:res.sc2)+'/4',cls:''}],
-    [0,1,2,3,4],[],res.recommended==='r1'?0:1,-1
-  ));
 
   setupIterCtrl();
-  iterGo(0);
-  renderTimeline(res);
+  iterGo(iterStates.length-1);
 }
 
-function mkState(title,summary,tags,activeEdgeIndices,activeNodes,activeRoute,activeSegIdx){
-  return{title:title,summary:summary,tags:tags,activeEdgeIndices:activeEdgeIndices,
-    activeNodes:activeNodes,activeRoute:activeRoute,activeSegIdx:activeSegIdx};
+function mkSt(title,summary,tags,activeEdge,activeNodes,activeRoute,activeSegIdx){
+  return{title:title,summary:summary,tags:tags,
+    activeEdge:activeEdge,activeNodes:activeNodes,
+    activeRoute:activeRoute,activeSegIdx:activeSegIdx};
 }
 
 // ============================================================
 // CANVAS
 // ============================================================
-var canvasNodes=[];  // [{id,x,y,label,fullName}]
-var canvasEdges=[];  // [{from,to,weight,cost,mode,route,segIdx}]
-var activeRoute=-1; // -1=all, 0=r1, 1=r2
+function buildCanvas(r0segs,r1segs){
+  cv_el=document.getElementById('cv');
+  ctx=cv_el.getContext('2d');
+  CVW=cv_el.parentElement.offsetWidth;
+  cv_el.style.height=CVH+'px';
 
-function buildCanvas(r1segs,r2segs){
-  cv=document.getElementById('cv');
-  c=cv.getContext('2d');
-  W=cv.parentElement.offsetWidth;
-  cv.style.height=H+'px';
-
-  // Nodes: A,B,C,D
-  var cx=W/2,cy=H/2,r=Math.min(W,H)*0.32;
-  var angles=[-Math.PI/2, Math.PI, 0, Math.PI/2]; // A top, B left, C right, D bottom
+  var cx=CVW/2,cy=CVH/2,r=Math.min(CVW,CVH)*.33;
+  var angles=[-Math.PI/2,Math.PI,0,Math.PI/2];
   canvasNodes=[
-    {id:'A',x:cx+r*Math.cos(angles[0]),y:cy+r*Math.sin(angles[0]),label:'A',fullName:locNames.A||'A'},
-    {id:'B',x:cx+r*Math.cos(angles[1]),y:cy+r*Math.sin(angles[1]),label:'B',fullName:locNames.B||'B'},
-    {id:'C',x:cx+r*Math.cos(angles[2]),y:cy+r*Math.sin(angles[2]),label:'C',fullName:locNames.C||'C'},
-    {id:'D',x:cx+r*Math.cos(angles[3]),y:cy+r*Math.sin(angles[3]),label:'D',fullName:locNames.D||'D'},
+    {id:'A',x:cx+r*Math.cos(angles[0]),y:cy+r*Math.sin(angles[0])},
+    {id:'B',x:cx+r*Math.cos(angles[1]),y:cy+r*Math.sin(angles[1])},
+    {id:'C',x:cx+r*Math.cos(angles[2]),y:cy+r*Math.sin(angles[2])},
+    {id:'D',x:cx+r*Math.cos(angles[3]),y:cy+r*Math.sin(angles[3])}
   ];
   nodePos=canvasNodes.map(function(n){return{x:n.x,y:n.y};});
 
-  // Edges from r1segs and r2segs
   canvasEdges=[];
-  var r1seq=[['A','B'],['B','C'],['C','D'],['D','A']];
-  var r2seq=[['A','C'],['C','B'],['B','D'],['D','A']];
-
-  r1segs.forEach(function(s,i){
-    canvasEdges.push({from:s.from,to:s.to,dur:s.dur,cost:s.cost,mode:s.mode,route:0,segIdx:i});
-  });
-  r2segs.forEach(function(s,i){
-    // Avoid duplicate edges (e.g. D→A appears in both)
-    var dup=canvasEdges.some(function(e){return e.from===s.from&&e.to===s.to;});
-    if(!dup){
-      canvasEdges.push({from:s.from,to:s.to,dur:s.dur,cost:s.cost,mode:s.mode,route:1,segIdx:i});
-    }else{
-      // Mark as both routes
-      var ex=canvasEdges.find(function(e){return e.from===s.from&&e.to===s.to;});
-      if(ex)ex.route=-1; // both
-    }
-  });
+  var seenEdges={};
+  function addEdge(s,route){
+    var key=s.from+'-'+s.to;
+    var rkey=s.to+'-'+s.from;
+    if(seenEdges[key]){seenEdges[key].route=-1;return;}
+    if(seenEdges[rkey]){seenEdges[rkey].route=-1;return;}
+    var e={from:s.from,to:s.to,dur:s.dur,cost:s.cost,mode:s.mode,route:route,segIdx:canvasEdges.length};
+    canvasEdges.push(e);seenEdges[key]=e;
+  }
+  r0segs.forEach(function(s){addEdge(s,0);});
+  r1segs.forEach(function(s){addEdge(s,1);});
 
   setupDrag();
-  drawCanvas([],[],[],-1,-1);
+  drawCanvas(-1,-1);
 }
 
-function getNodeIdx(id){
-  return canvasNodes.findIndex(function(n){return n.id===id;});
-}
+function getNodeIdx(id){return canvasNodes.findIndex(function(n){return n.id===id;});}
 
-function drawCanvas(hlEdges,hlNodes,bloomNodes,routeFilter,activeSegIdx){
-  if(!cv||!c)return;
+function drawCanvas(activeRoute,activeSegIdx){
+  if(!cv_el||!ctx)return;
   var dpr=window.devicePixelRatio||1;
-  W=cv.parentElement.offsetWidth;
-  cv.width=W*dpr;
-  cv.height=H*dpr;
-  cv.style.width=W+'px';
-  cv.style.height=H+'px';
-  c.scale(dpr*sc,dpr*sc);
+  CVW=cv_el.parentElement.offsetWidth;
+  cv_el.width=CVW*dpr;cv_el.height=CVH*dpr;
+  cv_el.style.width=CVW+'px';cv_el.style.height=CVH+'px';
+  ctx.scale(dpr*sc,dpr*sc);
 
-  var bg=getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
-  c.fillStyle=bg;
-  c.fillRect(0,0,W*2,H*2);
+  var bg=getCss('--canvas-bg');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,CVW*2,CVH*2);
 
-  // Draw edges
+  // Edges
   canvasEdges.forEach(function(e,ei){
-    var fi=getNodeIdx(e.from);
-    var ti=getNodeIdx(e.to);
+    var fi=getNodeIdx(e.from),ti=getNodeIdx(e.to);
     if(fi<0||ti<0)return;
-    var fp=nodePos[fi];
-    var tp=nodePos[ti];
-    if(!fp||!tp)return;
+    var fp=nodePos[fi],tp=nodePos[ti];
+    var show=activeRoute===-1||(e.route===activeRoute||e.route===-1);
+    var isHl=(activeRoute>=0&&(e.route===activeRoute||e.route===-1)&&activeSegIdx>=0&&e.segIdx===activeSegIdx);
 
-    var isActive=routeFilter===-1||(routeFilter===e.route||e.route===-1);
-    var isHl=hlEdges&&hlEdges.indexOf(ei)>=0;
-    var isSegHL=activeSegIdx>=0&&e.route===routeFilter&&e.segIdx===activeSegIdx;
+    var col=e.route===0?'#2980b9':e.route===1?'#c0392b':'#888';
+    var lw=e.route===-1?2:1.8;
+    ctx.globalAlpha=show?1:.12;
 
-    var col=getComputedStyle(document.documentElement).getPropertyValue('--edge-color').trim();
-    var lw=1.2;
-    var op=isActive?1:.18;
-
-    if(isSegHL){col=getComputedStyle(document.documentElement).getPropertyValue('--text').trim();lw=3.5;}
-    else if(isHl){col=getComputedStyle(document.documentElement).getPropertyValue('--text').trim();lw=2;}
-    else if(e.route===0){col='#2980b9';lw=1.8;}
-    else if(e.route===1){col='#c0392b';lw=1.8;}
-    else if(e.route===-1){col='#888';lw=2;}
-
-    c.globalAlpha=op;
-
-    // Bloom
-    if(isSegHL){
-      c.beginPath();
-      c.strokeStyle=col;c.lineWidth=10;c.globalAlpha=.08*op;
-      c.moveTo(fp.x,fp.y);c.lineTo(tp.x,tp.y);c.stroke();
-      c.globalAlpha=op;
+    if(isHl){
+      ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=12;ctx.globalAlpha=.1;
+      ctx.moveTo(fp.x,fp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
+      ctx.globalAlpha=1;lw=3.5;
     }
 
-    c.beginPath();
-    c.strokeStyle=col;c.lineWidth=lw;
-    c.moveTo(fp.x,fp.y);c.lineTo(tp.x,tp.y);c.stroke();
+    ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=lw;
+    ctx.moveTo(fp.x,fp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
 
-    // Arrow (midpoint)
-    var mx=(fp.x+tp.x)/2;
-    var my=(fp.y+tp.y)/2;
-    var ang=Math.atan2(tp.y-fp.y,tp.x-fp.x);
-    var as=8;
-    c.beginPath();
-    c.moveTo(mx+Math.cos(ang)*as,my+Math.sin(ang)*as);
-    c.lineTo(mx+Math.cos(ang-2.5)*as*.7,my+Math.sin(ang-2.5)*as*.7);
-    c.lineTo(mx+Math.cos(ang+2.5)*as*.7,my+Math.sin(ang+2.5)*as*.7);
-    c.closePath();c.fillStyle=col;c.fill();
+    // Arrow
+    var mx=(fp.x+tp.x)/2,my=(fp.y+tp.y)/2;
+    var ang=Math.atan2(tp.y-fp.y,tp.x-fp.x),as=9;
+    ctx.beginPath();
+    ctx.moveTo(mx+Math.cos(ang)*as,my+Math.sin(ang)*as);
+    ctx.lineTo(mx+Math.cos(ang-2.6)*as*.65,my+Math.sin(ang-2.6)*as*.65);
+    ctx.lineTo(mx+Math.cos(ang+2.6)*as*.65,my+Math.sin(ang+2.6)*as*.65);
+    ctx.closePath();ctx.fillStyle=col;ctx.fill();
 
-    // Label
-    if(isActive&&e.dur){
-      var lx=(fp.x*2+tp.x)/3;
-      var ly=(fp.y*2+tp.y)/3-10;
-      c.globalAlpha=op*.9;
-      c.fillStyle=bg;
-      c.fillRect(lx-22,ly-9,44,14);
-      c.fillStyle=col;
-      c.font='500 10px JetBrains Mono,monospace';
-      c.textAlign='center';c.textBaseline='middle';
-      c.fillText(e.dur+'m ¥'+e.cost,lx,ly);
+    // Label biaya
+    if(show&&e.cost){
+      var lx=(fp.x+tp.x)/2,ly=(fp.y+tp.y)/2-14;
+      ctx.globalAlpha=.85;
+      ctx.fillStyle=bg;ctx.fillRect(lx-28,ly-8,56,14);
+      ctx.fillStyle=col;ctx.font='500 10px JetBrains Mono,monospace';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('¥'+e.cost+(e.dur?' '+e.dur+'m':''),lx,ly);
     }
-    c.globalAlpha=1;
+    ctx.globalAlpha=1;
   });
 
-  // Draw nodes
+  // Nodes
   canvasNodes.forEach(function(n,ni){
     var p=nodePos[ni];
-    if(!p)return;
-    var isHl=hlNodes&&hlNodes.indexOf(n.id)>=0;
-    var isBloom=bloomNodes&&bloomNodes.indexOf(n.id)>=0;
-
-    var nodeFill=getComputedStyle(document.documentElement).getPropertyValue('--node-fill').trim();
-    var nodeStroke=getComputedStyle(document.documentElement).getPropertyValue('--node-stroke').trim();
-    var textC=getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    var isHl=activeRoute>=0&&analysisRes&&(
+      (activeRoute===0&&['A','B','C','D'][ni]!=null)||
+      (activeRoute===1)
+    );
+    var nodeFill=getCss('--node-fill'),nodeStroke=getCss('--node-stroke'),textC=getCss('--text');
     var nr=22;
 
-    if(isBloom||isHl){
-      c.beginPath();
-      c.arc(p.x,p.y,nr+8,0,Math.PI*2);
-      c.fillStyle=isHl?'rgba(41,128,185,.15)':'rgba(41,128,185,.1)';
-      c.fill();
-    }
+    ctx.beginPath();ctx.arc(p.x,p.y,nr,0,Math.PI*2);
+    ctx.fillStyle=nodeFill;ctx.strokeStyle=nodeStroke;ctx.lineWidth=1.5;
+    ctx.fill();ctx.stroke();
 
-    c.beginPath();
-    c.arc(p.x,p.y,nr,0,Math.PI*2);
-    c.fillStyle=isHl?textC:nodeFill;
-    c.strokeStyle=isHl?'transparent':nodeStroke;
-    c.lineWidth=1.5;
-    c.fill();c.stroke();
+    ctx.fillStyle=textC;ctx.font='700 13px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.id,p.x,p.y);
 
-    // Label
-    c.fillStyle=isHl?(isDark?'#0f0f0f':'#fff'):textC;
-    c.font='700 13px JetBrains Mono,monospace';
-    c.textAlign='center';c.textBaseline='middle';
-    c.fillText(n.label,p.x,p.y);
-
-    // Full name below
-    var maxW=90;
-    c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--sub').trim();
-    c.font='400 9px DM Sans,sans-serif';
-    var name=n.fullName||'';
+    var name=locNames[n.id]||n.id;
     if(name.length>14)name=name.slice(0,13)+'…';
-    c.fillText(name,p.x,p.y+nr+10);
+    ctx.fillStyle=getCss('--sub');ctx.font='400 9px DM Sans,sans-serif';
+    ctx.fillText(name,p.x,p.y+nr+10);
   });
 
   // Legend
-  drawLegend();
+  var lx=12,ly=CVH/sc-14;
+  [{col:'#2980b9',lbl:'Rute 1'},{col:'#c0392b',lbl:'Rute 2'},{col:'#888',lbl:'Keduanya'}].forEach(function(it,i){
+    var ix=lx+i*82;
+    ctx.beginPath();ctx.moveTo(ix,ly);ctx.lineTo(ix+18,ly);
+    ctx.strokeStyle=it.col;ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=getCss('--sub');ctx.font='400 10px DM Sans,sans-serif';
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText(it.lbl,ix+22,ly);
+  });
 
   // Watermark
-  c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--sub').trim();
-  c.globalAlpha=.08;
-  c.font='700 11px JetBrains Mono,monospace';
-  c.textAlign='right';c.textBaseline='bottom';
-  c.fillText('RAD STRIX',W/sc-10,H/sc-10);
-  c.globalAlpha=1;
+  ctx.globalAlpha=.07;ctx.fillStyle=getCss('--sub');
+  ctx.font='700 11px JetBrains Mono,monospace';ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillText('RAD STRIX',CVW/sc-10,CVH/sc-10);ctx.globalAlpha=1;
 }
 
-function drawLegend(){
-  var x=12,y=H/sc-12;
-  var items=[
-    {col:'#2980b9',label:'Rute 1'},
-    {col:'#c0392b',label:'Rute 2'},
-    {col:'#888',label:'Keduanya'},
-  ];
-  items.forEach(function(it,i){
-    var ix=x+i*80;
-    c.beginPath();c.moveTo(ix,y);c.lineTo(ix+18,y);
-    c.strokeStyle=it.col;c.lineWidth=2;c.stroke();
-    c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--sub').trim();
-    c.font='400 10px DM Sans,sans-serif';
-    c.textAlign='left';c.textBaseline='middle';
-    c.fillText(it.label,ix+22,y);
-  });
-}
+function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+var _hlRoute=-1;
+function hlRoute(r){_hlRoute=r;drawCanvas(r,-1);}
 
 function drawCurrent(){
-  if(!iterStates.length){drawCanvas([],[],[],-1,-1);return;}
+  if(!iterStates.length){drawCanvas(-1,-1);return;}
   var st=iterStates[curIter];
-  var hlEdges=[];
-  if(st.activeSegIdx>=0){
-    canvasEdges.forEach(function(e,ei){
-      if(e.route===st.activeRoute&&e.segIdx===st.activeSegIdx)hlEdges.push(ei);
-    });
-  }
-  var hlN=st.activeNodes||[];
-  drawCanvas(hlEdges,hlN,[],st.activeRoute,st.activeSegIdx);
+  drawCanvas(st.activeRoute,st.activeSegIdx);
 }
 
-function highlightRoute(r){
-  activeRoute=r;
-  drawCanvas([],[],[],r,-1);
-  if(r===0)toast('Menampilkan Rute 1 (A-B-C-D-A)');
-  else if(r===1)toast('Menampilkan Rute 2 (A-C-B-D-A)');
-  else toast('Menampilkan semua edge');
-}
-
-// ============================================================
 // DRAG
-// ============================================================
 function setupDrag(){
-  if(!cv)return;
-  cv.addEventListener('mousedown',startDrag);
-  cv.addEventListener('mousemove',moveDrag);
-  cv.addEventListener('mouseup',endDrag);
-  cv.addEventListener('touchstart',function(e){e.preventDefault();startDrag(e.touches[0]);},{passive:false});
-  cv.addEventListener('touchmove',function(e){e.preventDefault();moveDrag(e.touches[0]);},{passive:false});
-  cv.addEventListener('touchend',endDrag);
+  if(!cv_el)return;
+  cv_el.addEventListener('mousedown',sdrag);
+  cv_el.addEventListener('mousemove',mdrag);
+  cv_el.addEventListener('mouseup',edrag);
+  cv_el.addEventListener('touchstart',function(e){e.preventDefault();sdrag(e.touches[0]);},{passive:false});
+  cv_el.addEventListener('touchmove',function(e){e.preventDefault();mdrag(e.touches[0]);},{passive:false});
+  cv_el.addEventListener('touchend',edrag);
 }
+function gxy(e){var r=cv_el.getBoundingClientRect();return{x:(e.clientX-r.left)/sc,y:(e.clientY-r.top)/sc};}
+function sdrag(e){var p=gxy(e);di=-1;canvasNodes.forEach(function(n,i){var np=nodePos[i];var dx=p.x-np.x,dy=p.y-np.y;if(dx*dx+dy*dy<22*22){di=i;dOff={x:dx,y:dy};}});}
+function mdrag(e){if(di<0)return;var p=gxy(e);nodePos[di]={x:p.x-dOff.x,y:p.y-dOff.y};drawCurrent();}
+function edrag(){di=-1;}
 
-function getCanvasXY(e){
-  var rect=cv.getBoundingClientRect();
-  return{x:(e.clientX-rect.left)/sc,y:(e.clientY-rect.top)/sc};
-}
-
-function startDrag(e){
-  var p=getCanvasXY(e);
-  di=-1;
-  canvasNodes.forEach(function(n,i){
-    var np=nodePos[i];
-    var dx=p.x-np.x,dy=p.y-np.y;
-    if(dx*dx+dy*dy<24*24){di=i;dOff={x:dx,y:dy};}
-  });
-}
-
-function moveDrag(e){
-  if(di<0)return;
-  var p=getCanvasXY(e);
-  nodePos[di]={x:p.x-dOff.x,y:p.y-dOff.y};
-  drawCurrent();
-}
-
-function endDrag(){di=-1;}
-
-// ============================================================
-// ZOOM
-// ============================================================
 function zI(){sc=Math.min(3,sc+.15);drawCurrent();}
 function zO(){sc=Math.max(.4,sc-.15);drawCurrent();}
 function zReset(){
   sc=1;
-  if(canvasNodes.length){
-    var cx=W/2,cy=H/2,r=Math.min(W,H)*.32;
-    var angles=[-Math.PI/2,Math.PI,0,Math.PI/2];
-    nodePos=canvasNodes.map(function(n,i){return{x:cx+r*Math.cos(angles[i]),y:cy+r*Math.sin(angles[i])};});
-  }
+  var cx=CVW/2,cy=CVH/2,r=Math.min(CVW,CVH)*.33;
+  var angles=[-Math.PI/2,Math.PI,0,Math.PI/2];
+  nodePos=canvasNodes.map(function(n,i){return{x:cx+r*Math.cos(angles[i]),y:cy+r*Math.sin(angles[i])};});
   drawCurrent();
 }
-
-function exportCanvasPNG(){
-  if(!cv){toast('Visualisasi belum tersedia','error');return;}
-  var a=document.createElement('a');
-  a.download='tokyo-tour-'+Date.now()+'.png';
-  a.href=cv.toDataURL('image/png');
-  a.click();
+function savePNG(){
+  if(!cv_el){toast('Visualisasi belum tersedia','error');return;}
+  var a=document.createElement('a');a.download='tokyo-tour-map.png';a.href=cv_el.toDataURL('image/png');a.click();
   toast('Gambar disimpan','ok');
 }
 
@@ -1738,350 +1491,331 @@ function setupIterCtrl(){
   document.getElementById('iterCtrlWrap').classList.remove('hidden');
   updateIterUI();
 }
-
 function iterGo(idx){
   if(!iterStates.length)return;
   idx=Math.max(0,Math.min(iterStates.length-1,idx));
-  curIter=idx;
-  updateIterUI();
-  drawCurrent();
-  showIterChanges();
-  // Update timeline active
-  var items=document.querySelectorAll('.tl-item');
-  items.forEach(function(el,i){el.classList.toggle('active',i===curIter);});
+  curIter=idx;updateIterUI();drawCurrent();showIterChanges();
+  document.querySelectorAll('.tl-item').forEach(function(el,i){el.classList.toggle('active',i===curIter);});
 }
-
 function updateIterUI(){
-  var total=iterStates.length;
-  document.getElementById('iterBadge').textContent=(curIter+1)+'/'+total;
+  var tot=iterStates.length;
+  document.getElementById('iterBadge').textContent=(curIter+1)+'/'+tot;
   document.getElementById('iterLabel').textContent=iterStates[curIter]?iterStates[curIter].title:'';
-  document.getElementById('iBtnFirst').disabled=curIter===0;
-  document.getElementById('iBtnPrev').disabled=curIter===0;
-  document.getElementById('iBtnNext').disabled=curIter>=total-1;
-  document.getElementById('iBtnLast').disabled=curIter>=total-1;
+  document.getElementById('iBF').disabled=curIter===0;
+  document.getElementById('iBP').disabled=curIter===0;
+  document.getElementById('iBN').disabled=curIter>=tot-1;
+  document.getElementById('iBL').disabled=curIter>=tot-1;
 }
-
 function showIterChanges(){
-  var st=iterStates[curIter];
-  if(!st)return;
-  var el=document.getElementById('iterChanges');
-  el.innerHTML='<strong style="font-size:12px;font-family:\'JetBrains Mono\',monospace">'+st.title+'</strong>'
+  var st=iterStates[curIter];if(!st)return;
+  document.getElementById('iterChanges').innerHTML=
+    '<strong style="font-size:12px;font-family:\'JetBrains Mono\',monospace">'+st.title+'</strong>'
     +'<br><span style="color:var(--sub)">'+st.summary+'</span>';
 }
-
-var _playing=false;
-function togglePlayback(){
-  if(_playing){
-    clearInterval(playInterval);playInterval=null;_playing=false;
-    document.getElementById('playBtn').textContent='play';
-  }else{
+function togglePlay(){
+  if(_playing){clearInterval(playInterval);playInterval=null;_playing=false;document.getElementById('playBtn').textContent='play';}
+  else{
     if(curIter>=iterStates.length-1)curIter=0;
-    _playing=true;
-    document.getElementById('playBtn').textContent='pause';
-    playInterval=setInterval(function(){
-      if(curIter>=iterStates.length-1){stopPlayback();return;}
-      iterGo(curIter+1);
-    },playSpeed);
+    _playing=true;document.getElementById('playBtn').textContent='pause';
+    playInterval=setInterval(function(){if(curIter>=iterStates.length-1){stopPlay();return;}iterGo(curIter+1);},playSpd);
   }
 }
-function stopPlayback(){
-  clearInterval(playInterval);playInterval=null;_playing=false;
-  document.getElementById('playBtn').textContent='play';
-}
-function setSpeed(v){playSpeed=parseInt(v);if(_playing){stopPlayback();togglePlayback();}}
+function stopPlay(){clearInterval(playInterval);playInterval=null;_playing=false;document.getElementById('playBtn').textContent='play';}
+function setSpd(v){playSpd=parseInt(v);if(_playing){stopPlay();togglePlay();}}
 
 // ============================================================
 // TAB SWITCHING
 // ============================================================
-function switchTab(panes,btns,idx,btnEl){
-  panes.forEach(function(p){document.getElementById(p).classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(b){
-    if(btns.indexOf(b)>=0)b.classList.remove('active');
+function switchTab2(idx,btn){
+  ['inp0','inp1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('inp'+idx).classList.add('active');btn.classList.add('active');
+}
+function switchTabR(idx,btn){
+  ['rTab0','rTab1','rTab2'].forEach(function(p){document.getElementById(p).classList.remove('active');});
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('rTab'+idx).classList.add('active');btn.classList.add('active');
+}
+function switchTabO(idx,btn){
+  ['oTab0','oTab1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('oTab'+idx).classList.add('active');btn.classList.add('active');
+}
+
+// ============================================================
+// DEMO DATA
+// ============================================================
+function fillDemo(){
+  if(!locNames.A){toast('Masukkan NIM dulu','error');return;}
+  var demoR0=[[29,208,'Kereta/Train',1,4,'Jalur yang dipilih adalah alternatif pertama (¥208, walk 4 min).'],
+               [27,286,'Subway',1,5,'Jalur yang dipilih adalah alternatif pertama (¥286, walk 5 min).'],
+               [47,545,'Subway',2,11,'Jalur yang dipilih adalah alternatif pertama (¥545, walk 11 min).'],
+               [28,481,'Kereta/Train',1,8,'Jalur yang dipilih adalah alternatif pertama (¥481, walk 8 min).']];
+  var demoR1=[[26,386,'Kereta/Train',1,7,'Jalur yang dipilih adalah alternatif kedua (¥386, walk 7 min).'],
+               [31,286,'Subway',1,12,'Jalur yang dipilih adalah alternatif kedua (¥286, walk 12 min).'],
+               [59,597,'Subway',2,13,'Jalur yang dipilih adalah alternatif pertama (¥597, walk 13 min).'],
+               [30,481,'Kereta/Train',1,11,'Jalur yang dipilih adalah alternatif pertama (¥481, walk 11 min).']];
+
+  [demoR0,demoR1].forEach(function(demo,ri){
+    demo.forEach(function(d,si){
+      var setV=function(id,v){var el=document.getElementById(id);if(el)el.value=v;};
+      setV('r'+ri+'_dur_'+si,d[0]);
+      setV('r'+ri+'_cost_'+si,d[1]);
+      setV('r'+ri+'_mode_'+si,d[2]);
+      setV('r'+ri+'_trans_'+si,d[3]);
+      setV('r'+ri+'_walk_'+si,d[4]);
+      setV('r'+ri+'_jalur_'+si,d[5]);
+    });
   });
-  document.getElementById(panes[idx]).classList.add('active');
-  btnEl.classList.add('active');
+  // visit times
+  var setV=function(id,v){var el=document.getElementById(id);if(el)el.value=v;};
+  setV('vt_B',121);setV('vt_C',153);setV('vt_D',276);
+  setV('adm_B',300);setV('adm_C',0);setV('adm_D',0);
+  toast('Contoh data diisi','ok');
 }
 
-function switchInputTab(idx,btn){
-  ['inputTab0','inputTab1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('inputTab'+idx).classList.add('active');
-  btn.classList.add('active');
-}
-
-function switchResultTab(idx,btn){
-  ['resTab0','resTab1','resTab2','resTab3'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('resTab'+idx).classList.add('active');
-  btn.classList.add('active');
-}
-
-function switchScheduleTab(idx,btn){
-  ['schedTab0','schedTab1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('schedTab'+idx).classList.add('active');
-  btn.classList.add('active');
+function clearAll(){
+  [0,1].forEach(function(ri){
+    for(var si=0;si<4;si++){
+      ['dur','cost','trans','walk','jalur'].forEach(function(f){
+        var el=document.getElementById('r'+ri+'_'+f+'_'+si);if(el)el.value='';
+      });
+    }
+  });
+  toast('Input direset');
 }
 
 // ============================================================
 // MUSIC
 // ============================================================
-var musicPlaying=false;
-var ytFrame=document.getElementById('ytFrame');
+var musicOn=false;
 var ytLinks=[
   {id:'jfKfPfyJRdk',title:'lofi hip hop radio'},
-  {id:'5qap5aO4i9A',title:'lofi girl - study beats'},
-  {id:'lTRiuFIWV54',title:'chillhop music'},
+  {id:'5qap5aO4i9A',title:'lofi girl — study beats'},
+  {id:'lTRiuFIWV54',title:'chillhop essentials'},
 ];
 var curTrack=0;
-
 function toggleMusic(){
-  if(!musicPlaying){
-    // Load and play
+  if(!musicOn){
     var t=ytLinks[curTrack];
-    var vol=document.getElementById('volSlider').value;
-    ytFrame.src='https://www.youtube.com/embed/'+t.id+'?autoplay=1&loop=1&playlist='+t.id+'&controls=0&mute=0&start=0&volume='+vol;
-    musicPlaying=true;
+    document.getElementById('ytFrame').src=
+      'https://www.youtube.com/embed/'+t.id+'?autoplay=1&loop=1&playlist='+t.id+'&controls=0&mute=0';
+    musicOn=true;
     document.getElementById('musicDot').classList.remove('paused');
-    document.getElementById('musicToggleBtn').textContent='stop';
+    document.getElementById('musicBtn').textContent='stop';
     document.getElementById('musicTitle').textContent=t.title;
     toast('Memutar: '+t.title,'ok');
   }else{
-    ytFrame.src='';
-    musicPlaying=false;
+    document.getElementById('ytFrame').src='';
+    musicOn=false;
     document.getElementById('musicDot').classList.add('paused');
-    document.getElementById('musicToggleBtn').textContent='play';
-    document.getElementById('musicTitle').textContent='chill lo-fi';
+    document.getElementById('musicBtn').textContent='play';
+    document.getElementById('musicTitle').textContent='lo-fi';
   }
-}
-
-function setVol(v){
-  // YouTube iframe API volume tidak bisa dikontrol langsung via src param
-  // Kita store dan restart jika sedang play
-  if(musicPlaying){
-    var t=ytLinks[curTrack];
-    ytFrame.src='https://www.youtube.com/embed/'+t.id+'?autoplay=1&loop=1&playlist='+t.id+'&controls=0&mute=0&start=0';
-  }
-}
-
-// ============================================================
-// UTILITY
-// ============================================================
-function timeToMin(t){
-  var p=t.split(':');
-  return parseInt(p[0])*60+parseInt(p[1]);
-}
-function minToTime(m){
-  m=((m%1440)+1440)%1440;
-  return pad2(Math.floor(m/60))+':'+pad2(m%60);
-}
-function minToHHMM(m){
-  var h=Math.floor(m/60);
-  var mm=m%60;
-  return (h>0?h+'j ':'')+(mm>0?mm+'m':'');
-}
-function pad2(n){return (n<10?'0':'')+n;}
-function formatDateID(d){
-  var days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  var months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  return days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
-}
-
-// ============================================================
-// SHARE URL
-// ============================================================
-function copyShareURL(){
-  var data={
-    nim:document.getElementById('nimInput').value,
-    name:document.getElementById('studentName').value,
-    campus:document.getElementById('campusSel').value,
-  };
-  var url=location.origin+location.pathname+'?s='+btoa(JSON.stringify(data));
-  navigator.clipboard.writeText(url).then(function(){toast('URL disalin','ok');}).catch(function(){toast('Gagal menyalin URL','error');});
-}
-
-function loadFromURL(){
-  var params=new URLSearchParams(location.search);
-  var s=params.get('s');
-  if(!s)return;
-  try{
-    var data=JSON.parse(atob(s));
-    if(data.nim)document.getElementById('nimInput').value=data.nim;
-    if(data.name)document.getElementById('studentName').value=data.name;
-    if(data.campus)document.getElementById('campusSel').value=data.campus;
-    if(data.nim)onNimInput(data.nim);
-  }catch(e){}
 }
 
 // ============================================================
 // PDF EXPORT
 // ============================================================
 async function printPDF(){
-  if(!analysisResult){toast('Jalankan analisis terlebih dahulu','error');return;}
+  if(!analysisRes){toast('Jalankan analisis terlebih dahulu','error');return;}
   showOv('Membuat PDF...');
   try{
     var {jsPDF}=window.jspdf;
     var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    var pw=210,ph=297,mg=15,cw=pw-mg*2;
-    var y=mg;
-    var dark=isDark;
-    var textC=dark?[232,232,232]:[26,26,26];
-    var subC=dark?[120,120,120]:[136,136,136];
-    var lineC=dark?[50,50,50]:[220,220,220];
+    var pw=210,ph=297,mg=15,cw=pw-mg*2,y=mg;
+    var tC=[26,26,26],sC=[136,136,136],lC=[220,220,220];
 
-    function need(h){
-      if(y+h>ph-mg){doc.addPage();y=mg;drawFooter();}
-    }
-    function drawFooter(){
+    function need(h){if(y+h>ph-mg){doc.addPage();y=mg;footer();}}
+    function footer(){
       var pg=doc.internal.getCurrentPageInfo().pageNumber;
-      doc.setFontSize(8);doc.setTextColor(...subC);
-      doc.text('RAD STRIX  —  Tokyo Tour Optimizer  —  Halaman '+pg,pw-mg,ph-8,{align:'right'});
-      doc.setTextColor(...textC);
+      doc.setFontSize(8);doc.setTextColor(...sC);
+      doc.text('RAD STRIX — Tokyo Tour Optimizer — Hal '+pg,pw-mg,ph-7,{align:'right'});
+      doc.setTextColor(...tC);
     }
 
-    // Header
-    doc.setFillColor(26,26,26);
-    doc.roundedRect(mg,y,cw,28,3,3,'F');
-    doc.setFontSize(16);doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');
-    doc.text('Tokyo One Day Tour — Analisis Rute',mg+8,y+10);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,200,200);
-    doc.text('Mahasiswa: '+(document.getElementById('studentName').value||'—')+'   NIM: '+(document.getElementById('nimInput').value||'—'),mg+8,y+18);
-    doc.text('Tanggal: '+formatDateID(new Date(document.getElementById('tourDate').value||'2026-03-01'))+'   Generated: '+new Date().toLocaleString('id-ID'),mg+8,y+24);
-    y+=34;
+    function renderRouteOnPDF(ri){
+      var R=ri===0?analysisRes.R0:analysisRes.R1;
+      var sched=ri===0?analysisRes.sched0:analysisRes.sched1;
+      var rName='Rencana Perjalanan Alternatif '+(ri+1)+' ('+(ri===0?'A-B-C-D-A':'A-C-B-D-A')+')';
+      var dateStr=formatDateID(new Date(document.getElementById('tourDate').value+'T12:00:00'));
 
-    // Lokasi
-    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...textC);
-    doc.text('TITIK PERJALANAN',mg,y);y+=5;
-    doc.setDrawColor(...lineC);doc.line(mg,y,mg+cw,y);y+=4;
-    doc.setFont('helvetica','normal');doc.setFontSize(9);
-    ['A','B','C','D'].forEach(function(l,i){
-      var typeMap={A:'Stasiun (Hotel)',B:'Taman',C:'Landmark',D:'Pusat Perbelanjaan'};
-      doc.setFont('helvetica','bold');doc.text(l+' — '+typeMap[l],mg,y);
-      doc.setFont('helvetica','normal');doc.text(locNames[l]||'—',mg+45,y);
-      y+=5;
-    });
-    y+=4;
+      // Header
+      doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(...tC);
+      doc.text(rName,pw/2,y,{align:'center'});y+=7;
+      doc.setFont('helvetica','normal');doc.setFontSize(11);
+      doc.text(dateStr,pw/2,y,{align:'center'});y+=10;
 
-    // Comparison table
-    need(60);
-    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...textC);
-    doc.text('PERBANDINGAN RUTE',mg,y);y+=5;
-    doc.setDrawColor(...lineC);doc.line(mg,y,mg+cw,y);y+=4;
+      // Identitas
+      doc.setFontSize(9);
+      var rows=[
+        ['Disusun oleh',':'],
+        ['Nama',': '+(document.getElementById('studentName').value||'—')],
+        ['Kelas',': '+(document.getElementById('studentClass').value||'—')],
+        ['NIM',': '+(document.getElementById('nimInput').value||'—')],
+      ];
+      rows.forEach(function(r){
+        doc.setFont('helvetica','normal');
+        doc.text(r[0],mg,y);doc.text(r[1],mg+30,y);y+=5;
+      });
+      y+=4;
 
-    var rows=[
-      ['Urutan Rute','A-B-C-D-A','A-C-B-D-A'],
-      ['Biaya Transport','¥'+analysisResult.r1.totalCost.toLocaleString(),'¥'+analysisResult.r2.totalCost.toLocaleString()],
-      ['Waktu Transport',analysisResult.r1.totalTransport+' menit',analysisResult.r2.totalTransport+' menit'],
-      ['Waktu Kunjungan',analysisResult.r1.totalVisit+' menit',analysisResult.r2.totalVisit+' menit'],
-      ['Total Waktu',analysisResult.r1.totalTime+' menit',analysisResult.r2.totalTime+' menit'],
-      ['Jalan Kaki',analysisResult.r1.totalWalk+' menit',analysisResult.r2.totalWalk+' menit'],
-      ['Transfer Moda',analysisResult.r1.totalTransfers+'x',analysisResult.r2.totalTransfers+'x'],
+      // Tabel lokasi NIM
+      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
+      doc.text('Angka NIM',mg,y);doc.text('Lok.',mg+22,y);doc.text('Lokasi',mg+32,y);
+      doc.setDrawColor(...lC);doc.line(mg,y+1,mg+cw,y+1);y+=6;
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...tC);
+      ['A','B','C','D'].forEach(function(l){
+        doc.text(''+nimDigits[l],mg+4,y);
+        doc.text(l,mg+22,y);
+        doc.text(locNames[l],mg+32,y);
+        y+=5;
+      });
+      y+=6;
+
+      // Tabel output
+      var col={time:22,act:cw-22-28,cost:28};
+      // Header baris
+      doc.setFillColor(240,240,240);doc.rect(mg,y,cw,7,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
+      doc.text('Waktu',mg+2,y+5);
+      doc.text('Kegiatan',mg+col.time+2,y+5);
+      doc.text('Biaya',mg+col.time+col.act+2,y+5);
+      y+=7;
+
+      var totalPDF=0;
+      sched.forEach(function(s){
+        if(s.type==='depart')return;
+        var costStr=s.type==='transport'&&s.cost>0?'¥'+s.cost.toLocaleString():'';
+        if(s.type==='transport'&&s.cost>0)totalPDF+=s.cost;
+
+        // Build text lines
+        var lines=[s.label];
+        if(s.type==='transport'){
+          if(s.jalur&&s.jalur.trim()){lines.push('Alternatif jalur:');lines.push(s.jalur.trim());}
+          if(s.walk)lines.push('Waktu berjalan kaki: '+s.walk+' mnt');
+        }else if(s.type==='visit'&&s.notes&&s.notes.length){
+          lines.push('Catatan:');s.notes.forEach(function(n){lines.push('  '+n);});
+        }else if(s.type==='lunch'){
+          lines.push('Catatan: biaya makan siang ¥1000-¥1500.');
+        }
+
+        // Estimate height
+        var h=lines.length*5+6;
+        need(h+4);
+
+        var rowY=y;
+        doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...tC);
+        doc.text(s.timeRange||s.time||'',mg+2,y+5);
+
+        // Act column
+        var actX=mg+col.time+2;
+        lines.forEach(function(ln,li){
+          if(li===0)doc.setFont('helvetica','bold');else doc.setFont('helvetica','normal');
+          doc.setFontSize(li===0?9:8);
+          doc.setTextColor(li===0?tC:sC);
+          // word wrap
+          var wrapped=doc.splitTextToSize(ln,col.act-4);
+          wrapped.forEach(function(wl,wi){
+            doc.text(wl,actX,y+5);y+=5;
+          });
+          if(li<lines.length-1)doc.setFont('helvetica','normal');
+        });
+
+        if(costStr){
+          doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...tC);
+          doc.text(costStr,mg+col.time+col.act+2,rowY+5);
+        }
+
+        y+=4;
+        doc.setDrawColor(...lC);doc.line(mg,y,mg+cw,y);y+=2;
+      });
+
+      // Total
+      need(12);
+      doc.setFillColor(240,240,240);doc.rect(mg,y,cw,10,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...tC);
+      doc.text('Total Biaya:',mg+col.time+col.act-20,y+7);
+      doc.text('¥'+totalPDF.toLocaleString(),mg+col.time+col.act+2,y+7);
+      y+=16;
+    }
+
+    // Render Rute 1
+    renderRouteOnPDF(0);
+    footer();
+
+    // Render Rute 2
+    doc.addPage();y=mg;
+    renderRouteOnPDF(1);
+    footer();
+
+    // Halaman perbandingan
+    doc.addPage();y=mg;
+    doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(...tC);
+    doc.text('Perbandingan & Rekomendasi',pw/2,y,{align:'center'});y+=12;
+
+    var crows=[
+      ['Kriteria','Rute 1 (A-B-C-D-A)','Rute 2 (A-C-B-D-A)'],
+      ['Biaya Transport','¥'+analysisRes.R0.totCost.toLocaleString(),'¥'+analysisRes.R1.totCost.toLocaleString()],
+      ['Waktu Transport',analysisRes.R0.totTrans+' mnt',analysisRes.R1.totTrans+' mnt'],
+      ['Total Waktu',analysisRes.R0.totTime+' mnt',analysisRes.R1.totTime+' mnt'],
+      ['Jalan Kaki',analysisRes.R0.totWalk+' mnt',analysisRes.R1.totWalk+' mnt'],
+      ['Transfer Moda',analysisRes.R0.totTransfer+'x',analysisRes.R1.totTransfer+'x'],
     ];
+    var cwidths=[60,50,50];
+    var cxs=[mg,mg+60,mg+110];
 
-    var cols=[70,60,60];
-    var cx=[mg,mg+cols[0],mg+cols[0]+cols[1]];
-
-    // Header row
-    doc.setFillColor(240,240,240);
-    doc.rect(mg,y,cw,7,'F');
+    doc.setFillColor(240,240,240);doc.rect(mg,y,cw,7,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
-    doc.text('Kriteria',cx[0]+2,y+5);
-    doc.text('Rute 1 (A-B-C-D-A)',cx[1]+2,y+5);
-    doc.text('Rute 2 (A-C-B-D-A)',cx[2]+2,y+5);
+    crows[0].forEach(function(h,i){doc.text(h,cxs[i]+2,y+5);});
     y+=7;
 
-    rows.forEach(function(r,ri){
+    crows.slice(1).forEach(function(r,ri){
       need(8);
       if(ri%2===0){doc.setFillColor(250,250,250);doc.rect(mg,y,cw,7,'F');}
-      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...textC);
-      doc.text(r[0],cx[0]+2,y+5);
-      doc.text(r[1],cx[1]+2,y+5);
-      doc.text(r[2],cx[2]+2,y+5);
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...tC);
+      r.forEach(function(v,i){doc.text(v,cxs[i]+2,y+5);});
       y+=7;
     });
-    y+=4;
 
-    // Recommendation
-    need(24);
-    doc.setFillColor(26,26,26);
-    doc.roundedRect(mg,y,cw,22,2,2,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(255,255,255);
-    doc.text('REKOMENDASI: '+(analysisResult.recommended==='r1'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)'),mg+5,y+8);
+    y+=8;
+    need(20);
+    doc.setFillColor(26,26,26);doc.roundedRect(mg,y,cw,18,2,2,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
+    doc.text('REKOMENDASI: '+(analysisRes.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)'),mg+6,y+8);
     doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(200,200,200);
-    var selisih='Selisih biaya: ¥'+Math.abs(analysisResult.r1.totalCost-analysisResult.r2.totalCost).toLocaleString()
-      +'  |  Selisih waktu: '+Math.abs(analysisResult.r1.totalTime-analysisResult.r2.totalTime)+' menit'
-      +'  |  Skor: '+(analysisResult.recommended==='r1'?analysisResult.sc1:analysisResult.sc2)+'/4 kriteria';
-    doc.text(selisih,mg+5,y+15);
-    y+=28;
+    doc.text('Skor '+(analysisRes.recommended==='r0'?analysisRes.sc0:analysisRes.sc1)+'/4 kriteria evaluasi',mg+6,y+14);
+    y+=24;
 
     // Canvas snapshot
-    need(70);
-    if(cv){
-      var imgData=cv.toDataURL('image/png');
-      var iw=cw;var ih=iw*(H/W);
-      if(ih>80){ih=80;iw=ih*(W/H);}
-      doc.addImage(imgData,'PNG',mg+(cw-iw)/2,y,iw,ih);
+    if(cv_el){
+      var img=cv_el.toDataURL('image/png');
+      var iw=cw,ih=iw*(CVH/CVW);
+      if(ih>80){ih=80;iw=ih*(CVW/CVH);}
+      need(ih+6);
+      doc.addImage(img,'PNG',mg+(cw-iw)/2,y,iw,ih);
       y+=ih+6;
     }
 
-    // Schedules
-    ['r1','r2'].forEach(function(rk,ri){
-      need(20);
-      doc.addPage();y=mg;drawFooter();
-      var rName=ri===0?'Rute 1 — A-B-C-D-A':'Rute 2 — A-C-B-D-A';
-      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...textC);
-      doc.text('JADWAL '+rName,mg,y);y+=6;
-      doc.setDrawColor(...lineC);doc.line(mg,y,mg+cw,y);y+=5;
-
-      var sched=ri===0?analysisResult.sched1:analysisResult.sched2;
-      // Header
-      doc.setFillColor(240,240,240);doc.rect(mg,y,cw,6,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(80,80,80);
-      doc.text('Waktu',mg+2,y+4);doc.text('Aktivitas',mg+22,y+4);doc.text('Durasi',mg+145,y+4);doc.text('Keterangan',mg+165,y+4);
-      y+=6;
-      sched.forEach(function(s){
-        need(7);
-        doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...textC);
-        doc.text(s.time,mg+2,y+4);
-        var ev=s.event;if(ev.length>55)ev=ev.slice(0,54)+'…';
-        doc.text(ev,mg+22,y+4);
-        doc.text(s.duration?s.duration+' mnt':'—',mg+145,y+4);
-        var info=s.type==='transit'&&s.cost?'¥'+s.cost.toLocaleString():'';
-        doc.text(info,mg+165,y+4);
-        y+=6;
-        doc.setDrawColor(...lineC);doc.line(mg,y,mg+cw,y);
-      });
-      y+=6;
-    });
-
-    drawFooter();
-    var fname='tugas2-tokyo-tour-'+(document.getElementById('nimInput').value||'nim')+'.pdf';
-    doc.save(fname);
+    footer();
+    doc.save('tugas2-tokyo-'+(document.getElementById('nimInput').value||'nim')+'.pdf');
     toast('PDF berhasil dibuat','ok');
   }catch(err){
-    toast('Gagal membuat PDF: '+err.message,'error');
-    console.error(err);
+    toast('Gagal: '+err.message,'error');console.error(err);
   }
   hideOv();
 }
 
 // ============================================================
-// INIT
+// UTIL
 // ============================================================
-window.addEventListener('load',function(){
-  loadFromURL();
-  // resize canvas on window resize
-  window.addEventListener('resize',function(){
-    if(canvasNodes.length)drawCurrent();
-  });
-});
+function timeToMin(t){var p=(t||'08:00').split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function minToTime(m){m=((m%1440)+1440)%1440;return p2(Math.floor(m/60))+':'+p2(m%60);}
+function p2(n){return(n<10?'0':'')+n;}
 
-document.getElementById('tourDate').addEventListener('change',function(e){
-  var d=new Date(e.target.value);
-  document.getElementById('dateHint').textContent=formatDateID(d);
-});
-document.getElementById('startTime').addEventListener('change',function(){
-  buildSegmentTables();
+window.addEventListener('load',function(){
+  updateDateDisplay();
+  window.addEventListener('resize',function(){if(canvasNodes.length)drawCurrent();});
 });
 </script>
 </body>
