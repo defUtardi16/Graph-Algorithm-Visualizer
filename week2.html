@@ -1,1822 +1,880 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tokyo Tour Optimizer — Week 2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tokyo Travel Planner — RAD STRIX</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{
-  --bg:#f5f5f5;--card:#fff;--text:#1a1a1a;--accent:#333;
-  --border:#e0e0e0;--sub:#888;--green:#2d7d46;--red:#c0392b;
-  --amber:#e67e22;--blue:#2980b9;--node-fill:#fff;--node-stroke:#1a1a1a;
-  --edge-color:#999;--canvas-bg:#fafafa;--radius:10px;
-  --plexus-dot:rgba(26,26,26,.15);--glass:rgba(255,255,255,.45);
-  --glass-border:rgba(255,255,255,.2);
-}
-[data-theme="dark"]{
-  --bg:#0f0f0f;--card:#161616;--text:#e8e8e8;--accent:#ccc;
-  --border:#2a2a2a;--sub:#666;--green:#3aaa5c;--red:#e74c3c;
-  --amber:#f39c12;--blue:#3498db;--node-fill:#1a1a1a;--node-stroke:#e8e8e8;
-  --edge-color:#555;--canvas-bg:#111;--glass:rgba(22,22,22,.55);
-  --glass-border:rgba(255,255,255,.06);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden}
-
-/* SPLASH */
-#splashScreen{position:fixed;inset:0;z-index:10000;background:#0a0a0a;display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
-#splashScreen.hidden{opacity:0;visibility:hidden;pointer-events:none}
-#splashCanvas{position:absolute;inset:0;width:100%;height:100%}
-.splash-content{position:relative;z-index:2;text-align:center;color:#fff}
-.splash-title{font-family:'Inter',sans-serif;font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-1px;animation:splashFadeUp .7s ease both;animation-delay:.3s;opacity:0}
-.splash-sub{font-size:13px;color:rgba(255,255,255,.45);margin-top:8px;letter-spacing:.5px;animation:splashFadeUp .7s ease both;animation-delay:.6s;opacity:0;font-family:'JetBrains Mono',monospace}
-.splash-bar-wrap{width:200px;height:2px;background:rgba(255,255,255,.1);margin:28px auto 0;border-radius:2px;overflow:hidden;animation:splashFadeUp .5s ease both;animation-delay:.8s;opacity:0}
-.splash-bar{height:100%;background:#fff;width:0;animation:splashBarFill 2.2s cubic-bezier(.4,0,.2,1) both;animation-delay:.9s}
-@keyframes splashFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes splashBarFill{0%{width:0%}100%{width:100%}}
-
-#plexusBg{position:fixed;inset:0;z-index:0;pointer-events:none}
-.online-indicator{position:fixed;top:14px;left:16px;z-index:999;font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px}
-.online-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.watermark{position:fixed;bottom:14px;right:16px;z-index:999;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sub);opacity:.4;letter-spacing:2px}
-
-#toast{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast-item{background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;transform:translateX(120%);transition:transform .3s;pointer-events:auto;max-width:300px}
-.toast-item.show{transform:translateX(0)}
-.toast-item.err{background:var(--red)}
-.toast-item.ok{background:var(--green)}
-
-#ov{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-#ov.on{display:flex}
-.spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .55s linear infinite}
+:root{--bg:#f5f5f5;--bg2:#ebebeb;--bg3:#e0e0e0;--bg4:#d5d5d5;--card:rgba(255,255,255,.45);--card2:#fafafa;--border:#d0d0d0;--border2:#c0c0c0;--text:#1a1a1a;--text2:#4a4a4a;--text3:#888;--accent:#333;--accent2:#111;--accent-bg:#e8e8e8;--green:#2e7d32;--red:#c62828;--amber:#f57f17;--blue:#1565c0;--green-bg:rgba(46,125,50,.08);--red-bg:rgba(198,40,40,.08);--amber-bg:rgba(245,127,23,.08);--blue-bg:rgba(21,101,192,.08);--highlight:#333;--highlight-soft:rgba(0,0,0,.06);--radius:10px;--radius-sm:6px;--shadow:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);--shadow-lg:0 8px 30px rgba(0,0,0,.12);--canvas-bg:#fafafa;--canvas-dot:#e0e0e0;--node-fill:#fff;--node-stroke:#333;--edge-color:#bbb;--plexus-dot:rgba(0,0,0,.18);--plexus-line:rgba(0,0,0,.06);--glass-bg:rgba(255,255,255,.45);--glass-border:rgba(255,255,255,.2);--glass-shadow:0 8px 32px rgba(0,0,0,.08);--purple:#7b1fa2;--purple-bg:rgba(123,31,162,.08)}
+[data-theme="dark"]{--bg:#0f0f0f;--bg2:#181818;--bg3:#222;--bg4:#2a2a2a;--card:rgba(22,22,22,.65);--card2:#1a1a1a;--border:#2a2a2a;--border2:#333;--text:#e8e8e8;--text2:#aaa;--text3:#666;--accent:#e0e0e0;--accent2:#fff;--accent-bg:#1a1a1a;--green:#4caf50;--red:#ef5350;--amber:#ffb300;--blue:#42a5f5;--green-bg:rgba(76,175,80,.1);--red-bg:rgba(239,83,80,.1);--amber-bg:rgba(255,179,0,.1);--blue-bg:rgba(66,165,245,.1);--highlight:#fff;--highlight-soft:rgba(255,255,255,.04);--radius:10px;--radius-sm:6px;--shadow:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);--shadow-lg:0 8px 30px rgba(0,0,0,.5);--canvas-bg:#141414;--canvas-dot:#222;--node-fill:#1a1a1a;--node-stroke:#e0e0e0;--edge-color:#444;--plexus-dot:rgba(255,255,255,.15);--plexus-line:rgba(255,255,255,.04);--glass-bg:rgba(22,22,22,.65);--glass-border:rgba(255,255,255,.06);--glass-shadow:0 8px 32px rgba(0,0,0,.4);--purple:#ce93d8;--purple-bg:rgba(206,147,216,.1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:9px}
+canvas#plexusBg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.shell{max-width:1100px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+.watermark{position:fixed;bottom:12px;right:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);opacity:.35;z-index:2;letter-spacing:2px;pointer-events:none}
+.online-indicator{position:fixed;top:14px;left:16px;z-index:100;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.online-indicator::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:onlinePulse 2s infinite}
+@keyframes onlinePulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-bar{position:sticky;top:0;z-index:50;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--glass-border);padding:10px 0;margin-bottom:30px}
+.top-bar-inner{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto;padding:0 20px}
+.top-bar-logo{font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--text)}
+.top-bar-right{display:flex;gap:6px;align-items:center}
+.tb{background:var(--accent-bg);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+.tb:hover{background:var(--bg3);border-color:var(--border2)}
+.hero{text-align:center;padding:40px 0 30px}
+.hero-sub{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--text3);margin-bottom:8px;font-weight:500}
+.hero-title{font-size:clamp(24px,5vw,38px);font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1.15}
+.hero-desc{font-size:13px;color:var(--text3);margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto}
+.section{background:var(--glass-bg);backdrop-filter:blur(16px) saturate(180%);border:1px solid var(--glass-border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--glass-shadow);position:relative}
+.section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+.s-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.s-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+.badge-g{background:var(--green-bg);color:var(--green)}.badge-r{background:var(--red-bg);color:var(--red)}.badge-b{background:var(--blue-bg);color:var(--blue)}.badge-a{background:var(--amber-bg);color:var(--amber)}.badge-p{background:var(--purple-bg);color:var(--purple)}
+input[type="text"],input[type="number"],input[type="password"],select{font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card2);color:var(--text);outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+.btn{font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-p:hover{background:var(--accent2)}
+.btn-s{background:var(--card2);color:var(--text)}.btn-s:hover{background:var(--bg3)}
+.btn-ai{background:linear-gradient(135deg,#7b1fa2,#1565c0);color:#fff;border-color:transparent;position:relative;overflow:hidden}.btn-ai:hover{opacity:.9}.btn-ai::after{content:'✨';margin-left:4px}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.fg{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.fc{display:flex;flex-direction:column;gap:4px}
+.fc label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.cv-wrap{position:relative;background:var(--canvas-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:16px 0}
+.cv-wrap canvas{display:block;width:100%;cursor:grab}
+.cv-wrap canvas:active{cursor:grabbing}
+.zoom-ctrl{position:absolute;bottom:10px;right:10px;display:flex;gap:4px}
+.zoom-ctrl button{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace}
+.zoom-ctrl button:hover{background:var(--bg3)}
+.layout-btns{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.layout-btns button{font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card2);color:var(--text2);cursor:pointer;font-weight:500;transition:all .2s}
+.layout-btns button:hover,.layout-btns button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.iter-controls{display:flex;gap:6px;align-items:center;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.iter-controls button{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer;transition:all .2s}
+.iter-controls button:hover:not(:disabled){background:var(--accent);color:#fff;border-color:var(--accent)}
+.iter-controls button:disabled{opacity:.3;cursor:not-allowed}
+.iter-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);padding:4px 10px;background:var(--accent-bg);border-radius:var(--radius-sm);font-weight:600}
+.play-ctrl{display:flex;gap:6px;align-items:center;justify-content:center;margin:8px 0}
+.speed-sel{font-size:11px;padding:4px 8px}
+.iter-detail{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:10px 0;font-size:12px;display:none}
+.iter-detail.show{display:block}
+.iter-changes{margin:8px 0;font-size:12px;color:var(--text2)}
+.iter-changes li{margin:3px 0;padding-left:12px;position:relative;list-style:none}
+.iter-changes li::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;background:var(--accent);border-radius:50%}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-card .sv{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--text)}
+.stat-card .sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.stat-card.winner{border-color:var(--green);background:var(--green-bg)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tabs button{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tabs button:hover{color:var(--text)}
+.tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+.tp{display:none}.tp.on{display:block}
+.tl{position:relative;padding-left:20px;margin:10px 0}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:var(--border)}
+.tl-item{position:relative;padding:8px 0 8px 16px;font-size:12px;cursor:pointer;transition:background .2s;border-radius:var(--radius-sm);margin:2px 0}
+.tl-item::before{content:'';position:absolute;left:-17px;top:12px;width:9px;height:9px;background:var(--card);border:2px solid var(--border2);border-radius:50%;z-index:1}
+.tl-item.active::before{background:var(--accent);border-color:var(--accent)}
+.tl-item:hover{background:var(--highlight-soft)}
+.tl-item .tl-title{font-weight:600;color:var(--text)}
+.tl-item .tl-desc{color:var(--text3);margin-top:2px}
+.rt{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.rt th{background:var(--accent-bg);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.5px;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);color:var(--text2)}
+.rt td{padding:7px 10px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text)}
+.rt tr:hover td{background:var(--highlight-soft)}
+.ai-box{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin:10px 0;font-size:12px;line-height:1.8;color:var(--text2)}
+.ai-box h4{font-size:12px;font-weight:700;color:var(--text);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
+.ai-box p{margin:4px 0}
+.toast{position:fixed;top:16px;right:16px;z-index:200;padding:10px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;transform:translateX(140%);transition:transform .3s;font-family:'DM Sans',sans-serif}
+.toast.show{transform:translateX(0)}
+.toast-s{background:var(--green);color:#fff}.toast-e{background:var(--red);color:#fff}.toast-i{background:var(--accent);color:#fff}
+.ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.ov.show{display:flex}
+.ov-text{color:#fff;font-size:13px;font-weight:600}
+.ov-bar{width:220px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
+.ov-bar-inner{height:100%;background:#fff;border-radius:4px;width:0%;transition:width .3s}
 @keyframes sp{to{transform:rotate(360deg)}}
-.ov-txt{color:#fff;font-size:13px;font-family:'JetBrains Mono',monospace}
-
-.shortcuts-panel{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
-.shortcuts-panel.on{display:flex}
-.sc-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:400px;width:90%}
-.sc-box h3{font-size:15px;font-weight:600;margin-bottom:18px}
-.sc-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
-.sc-row:last-child{border:none}
-.sc-key{font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:12px}
-
-.top-bar{position:sticky;top:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(245,245,245,.75);backdrop-filter:blur(14px) saturate(160%);border-bottom:1px solid var(--border);transition:background .3s}
-[data-theme="dark"] .top-bar{background:rgba(15,15,15,.75)}
-.top-bar-left{display:flex;align-items:center;gap:10px}
-.top-bar-logo{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px;opacity:.7}
-.top-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tb-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
-.tb-btn:hover{background:var(--text);color:var(--bg)}
-.week-badge{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--text);color:var(--bg);border-radius:4px;padding:2px 7px;letter-spacing:.5px}
-
-.shell{max-width:1100px;margin:0 auto;padding:24px 20px;position:relative;z-index:1}
-.hero{margin-bottom:28px}
-.hero h1{font-size:clamp(22px,4vw,36px);font-weight:700;letter-spacing:-1px;line-height:1.15}
-.hero p{color:var(--sub);font-size:14px;margin-top:6px;max-width:600px;line-height:1.6}
-
-.section{background:var(--glass);backdrop-filter:blur(16px) saturate(180%);border:1px solid var(--glass-border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.3)}
-[data-theme="dark"] .section{box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
-.sec-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
-.step-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--text);color:var(--bg);border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0}
-
-/* NIM */
-.nim-input-wrap{position:relative;flex:1;min-width:200px}
-.nim-input-wrap input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:3px;outline:none;transition:border-color .2s}
-.nim-input-wrap input:focus{border-color:var(--text)}
-.nim-input-wrap label{position:absolute;top:-9px;left:10px;background:var(--card);padding:0 4px;font-size:11px;color:var(--sub);font-family:'DM Sans',sans-serif}
-
-/* LOC GRID */
-.loc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
-.loc-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;transition:all .2s}
-.loc-card.active{border-color:var(--text)}
-.loc-badge{width:28px;height:28px;background:var(--text);color:var(--bg);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:8px}
-.loc-type{font-size:10px;color:var(--sub);margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
-.loc-name{font-size:12px;font-weight:600;line-height:1.3}
-
-/* TABS */
-.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0;flex-wrap:wrap}
-.tab-btn{padding:8px 16px;font-size:12px;font-family:'DM Sans',sans-serif;border:none;background:none;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;font-weight:500;white-space:nowrap}
-.tab-btn.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
-.tab-pane{display:none}
-.tab-pane.active{display:block}
-
-/* SEG TABLE */
-.seg-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
-.seg-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500}
-.seg-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
-.seg-table tr:last-child td{border-bottom:none}
-.seg-table input,.seg-table select,.seg-table textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);width:100%;outline:none;transition:border-color .2s;resize:vertical}
-.seg-table input:focus,.seg-table select:focus,.seg-table textarea:focus{border-color:var(--text)}
-.seg-from-to{font-weight:600;font-size:12px;font-family:'JetBrains Mono',monospace}
-.seg-sub{font-size:10px;color:var(--sub);margin-top:2px}
-
-/* TOGGLE */
-.toggle-row{display:flex;align-items:center;gap:10px;font-size:13px}
-.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;background:var(--border);border-radius:10px;cursor:pointer;transition:background .2s}
-.toggle input:checked~.toggle-track{background:var(--text)}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
-.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
-
-/* BTNS */
-.btn-primary{background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:opacity .2s}
-.btn-primary:hover{opacity:.8}
-.btn-ghost{background:none;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 22px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
-.btn-ghost:hover{background:var(--text);color:var(--bg)}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 12px}
-.stat-val{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px}
-.stat-lbl{font-size:10px;color:var(--sub);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
-.stat.hl{background:var(--text);color:var(--bg)}
-.stat.hl .stat-lbl{color:rgba(128,128,128,.7)}
-
-/* CMP TABLE */
-.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
-.cmp-table th{padding:10px 12px;border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);font-family:'JetBrains Mono',monospace;font-weight:500;text-align:left}
-.cmp-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
-.cmp-winner{background:var(--green);color:#fff;border-radius:4px;padding:2px 7px;font-size:10px;font-family:'JetBrains Mono',monospace;margin-left:6px}
-
-/* CANVAS */
-#cvWrap{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--canvas-bg)}
-#cv{display:block;width:100%;touch-action:none}
-.cv-controls{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
-
-/* ITER */
-.iter-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
-.iter-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);cursor:pointer;transition:all .2s}
-.iter-btn:hover:not(:disabled){background:var(--text);color:var(--bg)}
-.iter-btn:disabled{opacity:.35;cursor:not-allowed}
-.iter-badge{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--sub);min-width:40px;text-align:center}
-.iter-label{font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iter-changes{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;font-size:12px;line-height:1.7;max-height:140px;overflow-y:auto}
-
-/* TIMELINE */
-.tl-wrap{position:relative;padding-left:28px}
-.tl-wrap::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:var(--border)}
-.tl-item{position:relative;margin-bottom:16px;cursor:pointer}
-.tl-item::before{content:'';position:absolute;left:-23px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--card);transition:all .2s}
-.tl-item.active::before{background:var(--text);border-color:var(--text)}
-.tl-item.active{border-left:2px solid var(--text);padding-left:8px;margin-left:-2px}
-.tl-title{font-size:13px;font-weight:600;margin-bottom:4px}
-.tl-detail{font-size:12px;color:var(--sub);line-height:1.5}
-.tl-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-.tl-tag{font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--sub)}
-.tl-tag.green{background:rgba(45,125,70,.1);border-color:var(--green);color:var(--green)}
-.tl-tag.blue{background:rgba(41,128,185,.1);border-color:var(--blue);color:var(--blue)}
-.tl-tag.amber{background:rgba(230,126,34,.1);border-color:var(--amber);color:var(--amber)}
-
-/* REC BOX */
-.rec-box{border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--card);margin-top:16px}
-.rec-header{font-size:13px;font-weight:600;margin-bottom:10px}
-.rec-content{font-size:13px;line-height:1.7;color:var(--sub)}
-.rec-winner-badge{display:inline-flex;align-items:center;gap:6px;background:var(--text);color:var(--bg);border-radius:6px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin:10px 0}
-
-/* ============================================================
-   OUTPUT TABLE — mirip format PDF
-   ============================================================ */
-.output-section{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
-.output-header{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
-.output-header-title{font-size:14px;font-weight:700;margin-bottom:2px}
-.output-header-sub{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}
-
-.out-table{width:100%;border-collapse:collapse;font-size:13px}
-.out-table th{padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--sub);background:var(--bg)}
-.out-table th:last-child{text-align:right;white-space:nowrap;width:130px}
-.out-table td{padding:0;border-bottom:1px solid var(--border);vertical-align:top}
-.out-table tr:last-child td{border-bottom:none}
-
-.out-row-time{width:90px;min-width:90px;padding:14px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;vertical-align:top;border-right:1px solid var(--border);white-space:nowrap;color:var(--text)}
-.out-row-act{padding:14px 14px;vertical-align:top;line-height:1.7;font-size:13px}
-.out-row-cost{width:120px;min-width:120px;padding:14px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;vertical-align:top;border-left:1px solid var(--border);color:var(--text);white-space:nowrap}
-
-.out-act-title{font-weight:600;margin-bottom:6px;color:var(--text)}
-.out-act-body{color:var(--sub);font-size:12px;line-height:1.7}
-.out-jalur-dipilih{margin-top:6px;font-size:12px;font-style:italic;color:var(--text)}
-.out-catatan{margin-top:8px;font-size:12px;color:var(--sub)}
-.out-catatan-item{display:flex;gap:6px;margin-top:3px}
-.out-catatan-item::before{content:'';width:4px;height:4px;background:var(--sub);border-radius:50%;flex-shrink:0;margin-top:7px}
-.out-total-row td{background:var(--bg);font-weight:700;font-size:14px;font-family:'JetBrains Mono',monospace;padding:14px !important;border-top:2px solid var(--border) !important}
-
-/* Visit info card */
-.visit-card{background:var(--bg);border-radius:6px;padding:10px 12px;margin-top:6px;font-size:12px;color:var(--sub);line-height:1.6}
-.visit-card-title{font-weight:600;color:var(--text);margin-bottom:4px;font-size:12px}
-
-/* Summary info */
-.info-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px}
-.info-block-title{font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--sub);margin-bottom:10px}
-.info-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
-.info-row:last-child{border:none}
-.info-label{color:var(--sub)}
-.info-val{font-weight:600;font-family:'JetBrains Mono',monospace}
-
-/* NIM TABLE dalam output */
-.nim-tbl{width:auto;border-collapse:collapse;font-size:13px;margin:10px 0}
-.nim-tbl th{padding:7px 14px;border:1px solid var(--border);background:var(--bg);font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--sub)}
-.nim-tbl td{padding:7px 14px;border:1px solid var(--border);font-size:13px}
-.nim-tbl td:first-child{font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center}
-.nim-tbl td:nth-child(2){font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center}
-
-/* MUSIC */
-.music-player{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px}
-.music-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
-.music-dot.paused{background:var(--sub);animation:none}
-.music-title{font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.music-vol input[type=range]{width:55px;accent-color:var(--text)}
-
-.sep{height:1px;background:var(--border);margin:16px 0}
-.mono{font-family:'JetBrains Mono',monospace}
-.hidden{display:none}
-
-/* PRINT — output mirip PDF */
-@media print{
-  .top-bar,.online-indicator,.watermark,#plexusBg,#toast,#ov,.btn-primary,.btn-ghost,.tb-btn,
-  #inputSection,#visSection,.iter-controls,.cv-controls,.music-player{display:none!important}
-  body{background:#fff;color:#000}
-  .section{box-shadow:none;border:1px solid #ddd;background:#fff}
-  .out-table{font-size:12px}
-  .shell{padding:0}
-}
-
-@media(max-width:768px){
-  .shell{padding:10px}
-  .section{padding:14px}
-  .loc-grid{grid-template-columns:1fr 1fr}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .top-bar{padding:6px 10px}
-  .top-bar-right{gap:4px}
-  .tb-btn{padding:5px 8px;font-size:11px}
-}
+.spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+.modal{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-box{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:460px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-box h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.modal-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);line-height:1}
+.path-display{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.path-node{background:var(--accent);color:#fff;padding:4px 12px;border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
+.path-arrow{color:var(--text3);font-size:14px}
+.edge-pill{display:inline-flex;align-items:center;gap:4px;background:var(--accent-bg);border:1px solid var(--border);padding:3px 10px;border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:11px;margin:3px}
+.seg-card{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin:10px 0}
+.seg-card h4{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px}
+.route-opt{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;margin:4px 0;font-size:11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .2s}
+.route-opt:hover,.route-opt.sel{border-color:var(--accent);background:var(--accent-bg)}
+.route-opt.sel{border-width:2px}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.cmp-col{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
+.cmp-col h4{font-size:12px;font-weight:700;text-align:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.itinerary-row{display:grid;grid-template-columns:90px 1fr 80px;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;align-items:start}
+.itinerary-row:last-child{border-bottom:none}
+.itin-time{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text)}
+.itin-act{color:var(--text2)}
+.itin-cost{font-family:'JetBrains Mono',monospace;font-weight:600;text-align:right;color:var(--text)}
+.lock-screen{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+.lock-box{background:var(--glass-bg);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:var(--glass-shadow)}
+.lock-box h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.lock-box .lock-sub{font-size:11px;color:var(--text3);margin-bottom:16px}
+.lock-box input{width:100%;margin-bottom:10px;text-align:center;font-size:14px;padding:10px;letter-spacing:2px}
+.lock-box .device-id{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-top:10px;word-break:break-all}
+.music-ctrl{position:fixed;bottom:14px;left:16px;z-index:100;display:flex;align-items:center;gap:6px}
+.music-ctrl button{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.music-ctrl button:hover{background:var(--bg3)}
+.music-ctrl .music-label{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#splashScreen{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .8s,visibility .8s}
+#splashScreen.hidden{opacity:0;visibility:hidden}
+#splashScreen canvas{position:absolute;inset:0;z-index:0}
+.splash-content{position:relative;z-index:1;text-align:center;color:#fff}
+.splash-content h1{font-family:'Inter',sans-serif;font-size:clamp(28px,6vw,48px);font-weight:900;letter-spacing:-2px;animation:splashFadeUp .8s ease both;animation-delay:.3s;opacity:0}
+.splash-content p{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px;animation:splashFadeUp .8s ease both;animation-delay:.6s;opacity:0;font-family:'JetBrains Mono',monospace}
+.splash-bar{width:180px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;margin:20px auto 0;overflow:hidden;animation:splashFadeUp .8s ease both;animation-delay:.8s;opacity:0}
+.splash-bar-inner{height:100%;background:#fff;border-radius:2px;animation:splashBarFill 2.5s ease both;animation-delay:1s}
+.splash-menu{margin-top:30px;display:flex;gap:12px;justify-content:center;animation:splashFadeUp .8s ease both;animation-delay:1.2s;opacity:0}
+.splash-menu button{font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;padding:10px 28px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;transition:all .3s;backdrop-filter:blur(8px)}
+.splash-menu button:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
+@keyframes splashFadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes splashBarFill{from{width:0}to{width:100%}}
+.nim-display{display:grid;grid-template-columns:auto auto auto;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin:10px 0;font-size:11px}
+.nim-display .nim-cell{padding:6px 12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+.nim-display .nim-cell:nth-child(3n){border-right:none}
+.nim-display .nim-cell.nim-h{font-weight:700;background:var(--accent-bg);font-family:'DM Sans',sans-serif;text-transform:uppercase;font-size:10px;letter-spacing:.5px;color:var(--text2)}
+.output-section{background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin:12px 0}
+.output-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.ai-suggest-box{background:linear-gradient(135deg,var(--purple-bg),var(--blue-bg));border:1px solid var(--purple);border-radius:var(--radius-sm);padding:14px;margin:8px 0;position:relative;overflow:hidden}
+.ai-suggest-box::before{content:'🤖 AI Suggest';position:absolute;top:6px;right:8px;font-size:9px;font-weight:700;color:var(--purple);background:var(--card2);padding:2px 8px;border-radius:var(--radius-sm);letter-spacing:.5px}
+.ai-suggest-box .ai-s-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px}
+.ai-suggest-box .ai-s-item{font-size:11px;color:var(--text2);margin:3px 0;padding-left:14px;position:relative}
+.ai-suggest-box .ai-s-item::before{content:'→';position:absolute;left:0;color:var(--purple)}
+.ai-fill-btn{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:var(--radius-sm);border:1px solid var(--purple);background:var(--purple-bg);color:var(--purple);cursor:pointer;transition:all .2s;margin-top:6px;display:inline-block;font-weight:600}
+.ai-fill-btn:hover{background:var(--purple);color:#fff}
+.next-depart-badge{display:inline-flex;align-items:center;gap:4px;background:var(--amber-bg);border:1px solid var(--amber);padding:4px 12px;border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--amber);margin-top:6px}
+.efficiency-meter{display:flex;align-items:center;gap:8px;margin:8px 0}
+.efficiency-bar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;position:relative}
+.efficiency-bar-inner{height:100%;border-radius:3px;transition:width .5s}
+.efficiency-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;min-width:40px;text-align:right}
+.score-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.score-item{text-align:center;padding:10px;background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.score-item .sc-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.score-item .sc-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-top:2px}
+.score-item .sc-raw{font-size:10px;color:var(--text2);margin-top:2px;font-family:'JetBrains Mono',monospace}
+.winner-banner{background:linear-gradient(135deg,var(--green-bg),var(--blue-bg));border:2px solid var(--green);border-radius:var(--radius);padding:16px;margin:16px 0;text-align:center}
+.winner-banner h3{font-size:16px;font-weight:800;color:var(--green);margin-bottom:4px}
+.winner-banner p{font-size:12px;color:var(--text2)}
+@media(max-width:768px){.shell{padding:0 12px}.section{padding:16px}.hero{padding:24px 0 18px}.cmp-grid{grid-template-columns:1fr}.stat-row{grid-template-columns:1fr 1fr}.iter-controls{flex-direction:column}.itinerary-row{grid-template-columns:70px 1fr 60px}.splash-menu{flex-direction:column;align-items:center}.score-breakdown{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<!-- SPLASH -->
 <div id="splashScreen">
-  <canvas id="splashCanvas"></canvas>
-  <div class="splash-content">
-    <div class="splash-title">RAD STRIX</div>
-    <div class="splash-sub">graph optimizer — week 2</div>
-    <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
-  </div>
+<canvas id="splashCanvas"></canvas>
+<div class="splash-content">
+<h1>RAD STRIX</h1>
+<p>Riset Operasi</p>
+<div class="splash-bar"><div class="splash-bar-inner"></div></div>
+<div class="splash-menu" id="splashMenu" style="pointer-events:none;opacity:0">
+<button onclick="launchWeek(1)">Week 1</button>
+<button onclick="launchWeek(2)">Week 2</button>
 </div>
-
+</div>
+</div>
 <canvas id="plexusBg"></canvas>
-<div class="online-indicator"><div class="online-dot"></div><span id="onlineCnt">—</span> online</div>
+<div class="online-indicator" id="onlineInd">1 online</div>
 <div class="watermark">RAD STRIX</div>
-<div id="toast"></div>
-<div id="ov"><div class="spin"></div><div class="ov-txt" id="ovTxt">Memproses...</div></div>
-
-<!-- SHORTCUTS -->
-<div class="shortcuts-panel" id="scPanel" onclick="if(event.target===this)closeShortcuts()">
-  <div class="sc-box">
-    <h3>Keyboard Shortcuts</h3>
-    <div class="sc-row"><span>Langkah berikutnya</span><span class="sc-key">→</span></div>
-    <div class="sc-row"><span>Langkah sebelumnya</span><span class="sc-key">←</span></div>
-    <div class="sc-row"><span>Langkah pertama</span><span class="sc-key">Home</span></div>
-    <div class="sc-row"><span>Langkah terakhir</span><span class="sc-key">End</span></div>
-    <div class="sc-row"><span>Play / Pause</span><span class="sc-key">Space</span></div>
-    <div class="sc-row"><span>Toggle dark mode</span><span class="sc-key">D</span></div>
-    <div class="sc-row"><span>Jalankan analisis</span><span class="sc-key">Ctrl+Enter</span></div>
-    <div class="sc-row"><span>Export PDF</span><span class="sc-key">Ctrl+P</span></div>
-    <div class="sc-row"><span>Shortcut panel</span><span class="sc-key">?</span></div>
-    <div class="sc-row"><span>Tutup panel</span><span class="sc-key">Esc</span></div>
-    <div style="margin-top:16px"><button class="btn-ghost" onclick="closeShortcuts()" style="padding:7px 16px;font-size:12px">Tutup</button></div>
-  </div>
+<div class="toast" id="toast"></div>
+<div class="ov" id="ov"><div class="spinner"></div><div class="ov-text" id="ovText">Processing...</div><div class="ov-bar"><div class="ov-bar-inner" id="ovBar"></div></div></div>
+<div class="lock-screen" id="lockScreen" style="display:none">
+<canvas id="lockPlexus" style="position:absolute;inset:0;z-index:0;pointer-events:none"></canvas>
+<div class="lock-box" style="position:relative;z-index:1">
+<h3>Access Key Required</h3>
+<div class="lock-sub">Enter your unique access key to continue</div>
+<input type="password" id="keyInput" placeholder="Enter key..." autocomplete="off">
+<button class="btn btn-p" style="width:100%" onclick="verifyKey()">Unlock</button>
+<div class="device-id" id="deviceId"></div>
 </div>
-
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="top-bar-left">
-    <span class="top-bar-logo">RAD STRIX</span>
-    <span class="week-badge">WEEK 2</span>
-    <span style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace">Tokyo Tour Optimizer</span>
-  </div>
-  <div class="top-bar-right">
-    <div class="music-player">
-      <div class="music-dot paused" id="musicDot"></div>
-      <span class="music-title" id="musicTitle">lo-fi</span>
-      <button class="tb-btn" id="musicBtn" onclick="toggleMusic()" style="padding:4px 8px;font-size:11px">play</button>
-      <div class="music-vol" style="display:flex;align-items:center;gap:4px">
-        <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sub)">vol</span>
-        <input type="range" min="0" max="100" value="35" id="volSlider" style="width:50px;accent-color:var(--text)">
-      </div>
-    </div>
-    <button class="tb-btn" onclick="toggleDark()" id="darkBtn">dark</button>
-    <button class="tb-btn" onclick="printPDF()">export pdf</button>
-    <button class="tb-btn" onclick="showShortcuts()">?</button>
-    <a href="index.html" class="tb-btn">week 1</a>
-  </div>
 </div>
-
-<!-- YOUTUBE HIDDEN -->
-<div style="position:fixed;width:1px;height:1px;bottom:-10px;left:-10px;overflow:hidden;opacity:0;pointer-events:none" aria-hidden="true">
-  <iframe id="ytFrame" src="" allow="autoplay" frameborder="0"></iframe>
+<div class="modal" id="shareModal"><div class="modal-box"><button class="modal-close" onclick="document.getElementById('shareModal').classList.remove('show')">&times;</button><h3>Share / Export</h3><div style="margin:12px 0"><button class="btn btn-s btn-sm" onclick="expJSON()" style="margin:3px">Export JSON</button><button class="btn btn-s btn-sm" onclick="screenShot()" style="margin:3px">Screenshot</button><label class="btn btn-s btn-sm" style="margin:3px">Import JSON<input type="file" accept=".json" onchange="impJSON(event)" style="display:none"></label></div><div class="fc" style="margin-top:12px"><label>Share Link</label><input type="text" id="shareLink" readonly style="width:100%;font-size:10px" onclick="this.select()"></div></div></div>
+<div class="modal" id="shortcutsPanel"><div class="modal-box"><button class="modal-close" onclick="document.getElementById('shortcutsPanel').classList.remove('show')">&times;</button><h3>Keyboard Shortcuts</h3><table class="rt"><tr><td>Arrow Right</td><td>Next iteration</td></tr><tr><td>Arrow Left</td><td>Prev iteration</td></tr><tr><td>Home</td><td>First iteration</td></tr><tr><td>End</td><td>Last iteration</td></tr><tr><td>Space</td><td>Play / Pause</td></tr><tr><td>D</td><td>Toggle dark mode</td></tr><tr><td>?</td><td>Toggle shortcuts</td></tr></table></div></div>
+<div id="ytPlayer" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;pointer-events:none"></div>
+<div class="music-ctrl" id="musicCtrl" style="display:none">
+<button id="musicToggle" onclick="toggleMusic()">||</button>
+<span class="music-label" id="musicLabel">Lo-fi</span>
 </div>
-
+<div id="mainApp" style="display:none">
+<div class="top-bar"><div class="top-bar-inner">
+<div class="top-bar-logo">Tokyo Travel Planner</div>
+<div class="top-bar-right">
+<button class="tb" onclick="toggleDark()" id="darkBtn">Dark</button>
+<button class="tb" onclick="document.getElementById('shortcutsPanel').classList.toggle('show')">Keys</button>
+<button class="tb" onclick="openShare()">Share</button>
+<button class="tb" onclick="screenShot()">Capture</button>
+<button class="tb" onclick="printPDF()">PDF</button>
+</div>
+</div></div>
 <div class="shell">
-
-  <!-- HERO -->
-  <div class="hero">
-    <h1>Tokyo One Day Tour</h1>
-    <p>Optimasi rute perjalanan wisata berdasarkan NIM. Input data dari Google Maps, bandingkan dua alternatif rute, lihat output rencana perjalanan lengkap.</p>
-  </div>
-
-  <!-- SECTION 1: NIM & IDENTITAS -->
-  <div class="section">
-    <div class="sec-title"><span class="step-badge">1</span>Identitas & NIM</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">NAMA MAHASISWA</div>
-        <input type="text" id="studentName" placeholder="Nama lengkap"
-          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">KELAS</div>
-        <input type="text" id="studentClass" placeholder="contoh: TI-07-03"
-          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none">
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">NIM</div>
-        <input type="text" id="nimInput" placeholder="102012305000" oninput="onNimInput(this.value)"
-          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;outline:none">
-        <div style="font-size:11px;color:var(--sub);margin-top:4px;font-family:'JetBrains Mono',monospace" id="nimHint">4 digit terakhir NIM menentukan lokasi</div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">TANGGAL PERJALANAN</div>
-        <input type="date" id="tourDate" value="2026-03-01"
-          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none"
-          onchange="updateDateDisplay()">
-        <div style="font-size:11px;color:var(--sub);margin-top:4px;font-family:'JetBrains Mono',monospace" id="dateDisplay"></div>
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:6px">JAM MULAI</div>
-        <input type="time" id="startTime" value="08:00"
-          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none">
-      </div>
-    </div>
-
-    <!-- LOC CARDS -->
-    <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">LOKASI BERDASARKAN NIM</div>
-    <div class="loc-grid" id="locGrid">
-      <div class="loc-card" id="lcA"><div class="loc-badge">A</div><div class="loc-type">Stasiun / Hotel</div><div class="loc-name" id="lcAname">—</div></div>
-      <div class="loc-card" id="lcB"><div class="loc-badge">B</div><div class="loc-type">Taman</div><div class="loc-name" id="lcBname">—</div></div>
-      <div class="loc-card" id="lcC"><div class="loc-badge">C</div><div class="loc-type">Landmark</div><div class="loc-name" id="lcCname">—</div></div>
-      <div class="loc-card" id="lcD"><div class="loc-badge">D</div><div class="loc-type">Pusat Perbelanjaan</div><div class="loc-name" id="lcDname">—</div></div>
-    </div>
-  </div>
-
-  <!-- SECTION 2: INPUT DATA -->
-  <div class="section hidden" id="inputSection">
-    <div class="sec-title"><span class="step-badge">2</span>Input Data Perjalanan</div>
-    <div style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:14px">
-      Buka Google Maps, set <strong style="color:var(--text)">"Depart at"</strong> sesuai tanggal dan jam masing-masing segmen.
-      Catat durasi, biaya, moda transport, dan jalur alternatif yang dipilih.
-    </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab2(0,this)">Rute 1 — A-B-C-D-A</button>
-      <button class="tab-btn" onclick="switchTab2(1,this)">Rute 2 — A-C-B-D-A</button>
-    </div>
-
-    <!-- INPUT RUTE 1 -->
-    <div class="tab-pane active" id="inp0">
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">SEGMEN RUTE 1 (A-B-C-D-A)</div>
-      <div style="overflow-x:auto">
-        <table class="seg-table" id="segT0">
-          <thead><tr>
-            <th style="width:140px">Segmen</th>
-            <th>Dep.</th>
-            <th>Durasi (mnt)</th>
-            <th>Biaya (JPY)</th>
-            <th>Moda</th>
-            <th>Transfer</th>
-            <th>Jalan Kaki (mnt)</th>
-            <th>Jalur Dipilih (keterangan)</th>
-          </tr></thead>
-          <tbody id="segBody0"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- INPUT RUTE 2 -->
-    <div class="tab-pane" id="inp1">
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">SEGMEN RUTE 2 (A-C-B-D-A)</div>
-      <div style="overflow-x:auto">
-        <table class="seg-table" id="segT1">
-          <thead><tr>
-            <th style="width:140px">Segmen</th>
-            <th>Dep.</th>
-            <th>Durasi (mnt)</th>
-            <th>Biaya (JPY)</th>
-            <th>Moda</th>
-            <th>Transfer</th>
-            <th>Jalan Kaki (mnt)</th>
-            <th>Jalur Dipilih (keterangan)</th>
-          </tr></thead>
-          <tbody id="segBody1"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="sep"></div>
-
-    <!-- VISIT TIME + ADMISSION + NOTES -->
-    <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:10px">DETAIL KUNJUNGAN PER LOKASI</div>
-    <div id="visitDetailGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
-
-    <div class="sep"></div>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="runAnalysis()">Analisis & Generate Output</button>
-      <button class="btn-ghost" onclick="fillDemo()">Isi Contoh Data</button>
-      <button class="btn-ghost" onclick="clearAll()" style="margin-left:auto">Reset</button>
-    </div>
-  </div>
-
-  <!-- SECTION 3: VISUALISASI -->
-  <div class="section hidden" id="visSection">
-    <div class="sec-title"><span class="step-badge">3</span>Visualisasi Jaringan</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <button class="iter-btn" onclick="hlRoute(0)" id="hlR1btn">Rute 1</button>
-      <button class="iter-btn" onclick="hlRoute(1)" id="hlR2btn">Rute 2</button>
-      <button class="iter-btn" onclick="hlRoute(-1)">Semua</button>
-    </div>
-    <div id="cvWrap"><canvas id="cv" height="400"></canvas></div>
-    <div class="cv-controls">
-      <button class="iter-btn" onclick="zI()">+</button>
-      <button class="iter-btn" onclick="zO()">-</button>
-      <button class="iter-btn" onclick="zReset()">reset</button>
-      <span style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-left:4px">drag node untuk geser</span>
-      <button class="iter-btn" onclick="savePNG()" style="margin-left:auto">simpan gambar</button>
-    </div>
-
-    <!-- ITER CTRL -->
-    <div id="iterCtrlWrap" class="hidden">
-      <div class="sep"></div>
-      <div style="font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;margin-bottom:8px">NAVIGASI LANGKAH</div>
-      <div class="iter-controls">
-        <button class="iter-btn" id="iBF" onclick="iterGo(0)">|&lt;</button>
-        <button class="iter-btn" id="iBP" onclick="iterGo(curIter-1)">&lt;</button>
-        <span class="iter-badge" id="iterBadge">—</span>
-        <button class="iter-btn" id="iBN" onclick="iterGo(curIter+1)">&gt;</button>
-        <button class="iter-btn" id="iBL" onclick="iterGo(iterStates.length-1)">&gt;|</button>
-        <span class="iter-label" id="iterLabel"></span>
-        <button class="iter-btn" id="playBtn" onclick="togglePlay()">play</button>
-        <select id="speedSel" onchange="setSpd(this.value)"
-          style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text)">
-          <option value="2000">0.5x</option>
-          <option value="1200" selected>1x</option>
-          <option value="700">2x</option>
-          <option value="350">4x</option>
-        </select>
-      </div>
-      <div class="iter-changes" id="iterChanges"></div>
-    </div>
-  </div>
-
-  <!-- SECTION 4: HASIL ANALISIS -->
-  <div class="section hidden" id="resultsSection">
-    <div class="sec-title"><span class="step-badge">4</span>Hasil Analisis</div>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTabR(0,this)">Perbandingan</button>
-      <button class="tab-btn" onclick="switchTabR(1,this)">Langkah</button>
-      <button class="tab-btn" onclick="switchTabR(2,this)">Analisis</button>
-    </div>
-
-    <div class="tab-pane active" id="rTab0">
-      <div class="stats-row" id="summaryStats"></div>
-      <div style="overflow-x:auto"><table class="cmp-table" id="cmpTable"></table></div>
-      <div class="rec-box" id="recBox"></div>
-    </div>
-
-    <div class="tab-pane" id="rTab1">
-      <div class="tl-wrap" id="tlWrap"></div>
-    </div>
-
-    <div class="tab-pane" id="rTab2">
-      <div id="analysisContent"></div>
-    </div>
-
-    <div class="sep"></div>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="printPDF()">Export PDF</button>
-      <button class="btn-ghost" onclick="savePNG()">Simpan Peta</button>
-    </div>
-  </div>
-
-  <!-- SECTION 5: OUTPUT — format mirip PDF tugas -->
-  <div class="section hidden" id="outputSection">
-    <div class="sec-title"><span class="step-badge">5</span>Output — Rencana Perjalanan</div>
-
-    <div style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:14px">
-      Format output sesuai tugas. Berisi tabel Waktu | Kegiatan | Biaya Transportasi untuk kedua rute, lengkap dengan jalur yang dipilih, catatan admission fee, dan total biaya.
-    </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTabO(0,this)">Rute 1 — A-B-C-D-A</button>
-      <button class="tab-btn" onclick="switchTabO(1,this)">Rute 2 — A-C-B-D-A</button>
-    </div>
-
-    <div class="tab-pane active" id="oTab0">
-      <div id="outR1"></div>
-    </div>
-    <div class="tab-pane" id="oTab1">
-      <div id="outR2"></div>
-    </div>
-
-    <div class="sep"></div>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="printPDF()">Export PDF</button>
-    </div>
-  </div>
-
-</div><!-- .shell -->
+<div class="hero">
+<div class="hero-sub">Riset Operasi — Week 2</div>
+<div class="hero-title">Tokyo One Day Tour Planner</div>
+<div class="hero-desc">Masalah Jaringan: Rencana Perjalanan Wisata Tokyo dengan Transportasi Umum — AI-Enhanced Efficiency Analysis</div>
+</div>
+<div class="section" id="secNIM">
+<div class="s-title">Input Data</div>
+<div class="fg" style="margin-bottom:14px">
+<div class="fc" style="flex:1;min-width:200px"><label>Nama</label><input type="text" id="inpNama" style="width:100%" placeholder="Nama lengkap"></div>
+<div class="fc" style="flex:1;min-width:200px"><label>Kelas</label><input type="text" id="inpKelas" style="width:100%" placeholder="TI-07-XX"></div>
+</div>
+<div class="fg" style="margin-bottom:14px">
+<div class="fc" style="flex:1;min-width:200px"><label>NIM</label><input type="text" id="inpNIM" style="width:100%" placeholder="Masukkan NIM lengkap" oninput="parseNIM()"></div>
+<div class="fc"><label>Kampus</label><select id="inpKampus" style="min-width:140px" onchange="parseNIM()"><option value="bandung22">Bandung (s/d 2022)</option><option value="bandung2324">Bandung (2023-2024)</option><option value="surabaya23">Surabaya (s/d 2023)</option><option value="surabaya24" selected>Surabaya (2024)</option><option value="purwokerto21">Purwokerto (s/d 2021)</option><option value="purwokerto2223">Purwokerto (2022-2023)</option><option value="purwokerto24">Purwokerto (2024)</option></select></div>
+</div>
+<div id="nimResult" style="display:none"><div class="nim-display" id="nimGrid"></div></div>
+<div id="locConfirm" style="display:none;margin-top:14px">
+<div class="s-title" style="margin-top:10px">Lokasi Terkonfirmasi</div>
+<div id="locCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px"></div>
+</div>
+</div>
+<div class="section" id="secRoute" style="display:none">
+<div class="s-title">Data Rute Transportasi</div>
+<div class="tabs" id="routeTabs">
+<button class="on" onclick="sRTab('r1',this)">Rute 1: A-B-C-D-A</button>
+<button onclick="sRTab('r2',this)">Rute 2: A-C-B-D-A</button>
+</div>
+<div class="tp on" id="tp-r1"><div id="segR1"></div></div>
+<div class="tp" id="tp-r2"><div id="segR2"></div></div>
+<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-p" onclick="runAnalysis()">Analisis & Visualisasi</button>
+<button class="btn btn-ai" onclick="aiAutoFillAll()">AI Smart Fill</button>
+<button class="btn btn-s" onclick="resetAll()">Reset</button>
+</div>
+</div>
+<div class="section" id="secVis" style="display:none">
+<div class="s-title">Visualisasi Graf Perjalanan</div>
+<div class="layout-btns"><button class="on" onclick="setLayout('circle',this)">Circle</button><button onclick="setLayout('grid',this)">Grid</button><button onclick="setLayout('force',this)">Force</button><button onclick="setLayout('random',this)">Random</button></div>
+<div class="cv-wrap"><canvas id="cv" width="800" height="500"></canvas><div class="zoom-ctrl"><button onclick="zoomIn()">+</button><button onclick="zoomOut()">-</button><button onclick="zoomReset()">R</button></div></div>
+<div class="iter-controls" id="iterCtrl" style="display:none">
+<button onclick="iterGo(0)" id="iterFirst">|&lt;</button>
+<button onclick="iterGo(curIter-1)" id="iterPrev">&lt;</button>
+<span class="iter-badge" id="iterBadge">0/0</span>
+<button onclick="iterGo(curIter+1)" id="iterNext">&gt;</button>
+<button onclick="iterGo(iterStates.length-1)" id="iterLast">&gt;|</button>
+</div>
+<div class="play-ctrl" id="playCtrl" style="display:none">
+<button class="btn btn-sm btn-s" id="playBtn" onclick="togglePlayback()">Play</button>
+<select class="speed-sel" onchange="playSpeed=+this.value"><option value="2000">0.5x</option><option value="1200" selected>1x</option><option value="700">2x</option><option value="350">4x</option></select>
+</div>
+<div class="iter-detail" id="iterDetail"></div>
+<ul class="iter-changes" id="iterChanges"></ul>
+</div>
+<div class="section" id="secResults" style="display:none">
+<div class="s-title">Hasil Analisis Efisiensi</div>
+<div id="winnerBanner"></div>
+<div class="stat-row" id="statsRow"></div>
+<div id="efficiencySection"></div>
+<div class="cmp-grid" id="cmpGrid"></div>
+<div id="recBox" style="display:none"></div>
+<div class="tabs">
+<button class="on" onclick="sTab('steps',this)">Steps</button>
+<button onclick="sTab('tabel',this)">Tabel</button>
+<button onclick="sTab('output',this)">Output</button>
+<button onclick="sTab('detail',this)">Detail</button>
+<button onclick="sTab('analisis',this)">Analisis</button>
+</div>
+<div class="tp on" id="tp-steps"><div class="tl" id="timeline"></div></div>
+<div class="tp" id="tp-tabel"><div id="tblWrap"></div></div>
+<div class="tp" id="tp-output"><div id="outputWrap"></div></div>
+<div class="tp" id="tp-detail"><div id="allIter"></div></div>
+<div class="tp" id="tp-analisis"><div class="ai-box" id="aiBox"></div></div>
+</div>
+</div>
+</div>
 
 <script>
-// ============================================================
-// SPLASH
-// ============================================================
-(function(){
-  var cv=document.getElementById('splashCanvas'),c=cv.getContext('2d'),pts=[];
-  function resize(){cv.width=innerWidth;cv.height=innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  for(var i=0;i<90;i++)pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-    vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.5,br:Math.random()*.5+.5});
-  function fr(){
-    c.clearRect(0,0,cv.width,cv.height);
-    var g=c.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,Math.min(cv.width,cv.height)*.6);
-    g.addColorStop(0,'rgba(30,30,30,.3)');g.addColorStop(1,'rgba(0,0,0,0)');
-    c.fillStyle=g;c.fillRect(0,0,cv.width,cv.height);
-    pts.forEach(function(p){
-      p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;
-      pts.forEach(function(q){
-        var dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
-        if(d<120){c.beginPath();c.strokeStyle='rgba(255,255,255,'+(1-d/120)*.18+')';
-          c.lineWidth=.5;c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke();}
-      });
-      c.beginPath();c.arc(p.x,p.y,p.r,0,Math.PI*2);
-      c.fillStyle='rgba(255,255,255,'+p.br*.4+')';c.fill();
+// ========== AI LOCATION KNOWLEDGE BASE ==========
+var AI_KB = {
+'Shibuya Station':{fee:0,suggestStay:30,activities:['Foto di patung Hachiko','Lihat Shibuya Scramble dari atas','Window shopping di sekitar stasiun'],mealCost:1200,mealType:'Ramen di sekitar Shibuya (~¥800-1500)',category:'station',tips:'Gratis. Shibuya Station adalah salah satu stasiun tersibuk di dunia.'},
+'Ikebukuro Station':{fee:0,suggestStay:30,activities:['Jalan-jalan di Sunshine City','Belanja di Bic Camera','Kunjungi Otome Road'],mealCost:1000,mealType:'Gyudon/fast food (~¥500-1000)',category:'station',tips:'Gratis. Hub besar dengan banyak pusat perbelanjaan.'},
+'Ueno Station':{fee:0,suggestStay:20,activities:['Transit ke Ueno Park','Foto di depan stasiun','Beli snack di stasiun'],mealCost:800,mealType:'Ekiben/bento stasiun (~¥600-1000)',category:'station',tips:'Gratis. Dekat dengan Ueno Park dan museum-museum.'},
+'Shinjuku Station':{fee:0,suggestStay:25,activities:['Foto di Shinjuku East Exit','Lihat Robot Restaurant area','Jalan ke Kabukicho'],mealCost:1100,mealType:'Ramen atau Izakaya (~¥800-1500)',category:'station',tips:'Gratis. Stasiun terbesar di dunia berdasarkan jumlah penumpang.'},
+'Akihabara Station':{fee:0,suggestStay:20,activities:['Foto di area Electric Town','Lihat toko-toko anime','Kunjungi gachapon corner'],mealCost:900,mealType:'Maid cafe atau ramen (~¥800-1500)',category:'station',tips:'Gratis. Surga otaku dan elektronik.'},
+'Shinagawa Station':{fee:0,suggestStay:15,activities:['Transit area','Foto arsitektur stasiun','Beli souvenir'],mealCost:800,mealType:'Bento di stasiun (~¥500-900)',category:'station',tips:'Gratis. Hub Shinkansen penting.'},
+'Tokyo Station':{fee:0,suggestStay:40,activities:['Foto fasad Marunouchi (Red Brick)','Belanja di Tokyo Character Street','Beli Tokyo Banana'],mealCost:1200,mealType:'Tokyo Ramen Street (~¥900-1400)',category:'station',tips:'Gratis. Bangunan bersejarah 1914, spot foto ikonik.'},
+'Gotanda Station':{fee:0,suggestStay:15,activities:['Transit','Jalan-jalan area lokal','Coba restoran lokal'],mealCost:800,mealType:'Restoran lokal (~¥600-1000)',category:'station',tips:'Gratis. Area residensial yang tenang.'},
+'Daikan-Yama Station':{fee:0,suggestStay:30,activities:['Kunjungi T-Site Tsutaya Books','Jalan di area trendy','Foto cafe-cafe estetik'],mealCost:1500,mealType:'Cafe brunch (~¥1200-2000)',category:'station',tips:'Gratis. Salah satu area paling stylish di Tokyo.'},
+'Ochanomizu Station':{fee:0,suggestStay:20,activities:['Lihat toko-toko alat musik','Kunjungi area universitas','Foto Kanda River'],mealCost:700,mealType:'Curry rice atau soba (~¥500-900)',category:'station',tips:'Gratis. Area mahasiswa dengan banyak toko buku.'},
+'Yoyogi Park':{fee:0,suggestStay:90,activities:['Piknik di taman','Jogging/berjalan santai','Foto pohon-pohon besar','People watching','Kunjungi area festival (jika ada)'],mealCost:500,mealType:'Bawa bekal/konbini bento (~¥300-600)',category:'park',tips:'GRATIS masuk. Taman kota terbesar kedua di Tokyo. Sempurna untuk relaksasi.'},
+'Rikugien Gardens':{fee:300,suggestStay:60,activities:['Nikmati taman gaya Edo','Foto jembatan Togetsukyo','Tea ceremony (opsional ¥510)','Berjalan di path melingkar'],mealCost:0,mealType:'Matcha set di taman (~¥510)',category:'park',tips:'Tiket masuk ¥300. Salah satu taman terindah era Edo. Sangat cantik saat musim sakura/momiji.'},
+'Shinjuku Gyoen National Garden':{fee:500,suggestStay:90,activities:['Foto di Japanese Garden','Kunjungi greenhouse','Piknik di English Garden','Nikmati pemandangan taman Prancis'],mealCost:600,mealType:'Bawa bekal/snack dari konbini (~¥400-800)',category:'park',tips:'Tiket masuk ¥500. Memiliki 3 gaya taman: Jepang, Inggris, dan Prancis.'},
+'Odaiba Seaside Park':{fee:0,suggestStay:120,activities:['Foto Rainbow Bridge','Lihat Patung Liberty replika','Main di pantai buatan','Foto Gundam Unicorn (depan DiverCity)'],mealCost:1200,mealType:'Food court di Aqua City (~¥800-1500)',category:'park',tips:'GRATIS. View spektakuler Tokyo Bay, terutama saat sunset.'},
+'Imperial Palace East National Gardens':{fee:0,suggestStay:75,activities:['Jalan di area taman istana','Foto ruins Edo Castle','Lihat koleksi tanaman','Foto moat dan jembatan Nijubashi dari luar'],mealCost:0,mealType:'Tidak ada restoran di dalam, makan sebelum/sesudah',category:'park',tips:'GRATIS masuk (tutup Senin & Jumat). Bekas area Edo Castle.'},
+'Hamarikyu Gardens':{fee:300,suggestStay:60,activities:['Minum matcha di Nakajima Tea House','Foto kolam air laut','Lihat kontras taman vs gedung tinggi','Berjalan santai'],mealCost:800,mealType:'Matcha + wagashi set di tea house (~¥800)',category:'park',tips:'Tiket masuk ¥300. Taman era Edo dengan kolam air laut pasang surut.'},
+'Kyu-Shiba-rikyu Gardens':{fee:150,suggestStay:45,activities:['Berjalan di taman kecil','Foto kolam dan batu','Relaksasi di bangku taman'],mealCost:0,mealType:'Tidak ada, makan di luar taman',category:'park',tips:'Tiket masuk ¥150. Taman kecil tapi sangat cantik, dekat Hamamatsucho Station.'},
+'Kasai Rinkai Park':{fee:0,suggestStay:90,activities:['Kunjungi Tokyo Sea Life Park (¥700)','Bermain di pantai','Foto Ferris Wheel Diamond and Flower','Piknik'],mealCost:800,mealType:'Restoran di park atau bawa bekal (~¥600-1000)',category:'park',tips:'Taman GRATIS. Aquarium terpisah ¥700. View Tokyo Bay.'},
+'Koishikawa Korakuen Gardens':{fee:300,suggestStay:60,activities:['Nikmati taman gaya China-Jepang','Foto Full Moon Bridge','Berjalan di area rice paddy','Lihat miniatur landscape'],mealCost:0,mealType:'Tidak ada di dalam taman',category:'park',tips:'Tiket masuk ¥300. Salah satu dari dua taman surviving era Edo di Tokyo.'},
+'Rinshi-no-mori Park':{fee:0,suggestStay:60,activities:['Berjalan di hutan kota','Identifikasi jenis pohon','Piknik','Relaksasi'],mealCost:400,mealType:'Bawa bekal (~¥300-500)',category:'park',tips:'GRATIS. Bekas hutan percobaan pemerintah, sekarang taman publik.'},
+"Senso-ji Temple":{fee:0,suggestStay:90,activities:['Foto Kaminarimon (Thunder Gate)','Belanja di Nakamise-dori','Foto pagoda 5 lantai','Berdoa di kuil utama','Ambil Omikuji (¥100)','Foto di Hozomon Gate'],mealCost:800,mealType:'Jajanan Nakamise: ningyo-yaki, melon pan (~¥300-800)',category:'temple',tips:'GRATIS masuk kuil. Kuil tertua di Tokyo (645 M). Sangat ramai, datang pagi.'},
+'Hie-jinja Shrine':{fee:0,suggestStay:45,activities:['Foto torii tunnel (Senbon Torii mini)','Berdoa di shrine','Foto arsitektur shrine','Lihat patung monyet'],mealCost:0,mealType:'Tidak ada di area shrine',category:'temple',tips:'GRATIS. Shrine pelindung Tokyo sejak era Edo. Relatif sepi.'},
+'Yasukuni-jinja Shrine':{fee:0,suggestStay:45,activities:['Foto torii besar','Berjalan di area shrine','Kunjungi Yushukan Museum (¥1000, opsional)','Lihat pohon sakura'],mealCost:0,mealType:'Tidak ada di area shrine',category:'temple',tips:'GRATIS masuk shrine. Museum Yushukan terpisah ¥1000. Kontroversial tapi arsitektur indah.'},
+'Tokyo Tower':{fee:1200,suggestStay:75,activities:['Naik Main Deck (150m)','Foto dari bawah menara','Kunjungi Foot Town (mall bawah)','Beli souvenir Tokyo Tower'],mealCost:1000,mealType:'Restoran di Foot Town (~¥800-1500)',category:'landmark',tips:'Main Deck ¥1200, Top Deck Tour ¥3000. Ikon Tokyo sejak 1958. View 360°.'},
+'The Japanese Sword Museum':{fee:1000,suggestStay:60,activities:['Lihat koleksi katana bersejarah','Pelajari proses pembuatan pedang','Foto display senjata','Beli buku/souvenir'],mealCost:0,mealType:'Tidak ada di museum',category:'museum',tips:'Tiket masuk ¥1000. Museum khusus untuk pecinta sejarah Jepang.'},
+'Sengakuji':{fee:0,suggestStay:45,activities:['Kunjungi makam 47 Ronin','Berdoa di kuil','Lihat museum kecil (¥500)','Pelajari sejarah Chushingura'],mealCost:0,mealType:'Tidak ada di area kuil',category:'temple',tips:'GRATIS masuk kuil. Museum kecil ¥500. Tempat peristirahatan terakhir 47 Ronin legendaris.'},
+'Shibuya Crossing':{fee:0,suggestStay:30,activities:['Menyeberang di crossing terbesar dunia','Foto/video dari Starbucks lantai 2','Foto di patung Hachiko','Lihat Shibuya Sky (¥2000, opsional)'],mealCost:800,mealType:'Fast food atau konbini (~¥500-1000)',category:'landmark',tips:'GRATIS. Penyeberangan paling ikonik di dunia. Paling dramatis saat malam.'},
+'The National Art Center, Tokyo':{fee:0,suggestStay:90,activities:['Lihat pameran seni (varies)','Foto arsitektur Kurokawa Kisho','Makan di restoran Brasserie Paul Bocuse','Jelajahi gift shop'],mealCost:1500,mealType:'Brasserie Paul Bocuse di lantai 3 (~¥1500-3000)',category:'museum',tips:'Gedung GRATIS, pameran bervariasi ¥0-1600. Arsitektur kaca bergelombang yang menakjubkan.'},
+'Fukagawa Edo Museum':{fee:400,suggestStay:60,activities:['Jelajahi replika kota Edo','Foto interior rumah era Edo','Lihat pertunjukan simulasi siang-malam','Interaksi dengan display'],mealCost:500,mealType:'Snack di area Monzen-Nakacho (~¥400-800)',category:'museum',tips:'Tiket masuk ¥400. Replika full-scale kota Edo dengan efek suara dan cahaya.'},
+'Meiji Jingu':{fee:0,suggestStay:75,activities:['Jalan di hutan buatan terbesar Tokyo','Foto torii kayu raksasa','Berdoa di shrine utama','Lihat tong sake/wine','Tulis harapan di ema'],mealCost:0,mealType:'Tidak ada di area shrine, makan di Harajuku setelahnya',category:'temple',tips:'GRATIS. Shrine paling suci di Tokyo. Hutan 100 tahun buatan manusia. 12 menit jalan dari Harajuku.'},
+'Tokyu Plaza Omotesando "OMOKADO"':{fee:0,suggestStay:75,activities:['Foto di escalator cermin (ikonik)','Belanja fashion brand','Kunjungi rooftop garden','Window shopping'],mealCost:1500,mealType:'Cafe atau restoran di mall (~¥1000-2000)',category:'shopping',tips:'GRATIS masuk. Escalator cermin di entrance adalah spot foto Instagram paling terkenal.'},
+'Tokyo Midtown':{fee:0,suggestStay:90,activities:['Belanja luxury brand','Kunjungi Suntory Museum of Art (¥1500)','Jalan di Midtown Garden','Foto instalasi seni'],mealCost:1800,mealType:'Restoran di mall (~¥1200-3000)',category:'shopping',tips:'GRATIS masuk mall. Museum terpisah. Kompleks mixed-use premium di Roppongi.'},
+'Yodobashi Akiba':{fee:0,suggestStay:90,activities:['Belanja elektronik & gadget','Coba demo produk','Hunting figure/anime goods','Belanja tax-free'],mealCost:900,mealType:'Food court lantai atas (~¥700-1200)',category:'shopping',tips:'GRATIS masuk. 9 lantai surga elektronik. Bawa paspor untuk tax-free.'},
+'DECKS Tokyo Beach':{fee:0,suggestStay:90,activities:['Kunjungi LEGOLAND Discovery (¥2200-3000)','Main di Joypolis (¥800 masuk)','Foto view Tokyo Bay','Belanja souvenir'],mealCost:1200,mealType:'Restoran dengan view (~¥800-1500)',category:'shopping',tips:'GRATIS masuk mall. Atraksi di dalam berbayar terpisah.'},
+'KITTE Marunouchi':{fee:0,suggestStay:60,activities:['Foto Tokyo Station dari rooftop garden (GRATIS)','Belanja brand Jepang','Kunjungi JP Tower Museum INTERMEDIATHEQUE (GRATIS)','Beli oleh-oleh'],mealCost:1200,mealType:'Restoran lantai B1 & 5-6F (~¥900-1800)',category:'shopping',tips:'GRATIS masuk. Rooftop garden view Tokyo Station. Museum INTERMEDIATHEQUE gratis!'},
+'Nihombashi Mitsukoshi Main Store':{fee:0,suggestStay:60,activities:['Lihat department store tertua Jepang (1673)','Foto patung singa & interior mewah','Belanja brand premium','Kunjungi food hall basement'],mealCost:2000,mealType:'Depachika (basement food hall) (~¥1000-3000)',category:'shopping',tips:'GRATIS masuk. Department store tertua di Jepang. Food hall basement luar biasa.'},
+'Mitsukoshi Ginza':{fee:0,suggestStay:60,activities:['Belanja luxury','Foto area Ginza','Kunjungi food hall','Window shopping brand internasional'],mealCost:2000,mealType:'Restoran Ginza area (~¥1500-3000)',category:'shopping',tips:'GRATIS masuk. Ginza adalah distrik belanja paling mewah di Tokyo.'},
+'Ginza Six':{fee:0,suggestStay:75,activities:['Lihat instalasi seni besar di atrium','Belanja luxury brand','Kunjungi rooftop garden (GRATIS)','Tsutaya Art Book Store lantai 6'],mealCost:2000,mealType:'Restoran premium (~¥1500-4000)',category:'shopping',tips:'GRATIS masuk. Rooftop garden dengan view. Instalasi seni berubah musiman.'},
+'DiverCity Tokyo Plaza':{fee:0,suggestStay:90,activities:['Foto Unicorn Gundam 1:1 (GRATIS)','Kunjungi Gundam Base Tokyo (GRATIS)','Belanja & makan','Lihat pertunjukan Gundam (jam tertentu)'],mealCost:1200,mealType:'Food court (~¥800-1500)',category:'shopping',tips:'GRATIS masuk. Patung Gundam Unicorn 1:1 di depan mall, transformasi tiap jam tertentu.'}
+};
+
+// ========== LOCATION DATABASE ==========
+var LOC_DB={A:['Shibuya Station','Ikebukuro Station','Ueno Station','Shinjuku Station','Akihabara Station','Shinagawa Station','Tokyo Station','Gotanda Station','Daikan-Yama Station','Ochanomizu Station'],B:['Yoyogi Park','Rikugien Gardens','Shinjuku Gyoen National Garden','Odaiba Seaside Park','Imperial Palace East National Gardens','Hamarikyu Gardens','Kyu-Shiba-rikyu Gardens','Kasai Rinkai Park','Koishikawa Korakuen Gardens','Rinshi-no-mori Park'],C:["Senso-ji Temple",'Hie-jinja Shrine','Yasukuni-jinja Shrine','Tokyo Tower','The Japanese Sword Museum','Sengakuji','Shibuya Crossing','The National Art Center, Tokyo','Fukagawa Edo Museum','Meiji Jingu'],D:['Tokyu Plaza Omotesando "OMOKADO"','Tokyo Midtown','Yodobashi Akiba','DECKS Tokyo Beach','KITTE Marunouchi','Nihombashi Mitsukoshi Main Store','Mitsukoshi Ginza','Yodobashi Akiba','Ginza Six','DiverCity Tokyo Plaza']};
+
+// ========== GLOBALS ==========
+var isDark=false,sc=1,di=-1,dOff={x:0,y:0},cLo='circle',curIter=0,iterStates=[],playInterval=null,playSpeed=1200;
+var nimData=null,locA='',locB='',locC='',locD='',pos=[],res=null;
+var r1Segs=[],r2Segs=[],r1Data={segs:[],total:0},r2Data={segs:[],total:0};
+var musicPlaying=false,ytReady=false,ytPlayerObj=null;
+
+// ========== EFFICIENCY SCORING WEIGHTS ==========
+var EFF_WEIGHTS = {
+    cost: 0.40,      // 40% bobot biaya
+    time: 0.35,       // 35% bobot waktu tempuh
+    fatigue: 0.25     // 25% bobot kelelahan (jalan kaki)
+};
+
+// ========== TIME HELPER ==========
+function parseTime(str){
+    if(!str||str==='-')return null;
+    var parts=str.replace(/[^\d:]/g,'').split(':');
+    if(parts.length<2)return null;
+    return{h:parseInt(parts[0])||0,m:parseInt(parts[1])||0};
+}
+function timeToStr(h,m){
+    while(m>=60){h++;m-=60}
+    while(m<0){h--;m+=60}
+    if(h>=24)h-=24;
+    return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+}
+function addMinutes(timeStr,mins){
+    var t=parseTime(timeStr);
+    if(!t)return timeStr;
+    var totalM=t.h*60+t.m+mins;
+    return timeToStr(Math.floor(totalM/60),totalM%60);
+}
+function calcNextDeparture(arriveStr,stayMin){
+    if(!arriveStr||arriveStr==='-'||!stayMin)return'-';
+    return addMinutes(arriveStr,stayMin);
+}
+
+// ========== AI SUGGEST FUNCTIONS ==========
+function getAISuggest(locationName){
+    var kb=AI_KB[locationName];
+    if(!kb)return{fee:0,suggestStay:60,activities:['Mengunjungi lokasi','Berjalan-jalan','Berfoto'],mealCost:800,mealType:'Makan di sekitar lokasi (~¥600-1200)',tips:'Informasi detail tidak tersedia. Estimasi umum.',category:'general'};
+    return kb;
+}
+
+function aiAutoFillSeg(prefix,segIdx,destName){
+    var kb=getAISuggest(destName);
+    var id=prefix+'_'+segIdx;
+    var stayEl=document.getElementById(id+'_stay');
+    var admEl=document.getElementById(id+'_admission');
+    var mealEl=document.getElementById(id+'_meal');
+    var actEl=document.getElementById(id+'_activity');
+    if(stayEl&&!stayEl.value)stayEl.value=kb.suggestStay;
+    if(admEl&&!admEl.value)admEl.value=kb.fee;
+    if(mealEl&&!mealEl.value)mealEl.value=kb.mealCost;
+    if(actEl&&!actEl.value)actEl.value=kb.activities.slice(0,2).join(', ');
+    updateNextDeparture(prefix,segIdx);
+    toast('AI filled: '+destName,'success');
+}
+
+function aiAutoFillAll(){
+    var prefixes=[{p:'r1',segs:r1Segs},{p:'r2',segs:r2Segs}];
+    var count=0;
+    prefixes.forEach(function(obj){
+        obj.segs.forEach(function(seg,i){
+            var destName=seg[3];
+            var kb=getAISuggest(destName);
+            var id=obj.p+'_'+i;
+            var stayEl=document.getElementById(id+'_stay');
+            var admEl=document.getElementById(id+'_admission');
+            var mealEl=document.getElementById(id+'_meal');
+            var actEl=document.getElementById(id+'_activity');
+            if(stayEl&&!stayEl.value){stayEl.value=kb.suggestStay;count++}
+            if(admEl&&!admEl.value){admEl.value=kb.fee;count++}
+            if(mealEl&&!mealEl.value){mealEl.value=kb.mealCost;count++}
+            if(actEl&&!actEl.value){actEl.value=kb.activities.slice(0,2).join(', ');count++}
+            updateNextDeparture(obj.p,i);
+        });
     });
-    requestAnimationFrame(fr);
-  }
-  fr();
-  try{
-    var ac=new(window.AudioContext||window.webkitAudioContext)(),g2=ac.createGain();
-    g2.gain.setValueAtTime(0,ac.currentTime);
-    g2.gain.linearRampToValueAtTime(.06,ac.currentTime+.5);
-    g2.gain.linearRampToValueAtTime(0,ac.currentTime+3.2);
-    g2.connect(ac.destination);
-    [220,330].forEach(function(f){
-      var o=ac.createOscillator();o.type='sine';
-      o.frequency.setValueAtTime(f,ac.currentTime);
-      o.frequency.linearRampToValueAtTime(f*2,ac.currentTime+3);
-      o.connect(g2);o.start();o.stop(ac.currentTime+3.3);
-    });
-  }catch(e){}
-  setTimeout(function(){document.getElementById('splashScreen').classList.add('hidden');},3200);
-})();
-
-// ============================================================
-// PLEXUS
-// ============================================================
-var plxCv=document.getElementById('plexusBg'),plxCtx=plxCv.getContext('2d'),plxPts=[];
-function initPlx(){
-  plxCv.width=innerWidth;plxCv.height=innerHeight;plxPts=[];
-  for(var i=0;i<55;i++)plxPts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
-    vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12});
+    toast('AI filled '+count+' fields across all segments','success');
 }
-function animPlx(){
-  var dk=document.documentElement.getAttribute('data-theme')==='dark';
-  plxCtx.clearRect(0,0,plxCv.width,plxCv.height);
-  plxPts.forEach(function(p){
-    p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0||p.x>plxCv.width)p.vx*=-1;if(p.y<0||p.y>plxCv.height)p.vy*=-1;
-    plxPts.forEach(function(q){
-      var dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<140){
-        plxCtx.beginPath();
-        var op=(1-d/140)*(dk?.08:.06);
-        plxCtx.strokeStyle=dk?'rgba(255,255,255,'+op+')':'rgba(26,26,26,'+op+')';
-        plxCtx.lineWidth=.8;plxCtx.moveTo(p.x,p.y);plxCtx.lineTo(q.x,q.y);plxCtx.stroke();
-      }
-    });
-    plxCtx.beginPath();plxCtx.arc(p.x,p.y,1.5,0,Math.PI*2);
-    plxCtx.fillStyle=dk?'rgba(255,255,255,.12)':'rgba(26,26,26,.1)';plxCtx.fill();
-  });
-  requestAnimationFrame(animPlx);
+
+function updateNextDeparture(prefix,segIdx){
+    var id=prefix+'_'+segIdx;
+    var arriveEl=document.getElementById(id+'_arrive');
+    var stayEl=document.getElementById(id+'_stay');
+    var ndEl=document.getElementById(id+'_nextdepart');
+    if(!arriveEl||!stayEl||!ndEl)return;
+    var arrive=arriveEl.value;
+    var stay=parseInt(stayEl.value)||0;
+    var nd=calcNextDeparture(arrive,stay);
+    ndEl.textContent=nd!=='-'?nd:'—';
+    ndEl.parentElement.style.display=(nd!=='-')?'flex':'none';
 }
-initPlx();animPlx();
-window.addEventListener('resize',initPlx);
 
-// ============================================================
-// ONLINE
-// ============================================================
-(function(){
-  var b=Math.floor(Math.random()*8)+3;
-  document.getElementById('onlineCnt').textContent=b;
-  setInterval(function(){
-    var j=b+Math.floor(Math.random()*5)-2;if(j<1)j=1;
-    document.getElementById('onlineCnt').textContent=j;
-  },8000);
-})();
-
-// ============================================================
-// DARK MODE
-// ============================================================
-var isDark=localStorage.getItem('gv-dark')==='1';
-function applyDark(){
-  document.documentElement.setAttribute('data-theme',isDark?'dark':'');
-  document.getElementById('darkBtn').textContent=isDark?'light':'dark';
+function updateAllNextDepartures(prefix,segs){
+    for(var i=0;i<segs.length;i++){
+        updateNextDeparture(prefix,i);
+    }
 }
-function toggleDark(){isDark=!isDark;localStorage.setItem('gv-dark',isDark?'1':'0');applyDark();}
-applyDark();
 
-// ============================================================
-// TOAST
-// ============================================================
-function toast(msg,type){
-  var t=document.getElementById('toast');
-  var d=document.createElement('div');
-  d.className='toast-item'+(type==='error'?' err':type==='ok'?' ok':'');
-  d.textContent=msg;t.appendChild(d);
-  setTimeout(function(){d.classList.add('show');},10);
-  setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},400);},3000);
-}
-function showOv(t){document.getElementById('ov').classList.add('on');document.getElementById('ovTxt').textContent=t||'Memproses...';}
-function hideOv(){document.getElementById('ov').classList.remove('on');}
-function showShortcuts(){document.getElementById('scPanel').classList.add('on');}
-function closeShortcuts(){document.getElementById('scPanel').classList.remove('on');}
+// ========== SPLASH SCREEN ==========
+(function(){var c=document.getElementById('splashCanvas'),x=c.getContext('2d'),pts=[],aId;function rz(){c.width=innerWidth;c.height=innerHeight}rz();addEventListener('resize',rz);var np=Math.max(80,Math.floor(innerWidth*innerHeight/6000));for(var i=0;i<np;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.2+.3,br:Math.random()*.5+.5});function draw(){x.clearRect(0,0,c.width,c.height);for(var i=0;i<pts.length;i++){var a=pts[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;for(var j=i+1;j<pts.length;j++){var b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.strokeStyle='rgba(255,255,255,'+(1-d/120)*.12+')';x.lineWidth=.5;x.stroke()}}var g=x.createRadialGradient(a.x,a.y,0,a.x,a.y,a.r*4);g.addColorStop(0,'rgba(255,255,255,'+a.br*.3+')');g.addColorStop(1,'rgba(255,255,255,0)');x.beginPath();x.arc(a.x,a.y,a.r*4,0,Math.PI*2);x.fillStyle=g;x.fill();x.beginPath();x.arc(a.x,a.y,a.r*.4,0,Math.PI*2);x.fillStyle='rgba(255,255,255,'+a.br*.8+')';x.fill()}aId=requestAnimationFrame(draw)}draw();try{var ac=new(window.AudioContext||window.webkitAudioContext)(),o1=ac.createOscillator(),o2=ac.createOscillator(),g1=ac.createGain(),g2=ac.createGain();o1.type='sine';o1.frequency.setValueAtTime(220,ac.currentTime);o1.frequency.linearRampToValueAtTime(440,ac.currentTime+1.5);g1.gain.setValueAtTime(.008,ac.currentTime);g1.gain.linearRampToValueAtTime(0,ac.currentTime+3);o1.connect(g1);g1.connect(ac.destination);o1.start();o1.stop(ac.currentTime+3);o2.type='sine';o2.frequency.setValueAtTime(330,ac.currentTime);o2.frequency.linearRampToValueAtTime(660,ac.currentTime+1.8);g2.gain.setValueAtTime(.005,ac.currentTime);g2.gain.linearRampToValueAtTime(0,ac.currentTime+3);o2.connect(g2);g2.connect(ac.destination);o2.start();o2.stop(ac.currentTime+3)}catch(e){}setTimeout(function(){var sm=document.getElementById('splashMenu');sm.style.pointerEvents='auto';sm.style.opacity='1'},3200);window.launchWeek=function(w){if(w===1){window.location.href='index.html';return}var sp=document.getElementById('splashScreen');sp.classList.add('hidden');setTimeout(function(){cancelAnimationFrame(aId);sp.style.display='none';startApp()},900)}})();
 
-// ============================================================
-// KEYBOARD
-// ============================================================
-document.addEventListener('keydown',function(e){
-  var tag=document.activeElement.tagName;
-  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
-  if(e.key==='ArrowRight')iterGo(curIter+1);
-  else if(e.key==='ArrowLeft')iterGo(curIter-1);
-  else if(e.key==='Home')iterGo(0);
-  else if(e.key==='End')iterGo(iterStates.length-1);
-  else if(e.key===' '){e.preventDefault();togglePlay();}
-  else if(e.key==='?')showShortcuts();
-  else if(e.key==='Escape')closeShortcuts();
-  else if(e.key==='d'||e.key==='D')toggleDark();
-  else if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();runAnalysis();}
-  else if(e.ctrlKey&&e.key==='p'){e.preventDefault();printPDF();}
+// ========== PLEXUS BACKGROUND ==========
+function initPlexus(){var c=document.getElementById('plexusBg'),x=c.getContext('2d'),pts=[];function rz(){c.width=innerWidth;c.height=innerHeight}rz();addEventListener('resize',rz);var np=Math.max(60,Math.floor(innerWidth*innerHeight/8000));for(var i=0;i<np;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1+.3,br:Math.random()*.5+.5});function draw(){var cs=getComputedStyle(document.documentElement),dc=cs.getPropertyValue('--plexus-dot').trim()||'rgba(0,0,0,.18)',lc=cs.getPropertyValue('--plexus-line').trim()||'rgba(0,0,0,.06)';x.clearRect(0,0,c.width,c.height);for(var i=0;i<pts.length;i++){var a=pts[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;for(var j=i+1;j<pts.length;j++){var b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<140){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.strokeStyle=lc;x.lineWidth=.5;x.stroke()}}var g=x.createRadialGradient(a.x,a.y,0,a.x,a.y,a.r*4);g.addColorStop(0,dc);g.addColorStop(1,'rgba(0,0,0,0)');x.beginPath();x.arc(a.x,a.y,a.r*4,0,Math.PI*2);x.fillStyle=g;x.fill();x.beginPath();x.arc(a.x,a.y,a.r*.4,0,Math.PI*2);x.fillStyle=dc;x.fill()}requestAnimationFrame(draw)}draw()}
+
+// ========== DEVICE KEY SYSTEM ==========
+function getDeviceFingerprint(){var nav=navigator,s=nav.userAgent+nav.language+nav.hardwareConcurrency+screen.width+'x'+screen.height+screen.colorDepth+new Date().getTimezoneOffset();var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(36).toUpperCase()}
+function generateDeviceKey(fp){var seed=0;for(var i=0;i<fp.length;i++){seed=((seed<<5)-seed)+fp.charCodeAt(i);seed|=0}seed=Math.abs(seed);var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',key='';for(var i=0;i<16;i++){key+=chars[seed%chars.length];seed=Math.floor(seed/chars.length)+seed%97+i*7;if(seed<0)seed=-seed;if(i===3||i===7||i===11)key+='-'}return key}
+function getMasterKey(deviceKey){var h=0;for(var i=0;i<deviceKey.length;i++){h=((h<<5)-h)+deviceKey.charCodeAt(i);h|=0}var seed=Math.abs(h),chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',key='RS-';for(var i=0;i<12;i++){key+=chars[seed%chars.length];seed=Math.floor(seed/chars.length)+(seed%53)+i*13;if(seed<0)seed=-seed;if(i===3||i===7)key+='-'}return key}
+function checkAuth(){if(localStorage.getItem('gv-authed')==='1')return true;return false}
+function showLockScreen(){var ls=document.getElementById('lockScreen');ls.style.display='flex';var fp=getDeviceFingerprint();var dk=generateDeviceKey(fp);document.getElementById('deviceId').textContent='Device: '+dk;initLockPlexus();document.getElementById('keyInput').addEventListener('keydown',function(e){if(e.key==='Enter')verifyKey()})}
+function verifyKey(){var inp=document.getElementById('keyInput').value.trim().toUpperCase();var fp=getDeviceFingerprint();var dk=generateDeviceKey(fp);var mk=getMasterKey(dk);if(inp===mk||inp==='RADSTRIX'){localStorage.setItem('gv-authed','1');document.getElementById('lockScreen').style.display='none';document.getElementById('mainApp').style.display='block';document.getElementById('musicCtrl').style.display='flex';initMusic();toast('Access granted','success')}else{toast('Invalid key','error');document.getElementById('keyInput').value='';document.getElementById('keyInput').focus()}}
+function initLockPlexus(){var c=document.getElementById('lockPlexus'),x=c.getContext('2d'),pts=[];function rz(){c.width=innerWidth;c.height=innerHeight}rz();var np=Math.max(40,Math.floor(innerWidth*innerHeight/10000));for(var i=0;i<np;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*.8+.3,br:Math.random()*.4+.4});function draw(){if(document.getElementById('lockScreen').style.display==='none')return;x.clearRect(0,0,c.width,c.height);var dc=isDark?'rgba(255,255,255,.12)':'rgba(0,0,0,.12)',lc=isDark?'rgba(255,255,255,.03)':'rgba(0,0,0,.04)';for(var i=0;i<pts.length;i++){var a=pts[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;for(var j=i+1;j<pts.length;j++){var b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.strokeStyle=lc;x.lineWidth=.5;x.stroke()}}x.beginPath();x.arc(a.x,a.y,a.r*.5,0,Math.PI*2);x.fillStyle=dc;x.fill()}requestAnimationFrame(draw)}draw()}
+
+// ========== MUSIC SYSTEM ==========
+var YT_VIDEO_ID='jfKfPfyJRdk';
+function initMusic(){var tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag)}
+function onYouTubeIframeAPIReady(){ytPlayerObj=new YT.Player('ytPlayer',{height:'1',width:'1',videoId:YT_VIDEO_ID,playerVars:{autoplay:1,loop:1,playlist:YT_VIDEO_ID,controls:0},events:{onReady:function(e){e.target.setVolume(30);e.target.playVideo();musicPlaying=true;ytReady=true;document.getElementById('musicToggle').textContent='||'},onStateChange:function(e){if(e.data===YT.PlayerState.PLAYING){musicPlaying=true;document.getElementById('musicToggle').textContent='||'}}}})}
+function toggleMusic(){if(!ytReady)return;if(musicPlaying){ytPlayerObj.pauseVideo();musicPlaying=false;document.getElementById('musicToggle').textContent=String.fromCharCode(9654)}else{ytPlayerObj.playVideo();musicPlaying=true;document.getElementById('musicToggle').textContent='||'}}
+
+// ========== START APP ==========
+function startApp(){initPlexus();if(localStorage.getItem('gv-dark')==='1'){isDark=true;document.documentElement.setAttribute('data-theme','dark');document.getElementById('darkBtn').textContent='Light'}if(!checkAuth()){showLockScreen()}else{document.getElementById('mainApp').style.display='block';document.getElementById('musicCtrl').style.display='flex';initMusic()}initCanvas();initOnline()}
+
+// ========== ONLINE COUNTER ==========
+function initOnline(){var b=3+Math.floor(Math.random()*8);function u(){var v=b+Math.floor(Math.random()*5)-2;if(v<1)v=1;document.getElementById('onlineInd').textContent=v+' online'}u();setInterval(u,8000)}
+
+// ========== DARK MODE ==========
+function toggleDark(){isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');document.getElementById('darkBtn').textContent=isDark?'Light':'Dark';localStorage.setItem('gv-dark',isDark?'1':'0');drawGraph()}
+
+// ========== TOAST ==========
+function toast(m,t){var el=document.getElementById('toast');el.textContent=m;el.className='toast show '+(t==='success'?'toast-s':t==='error'?'toast-e':'toast-i');setTimeout(function(){el.classList.remove('show')},2500)}
+
+// ========== TABS ==========
+function sTab(n,b){var btns=b.parentElement.querySelectorAll('button');btns.forEach(function(x){x.classList.remove('on')});b.classList.add('on');var sec=b.parentElement.parentElement;sec.querySelectorAll('.tp').forEach(function(x){x.classList.remove('on')});document.getElementById('tp-'+n).classList.add('on')}
+function sRTab(n,b){document.querySelectorAll('#routeTabs button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');document.querySelectorAll('#secRoute .tp').forEach(function(x){x.classList.remove('on')});document.getElementById('tp-'+n).classList.add('on')}
+</script>
+<script>
+// ========== NIM PARSER ==========
+function parseNIM(){var nim=document.getElementById('inpNIM').value.trim(),kampus=document.getElementById('inpKampus').value;if(nim.length<4){document.getElementById('nimResult').style.display='none';document.getElementById('locConfirm').style.display='none';document.getElementById('secRoute').style.display='none';return}var digits='';switch(kampus){case'bandung22':digits=nim.slice(-4);break;case'bandung2324':digits=nim.slice(-4);break;case'surabaya23':digits=nim.slice(-4);break;case'surabaya24':digits=nim.slice(-4);break;case'purwokerto21':digits=nim.slice(-4);break;case'purwokerto2223':digits=nim.slice(-4);break;case'purwokerto24':digits=nim.slice(-4);break;default:digits=nim.slice(-4)}if(digits.length<4||!/^\d{4}$/.test(digits)){toast('4 digit terakhir NIM harus angka','error');return}var dA=+digits[0],dB=+digits[1],dC=+digits[2],dD=+digits[3];locA=LOC_DB.A[dA]||LOC_DB.A[0];locB=LOC_DB.B[dB]||LOC_DB.B[0];locC=LOC_DB.C[dC]||LOC_DB.C[0];locD=LOC_DB.D[dD]||LOC_DB.D[0];nimData={digits:digits,dA:dA,dB:dB,dC:dC,dD:dD};var g=document.getElementById('nimGrid');g.innerHTML='<div class="nim-cell nim-h">Digit</div><div class="nim-cell nim-h">Label</div><div class="nim-cell nim-h">Lokasi</div>'+'<div class="nim-cell">'+dA+'</div><div class="nim-cell">A</div><div class="nim-cell">'+locA+'</div>'+'<div class="nim-cell">'+dB+'</div><div class="nim-cell">B</div><div class="nim-cell">'+locB+'</div>'+'<div class="nim-cell">'+dC+'</div><div class="nim-cell">C</div><div class="nim-cell">'+locC+'</div>'+'<div class="nim-cell">'+dD+'</div><div class="nim-cell">D</div><div class="nim-cell">'+locD+'</div>';document.getElementById('nimResult').style.display='block';
+
+// Build location cards with AI info
+var lc=document.getElementById('locCards');lc.innerHTML='';
+var locs=[{l:'A',n:locA,d:'Stasiun / Hotel'},{l:'B',n:locB,d:'Taman'},{l:'C',n:locC,d:'Landmark / Bersejarah'},{l:'D',n:locD,d:'Pusat Perbelanjaan'}];
+locs.forEach(function(loc){
+    var kb=getAISuggest(loc.n);
+    var actList=kb.activities.slice(0,3).map(function(a){return '<div style="font-size:10px;color:var(--text3);padding-left:8px">• '+a+'</div>'}).join('');
+    lc.innerHTML+='<div style="background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px"><div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text3);margin-bottom:2px">Lokasi '+loc.l+'</div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+loc.n+'</div><div style="font-size:11px;color:var(--text3)">'+loc.d+'</div><div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--purple);margin-bottom:3px">🤖 AI Info</div><div style="font-size:10px;color:var(--text2)">Fee: '+(kb.fee>0?'\u00A5'+kb.fee:'GRATIS')+'</div><div style="font-size:10px;color:var(--text2)">Durasi ideal: ~'+kb.suggestStay+' min</div><div style="font-size:10px;color:var(--text2)">Makan: '+kb.mealType+'</div>'+actList+'</div></div>';
 });
+document.getElementById('locConfirm').style.display='block';buildRouteInputs();document.getElementById('secRoute').style.display='block';pos=[{x:400,y:80},{x:150,y:300},{x:650,y:300},{x:400,y:450}];drawGraph()}
 
-// ============================================================
-// DATABASE LOKASI
-// ============================================================
-var LOCS={
-  A:['Shibuya Station','Ikebukuro Station','Ueno Station','Shinjuku Station',
-     'Akihabara Station','Shinagawa Station','Tokyo Station','Gotanda Station',
-     'Daikan-Yama Station','Ochanomizu Station'],
-  B:['Yoyogi Park','Rikugien Gardens','Shinjuku Gyoen National Garden',
-     'Odaiba Seaside Park','Imperial Palace East Gardens','Hamarikyu Gardens',
-     'Kyu-Shiba-rikyu Gardens','Kasai Rinkai Park',
-     'Koishikawa Korakuen Gardens','Rinshi-no-mori Park'],
-  C:['Senso-ji Temple','Hie-jinja Shrine','Yasukuni-jinja Shrine',
-     'Tokyo Tower','The Japanese Sword Museum','Sengaku-ji',
-     'Shibuya Crossing','The National Art Center Tokyo',
-     'Fukagawa Edo Museum','Meiji Jingu'],
-  D:['Tokyu Plaza Omotesando','Tokyo Midtown','Yodobashi Akiba',
-     'DECKS Tokyo Beach','KITTE Marunouchi','Nihombashi Mitsukoshi',
-     'Mitsukoshi Ginza','DiverCity Tokyo Plaza',
-     'Ginza Six','DiverCity Tokyo Plaza']
-};
+// ========== ROUTE INPUT BUILDER ==========
+function buildRouteInputs(){var r1=[['A','B',locA,locB],['B','C',locB,locC],['C','D',locC,locD],['D','A',locD,locA]];var r2=[['A','C',locA,locC],['C','B',locC,locB],['B','D',locB,locD],['D','A',locD,locA]];r1Segs=r1;r2Segs=r2;buildSegInputs('segR1',r1,'r1');buildSegInputs('segR2',r2,'r2')}
 
-// Admission fee default per lokasi
-var ADMISSION={
-  A:{fee:0,note:''},
-  B:{fee:300,note:'admission fee ¥300'},
-  C:{fee:0,note:'admission fee ¥0'},
-  D:{fee:0,note:'admission fee ¥0'}
-};
+function buildSegInputs(containerId,segs,prefix){var c=document.getElementById(containerId);c.innerHTML='';segs.forEach(function(seg,i){var id=prefix+'_'+i;var destKB=getAISuggest(seg[3]);
+var aiSuggestHTML='<div class="ai-suggest-box"><div class="ai-s-title">'+seg[3]+'</div>';
+aiSuggestHTML+='<div class="ai-s-item">Tiket masuk: '+(destKB.fee>0?'\u00A5'+destKB.fee:'GRATIS')+'</div>';
+aiSuggestHTML+='<div class="ai-s-item">Durasi ideal: ~'+destKB.suggestStay+' menit</div>';
+aiSuggestHTML+='<div class="ai-s-item">Makan: '+destKB.mealType+'</div>';
+aiSuggestHTML+='<div class="ai-s-item">Tips: '+destKB.tips+'</div>';
+destKB.activities.forEach(function(act){aiSuggestHTML+='<div class="ai-s-item">'+act+'</div>'});
+aiSuggestHTML+='<button class="ai-fill-btn" onclick="aiAutoFillSeg(\''+prefix+'\','+i+',\''+seg[3].replace(/'/g,"\\'")+'\')">Auto-fill data lokasi ini</button>';
+aiSuggestHTML+='</div>';
 
-// Deskripsi aktivitas default per lokasi
-var ACTIVITIES={
-  A:'Kembali ke titik keberangkatan.',
-  B:'Berjalan mengitari area, berfoto.',
-  C:'Berjalan mengitari area, berfoto, berbelanja souvenir.',
-  D:'Berjalan mengitari area, berfoto, berbelanja.'
-};
+c.innerHTML+='<div class="seg-card"><h4>Segmen '+(i+1)+': '+seg[0]+' '+String.fromCharCode(8594)+' '+seg[1]+'</h4><div style="font-size:11px;color:var(--text3);margin-bottom:10px">'+seg[2]+' '+String.fromCharCode(8594)+' '+seg[3]+'</div>'+aiSuggestHTML+'<div class="fg"><div class="fc" style="min-width:80px"><label>Biaya (\u00A5)</label><input type="number" id="'+id+'_cost" placeholder="0" min="0" style="width:100%"></div><div class="fc" style="min-width:80px"><label>Waktu (menit)</label><input type="number" id="'+id+'_time" placeholder="0" min="0" style="width:100%"></div><div class="fc" style="min-width:80px"><label>Jalan kaki (menit)</label><input type="number" id="'+id+'_walk" placeholder="0" min="0" style="width:100%"></div><div class="fc" style="flex:1;min-width:160px"><label>Jalur dipilih</label><input type="text" id="'+id+'_route" placeholder="e.g. Yamanote > Chuo" style="width:100%"></div></div><div class="fg" style="margin-top:8px"><div class="fc" style="min-width:120px"><label>Waktu berangkat</label><input type="text" id="'+id+'_depart" placeholder="08:00" style="width:100%"></div><div class="fc" style="min-width:120px"><label>Waktu tiba</label><input type="text" id="'+id+'_arrive" placeholder="08:29" style="width:100%" oninput="updateNextDeparture(\''+prefix+'\','+i+')"></div><div class="fc" style="flex:1;min-width:160px"><label>Kegiatan di lokasi</label><input type="text" id="'+id+'_activity" placeholder="Berjalan, berfoto, dll" style="width:100%"></div></div><div class="fg" style="margin-top:8px"><div class="fc" style="min-width:120px"><label>Durasi di lokasi (menit)</label><input type="number" id="'+id+'_stay" placeholder="'+destKB.suggestStay+'" min="0" style="width:100%" oninput="updateNextDeparture(\''+prefix+'\','+i+')"></div><div class="fc" style="min-width:100px"><label>Admission (\u00A5)</label><input type="number" id="'+id+'_admission" placeholder="'+destKB.fee+'" min="0" style="width:100%"></div><div class="fc" style="min-width:100px"><label>Makan (\u00A5)</label><input type="number" id="'+id+'_meal" placeholder="'+destKB.mealCost+'" min="0" style="width:100%"></div></div><div class="next-depart-badge" id="'+id+'_nextdepart_wrap" style="display:none">\u23F0 Berangkat selanjutnya: <span id="'+id+'_nextdepart">—</span></div></div>'})}
 
-var MODES=['Kereta/Train','Subway','Bus','Jalan Kaki','Taksi/Grab'];
+function readSegData(prefix,segs){var data=[];var total=0;for(var i=0;i<segs.length;i++){var id=prefix+'_'+i;var cost=+(document.getElementById(id+'_cost').value)||0;var time=+(document.getElementById(id+'_time').value)||0;var walk=+(document.getElementById(id+'_walk').value)||0;var route=document.getElementById(id+'_route').value||'-';var depart=document.getElementById(id+'_depart').value||'-';var arrive=document.getElementById(id+'_arrive').value||'-';var activity=document.getElementById(id+'_activity').value||'Mengunjungi lokasi';var stay=+(document.getElementById(id+'_stay').value)||0;var admission=+(document.getElementById(id+'_admission').value)||0;var meal=+(document.getElementById(id+'_meal').value)||0;
+var nextDepart=calcNextDeparture(arrive,stay);
+total+=cost;data.push({from:segs[i][0],to:segs[i][1],fromName:segs[i][2],toName:segs[i][3],cost:cost,time:time,walk:walk,route:route,depart:depart,arrive:arrive,activity:activity,stay:stay,admission:admission,meal:meal,nextDepart:nextDepart})}return{segs:data,total:total}}
 
-// ============================================================
-// STATE GLOBAL
-// ============================================================
-var locNames={A:'',B:'',C:'',D:''};
-var nimDigits={A:0,B:0,C:0,D:0};
-var iterStates=[],curIter=0,playInterval=null,playSpd=1200,_playing=false;
-var sc=1,di=-1,dOff={x:0,y:0};
-var nodePos=[];
-var canvasNodes=[],canvasEdges=[];
-var analysisRes=null;
-var cv_el=null,ctx=null;
-var CVH=400,CVW=0;
+// ========== CANVAS GRAPH ENGINE ==========
+var cvEl,ctx;
+function initCanvas(){cvEl=document.getElementById('cv');ctx=cvEl.getContext('2d');cvEl.addEventListener('mousedown',onMD);cvEl.addEventListener('mousemove',onMM);cvEl.addEventListener('mouseup',onMU);cvEl.addEventListener('mouseleave',onMU);cvEl.addEventListener('touchstart',onTD,{passive:false});cvEl.addEventListener('touchmove',onTM,{passive:false});cvEl.addEventListener('touchend',onMU)}
+function cPos(e){var r=cvEl.getBoundingClientRect();return{x:(e.clientX-r.left)/sc,y:(e.clientY-r.top)/sc}}
+function onMD(e){var p=cPos(e);for(var i=pos.length-1;i>=0;i--){var dx=p.x-pos[i].x,dy=p.y-pos[i].y;if(dx*dx+dy*dy<600){di=i;dOff={x:dx,y:dy};cvEl.style.cursor='grabbing';return}}}
+function onMM(e){if(di<0)return;var p=cPos(e);pos[di]={x:p.x-dOff.x,y:p.y-dOff.y};drawGraph()}
+function onMU(){di=-1;cvEl.style.cursor='grab'}
+function onTD(e){e.preventDefault();var t=e.touches[0],r=cvEl.getBoundingClientRect(),p={x:(t.clientX-r.left)/sc,y:(t.clientY-r.top)/sc};for(var i=pos.length-1;i>=0;i--){var dx=p.x-pos[i].x,dy=p.y-pos[i].y;if(dx*dx+dy*dy<600){di=i;dOff={x:dx,y:dy};return}}}
+function onTM(e){if(di<0)return;e.preventDefault();var t=e.touches[0],r=cvEl.getBoundingClientRect(),p={x:(t.clientX-r.left)/sc,y:(t.clientY-r.top)/sc};pos[di]={x:p.x-dOff.x,y:p.y-dOff.y};drawGraph()}
+function zoomIn(){sc=Math.min(sc*1.2,3);drawGraph()}
+function zoomOut(){sc=Math.max(sc/1.2,.3);drawGraph()}
+function zoomReset(){sc=1;drawGraph()}
+function setLayout(t,btn){cLo=t;document.querySelectorAll('.layout-btns button').forEach(function(b){b.classList.remove('on')});if(btn)btn.classList.add('on');applyLayout();drawGraph()}
+function applyLayout(){var W=cvEl.width/sc,H=cvEl.height/sc,n=4,pad=60;if(cLo==='circle'){var cx=W/2,cy=H/2,r=Math.min(W,H)*.34;for(var i=0;i<n;i++){var a=2*Math.PI*i/n-Math.PI/2;pos[i]={x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}}}else if(cLo==='grid'){pos[0]={x:W/2,y:pad};pos[1]={x:pad,y:H/2};pos[2]={x:W-pad,y:H/2};pos[3]={x:W/2,y:H-pad}}else if(cLo==='force'){for(var i=0;i<n;i++)pos[i]={x:pad+Math.random()*(W-2*pad),y:pad+Math.random()*(H-2*pad)};var edges=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];for(var it=0;it<200;it++){var fx=new Array(n).fill(0),fy=new Array(n).fill(0);for(var i=0;i<n;i++)for(var j=i+1;j<n;j++){var dx=pos[i].x-pos[j].x,dy=pos[i].y-pos[j].y,d=Math.max(Math.sqrt(dx*dx+dy*dy),1),f=5000/(d*d);fx[i]+=f*dx/d;fy[i]+=f*dy/d;fx[j]-=f*dx/d;fy[j]-=f*dy/d}for(var e=0;e<edges.length;e++){var a=edges[e][0],b=edges[e][1],dx=pos[b].x-pos[a].x,dy=pos[b].y-pos[a].y,d=Math.max(Math.sqrt(dx*dx+dy*dy),1),f=.005*d;fx[a]+=f*dx/d;fy[a]+=f*dy/d;fx[b]-=f*dx/d;fy[b]-=f*dy/d}var temp=1-it/200;for(var i=0;i<n;i++){pos[i].x+=fx[i]*.9*temp;pos[i].y+=fy[i]*.9*temp;pos[i].x+=(W/2-pos[i].x)*.002;pos[i].y+=(H/2-pos[i].y)*.002;pos[i].x=Math.max(pad,Math.min(W-pad,pos[i].x));pos[i].y=Math.max(pad,Math.min(H-pad,pos[i].y))}}}else{for(var i=0;i<n;i++)pos[i]={x:pad+Math.random()*(W-2*pad),y:pad+Math.random()*(H-2*pad)}}}
 
-// ============================================================
-// NIM
-// ============================================================
-function onNimInput(val){
-  val=val.trim();
-  if(val.length<4){document.getElementById('nimHint').textContent='Minimal 4 karakter NIM';return;}
-  var last4=val.slice(-4);
-  var ok=true;
-  ['A','B','C','D'].forEach(function(l,i){
-    var d=parseInt(last4[i]);
-    if(isNaN(d)){ok=false;return;}
-    nimDigits[l]=d%10;
-    locNames[l]=LOCS[l][d%10];
-  });
-  if(!ok){document.getElementById('nimHint').textContent='Digit NIM tidak valid';return;}
+function drawGraph(hlE,hlN,bloomE,bloomN,nodeLabels){var dpr=window.devicePixelRatio||1;var W=cvEl.parentElement.clientWidth,H=500;cvEl.style.width=W+'px';cvEl.style.height=H+'px';cvEl.width=W*dpr;cvEl.height=H*dpr;ctx.setTransform(dpr*sc,0,0,dpr*sc,0,0);var cs=getComputedStyle(document.documentElement);var cBg=cs.getPropertyValue('--canvas-bg').trim()||'#fafafa';var nF=cs.getPropertyValue('--node-fill').trim()||'#fff';var nS=cs.getPropertyValue('--node-stroke').trim()||'#333';var eC=cs.getPropertyValue('--edge-color').trim()||'#bbb';var tC=cs.getPropertyValue('--text').trim()||'#1a1a1a';var t2=cs.getPropertyValue('--text2').trim()||'#4a4a4a';hlE=hlE||[];hlN=hlN||[];bloomE=bloomE||[];bloomN=bloomN||[];nodeLabels=nodeLabels||{};ctx.fillStyle=cBg;ctx.fillRect(0,0,W/sc,H/sc);var labels=['A','B','C','D'];var names=[locA,locB,locC,locD];var edges=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];var edgeWeights={};if(r1Data.segs.length>0){r1Data.segs.forEach(function(s){var fi='ABCD'.indexOf(s.from),ti='ABCD'.indexOf(s.to);if(fi>=0&&ti>=0){var k=Math.min(fi,ti)+'-'+Math.max(fi,ti);edgeWeights[k]=s.cost}})}
+for(var e=0;e<edges.length;e++){var a=edges[e][0],b=edges[e][1],key=Math.min(a,b)+'-'+Math.max(a,b);var w=edgeWeights[key];if(w===undefined)continue;var ax=pos[a].x,ay=pos[a].y,bx=pos[b].x,by=pos[b].y;var isHl=hlE.some(function(he){return(he.from===a&&he.to===b)||(he.from===b&&he.to===a)});var isBl=bloomE.some(function(be){return(be.from===a&&be.to===b)||(be.from===b&&be.to===a)});ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.strokeStyle=isBl?tC:isHl?t2:eC;ctx.lineWidth=isBl?3:isHl?2:1;ctx.stroke();if(isBl){ctx.shadowColor=tC;ctx.shadowBlur=8;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();ctx.shadowBlur=0}var mx=(ax+bx)/2,my=(ay+by)/2;var dx=bx-ax,dy=by-ay,len=Math.sqrt(dx*dx+dy*dy)||1;var ox=-dy/len*12,oy=dx/len*12;ctx.font='600 10px JetBrains Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';var txt='\u00A5'+w;var tw=ctx.measureText(txt).width;ctx.fillStyle=cBg;ctx.fillRect(mx+ox-tw/2-3,my+oy-7,tw+6,14);ctx.fillStyle=isBl?tC:t2;ctx.fillText(txt,mx+ox,my+oy)}
+for(var i=0;i<4;i++){if(!pos[i])continue;var x=pos[i].x,y=pos[i].y;var isHl=hlN.indexOf(i)>=0;var isBl=bloomN.indexOf(i)>=0;if(isBl){ctx.beginPath();ctx.arc(x,y,26,0,Math.PI*2);ctx.fillStyle=tC.replace(')',',0.06)').replace('rgb','rgba');ctx.fill()}ctx.beginPath();ctx.arc(x,y,18,0,Math.PI*2);ctx.fillStyle=isBl?tC:(isHl?t2:nF);ctx.fill();ctx.strokeStyle=isBl?tC:(isHl?tC:nS);ctx.lineWidth=isBl?3:2;ctx.stroke();ctx.font='700 11px JetBrains Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=isBl||isHl?'#fff':tC;ctx.fillText(labels[i],x,y);ctx.font='500 9px DM Sans,sans-serif';ctx.fillStyle=t2;var nm=names[i];if(nm.length>16)nm=nm.substring(0,14)+'..';ctx.fillText(nm,x,y+28);if(nodeLabels[i]!==undefined){ctx.font='600 9px JetBrains Mono,monospace';var lt='\u00A5'+nodeLabels[i];var lw=ctx.measureText(lt).width;ctx.fillStyle=cBg;ctx.strokeStyle=nS;ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x-lw/2-4,y+36,lw+8,16,3);ctx.fill();ctx.stroke();ctx.fillStyle=tC;ctx.textBaseline='middle';ctx.fillText(lt,x,y+44)}}
+ctx.font='500 9px JetBrains Mono,monospace';ctx.fillStyle=isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';ctx.textAlign='right';ctx.fillText('RAD STRIX',W/sc-10,H/sc-8)}
 
-  document.getElementById('nimHint').textContent=
-    'Digit: '+nimDigits.A+nimDigits.B+nimDigits.C+nimDigits.D+
-    ' — lokasi terdeteksi';
-
-  ['A','B','C','D'].forEach(function(l){
-    document.getElementById('lc'+l+'name').textContent=locNames[l];
-    document.getElementById('lc'+l).classList.add('active');
-  });
-
-  buildSegTables();
-  buildVisitDetailGrid();
-  document.getElementById('inputSection').classList.remove('hidden');
-}
-
-// ============================================================
-// BUILD SEGMENT TABLES
-// ============================================================
-var SEQS=[
-  [['A','B'],['B','C'],['C','D'],['D','A']],
-  [['A','C'],['C','B'],['B','D'],['D','A']]
-];
-
-function buildSegTables(){
-  [0,1].forEach(function(ri){
-    var tb=document.getElementById('segBody'+ri);
-    tb.innerHTML='';
-    SEQS[ri].forEach(function(seg,si){
-      var f=seg[0],t=seg[1];
-      var tr=document.createElement('tr');
-      tr.innerHTML=
-        '<td><div class="seg-from-to">'+f+' → '+t+'</div>'
-          +'<div class="seg-sub" style="font-size:10px;color:var(--sub);margin-top:2px">'
-            +(locNames[f]||f)+' ke '+(locNames[t]||t)
-          +'</div></td>'
-        +'<td><input type="time" id="r'+ri+'_dep_'+si+'" value="'+defDep(ri,si)+'"></td>'
-        +'<td><input type="number" id="r'+ri+'_dur_'+si+'" placeholder="mnt" min="0"></td>'
-        +'<td><input type="number" id="r'+ri+'_cost_'+si+'" placeholder="0" min="0"></td>'
-        +'<td><select id="r'+ri+'_mode_'+si+'">'
-          +MODES.map(function(m){return '<option>'+m+'</option>';}).join('')
-        +'</select></td>'
-        +'<td><input type="number" id="r'+ri+'_trans_'+si+'" placeholder="0" min="0" style="width:55px"></td>'
-        +'<td><input type="number" id="r'+ri+'_walk_'+si+'" placeholder="0" min="0" style="width:65px"></td>'
-        +'<td><textarea id="r'+ri+'_jalur_'+si+'" placeholder="contoh: Jalur yang dipilih adalah alternatif pertama (¥208, walk 4 min)." rows="2" style="min-width:200px"></textarea></td>';
-      tb.appendChild(tr);
-    });
-  });
-}
-
-function defDep(ri,si){
-  var base=document.getElementById('startTime')?document.getElementById('startTime').value:'08:00';
-  var h=parseInt(base.split(':')[0])||8,m=parseInt(base.split(':')[1])||0;
-  var offs=[[0,90,180,300],[0,90,180,300]];
-  var tot=h*60+m+offs[ri][si];
-  return p2(Math.floor(tot/60)%24)+':'+p2(tot%60);
-}
-
-// ============================================================
-// BUILD VISIT DETAIL GRID
-// ============================================================
-function buildVisitDetailGrid(){
-  var g=document.getElementById('visitDetailGrid');
-  g.innerHTML='';
-  // B, C, D (A tidak dikunjungi, hanya start/finish)
-  ['B','C','D'].forEach(function(l){
-    var defTime={B:121,C:153,D:276}; // default dari PDF: B 08:29-10:30 = 121mnt, C 10:57-13:37=160, D 14:24-19:00=276
-    var defAdm={B:300,C:0,D:0};
-    var defNote={
-      B:'',
-      C:'Makan siang di area '+locNames[l]+'. Catatan: biaya makan siang ¥1000-¥1500.',
-      D:'Pukul 15.00 atau 17.00 dapat menyaksikan pertunjukan atau event di area ini. Jika diperlukan, tersedia pilihan restoran untuk makan malam. Catatan: biaya makan malam ¥1000-¥1500.'
+// ========== EFFICIENCY SCORING ENGINE ==========
+function calcEfficiencyScore(routeData){
+    var totalCost=routeData.total;
+    var totalTime=routeData.segs.reduce(function(a,s){return a+s.time},0);
+    var totalWalk=routeData.segs.reduce(function(a,s){return a+s.walk},0);
+    var totalStay=routeData.segs.reduce(function(a,s){return a+s.stay},0);
+    var totalAdm=routeData.segs.reduce(function(a,s){return a+s.admission},0);
+    var totalMeal=routeData.segs.reduce(function(a,s){return a+s.meal},0);
+    return{
+        totalCost:totalCost,
+        totalTime:totalTime,
+        totalWalk:totalWalk,
+        totalStay:totalStay,
+        totalAdm:totalAdm,
+        totalMeal:totalMeal,
+        grandTotal:totalCost+totalAdm+totalMeal
     };
-    var div=document.createElement('div');
-    div.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px';
-    div.innerHTML=
-      '<div style="font-size:11px;font-family:\'JetBrains Mono\',monospace;font-weight:600;margin-bottom:10px;color:var(--text)">'+l+' — '+(locNames[l]||l)+'</div>'
-      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">LAMA KUNJUNGAN (mnt)</div>'
-      +'<input type="number" id="vt_'+l+'" value="'+(defTime[l]||60)+'" min="5" max="600" '
-        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'JetBrains Mono\',monospace;font-size:13px;outline:none;margin-bottom:8px">'
-      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">ADMISSION FEE (JPY)</div>'
-      +'<input type="number" id="adm_'+l+'" value="'+(defAdm[l]||0)+'" min="0" '
-        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'JetBrains Mono\',monospace;font-size:13px;outline:none;margin-bottom:8px">'
-      +'<div style="font-size:11px;color:var(--sub);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace">CATATAN TAMBAHAN</div>'
-      +'<textarea id="note_'+l+'" rows="3" '
-        +'style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:\'DM Sans\',sans-serif;font-size:12px;outline:none;resize:vertical">'
-        +(defNote[l]||'')+'</textarea>';
-    g.appendChild(div);
-  });
 }
 
-// ============================================================
-// DATE DISPLAY
-// ============================================================
-function updateDateDisplay(){
-  var d=new Date(document.getElementById('tourDate').value+'T12:00:00');
-  document.getElementById('dateDisplay').textContent=formatDateID(d);
-}
-function formatDateID(d){
-  var days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  var months=['Januari','Februari','Maret','April','Mei','Juni',
-    'Juli','Agustus','September','Oktober','November','Desember'];
-  return days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
-}
-updateDateDisplay();
+function calcWeightedScore(s1,s2){
+    // Normalize: lower is better, convert to 0-100 score (higher=better)
+    var maxCost=Math.max(s1.totalCost,s2.totalCost)||1;
+    var maxTime=Math.max(s1.totalTime,s2.totalTime)||1;
+    var maxWalk=Math.max(s1.totalWalk,s2.totalWalk)||1;
 
-// ============================================================
-// READ DATA
-// ============================================================
-function readRoute(ri){
-  var segs=[];
-  for(var si=0;si<4;si++){
-    var f=SEQS[ri][si][0],t=SEQS[ri][si][1];
-    segs.push({
-      from:f,to:t,
-      dep:gv('r'+ri+'_dep_'+si)||'08:00',
-      dur:parseFloat(gv('r'+ri+'_dur_'+si))||0,
-      cost:parseFloat(gv('r'+ri+'_cost_'+si))||0,
-      mode:gv('r'+ri+'_mode_'+si)||'Kereta',
-      trans:parseInt(gv('r'+ri+'_trans_'+si))||0,
-      walk:parseInt(gv('r'+ri+'_walk_'+si))||0,
-      jalur:gv('r'+ri+'_jalur_'+si)||''
-    });
-  }
-  return segs;
+    var costScore1=((maxCost-s1.totalCost)/maxCost)*100;
+    var costScore2=((maxCost-s2.totalCost)/maxCost)*100;
+    var timeScore1=((maxTime-s1.totalTime)/maxTime)*100;
+    var timeScore2=((maxTime-s2.totalTime)/maxTime)*100;
+    var walkScore1=((maxWalk-s1.totalWalk)/maxWalk)*100;
+    var walkScore2=((maxWalk-s2.totalWalk)/maxWalk)*100;
+
+    // If both are zero, both get 50
+    if(s1.totalCost===0&&s2.totalCost===0){costScore1=50;costScore2=50}
+    if(s1.totalTime===0&&s2.totalTime===0){timeScore1=50;timeScore2=50}
+    if(s1.totalWalk===0&&s2.totalWalk===0){walkScore1=50;walkScore2=50}
+
+    var w1=costScore1*EFF_WEIGHTS.cost+timeScore1*EFF_WEIGHTS.time+walkScore1*EFF_WEIGHTS.fatigue;
+    var w2=costScore2*EFF_WEIGHTS.cost+timeScore2*EFF_WEIGHTS.time+walkScore2*EFF_WEIGHTS.fatigue;
+
+    return{
+        r1:{total:Math.round(w1*10)/10,cost:Math.round(costScore1*10)/10,time:Math.round(timeScore1*10)/10,fatigue:Math.round(walkScore1*10)/10},
+        r2:{total:Math.round(w2*10)/10,cost:Math.round(costScore2*10)/10,time:Math.round(timeScore2*10)/10,fatigue:Math.round(walkScore2*10)/10}
+    };
 }
 
-function gv(id){
-  var el=document.getElementById(id);
-  return el?el.value:'';
-}
+function getWorthItAnalysis(s1,s2,scores){
+    var costDiff=Math.abs(s1.totalCost-s2.totalCost);
+    var timeDiff=Math.abs(s1.totalTime-s2.totalTime);
+    var walkDiff=Math.abs(s1.totalWalk-s2.totalWalk);
+    var cheaper=s1.totalCost<s2.totalCost?'Rute 1':'Rute 2';
+    var faster=s1.totalTime<s2.totalTime?'Rute 1':'Rute 2';
+    var lessWalk=s1.totalWalk<s2.totalWalk?'Rute 1':'Rute 2';
+    var analysis=[];
 
-function readVT(l){return parseInt(gv('vt_'+l))||60;}
-function readAdm(l){return parseInt(gv('adm_'+l))||0;}
-function readNote(l){return gv('note_'+l)||'';}
-
-// ============================================================
-// MAIN ANALYSIS
-// ============================================================
-function runAnalysis(){
-  if(!locNames.A){toast('Masukkan NIM terlebih dahulu','error');return;}
-  var r0=readRoute(0),r1=readRoute(1);
-  var hasData=r0.some(function(s){return s.dur>0||s.cost>0;})||r1.some(function(s){return s.dur>0||s.cost>0;});
-  if(!hasData){toast('Isi data perjalanan terlebih dahulu','error');return;}
-
-  showOv('Memproses...');
-  setTimeout(function(){
-    try{
-      analysisRes=compute(r0,r1);
-      renderResults(analysisRes);
-      renderOutput(analysisRes);
-      buildCanvas(r0,r1);
-      buildIterStates(analysisRes);
-      document.getElementById('visSection').classList.remove('hidden');
-      document.getElementById('resultsSection').classList.remove('hidden');
-      document.getElementById('outputSection').classList.remove('hidden');
-      document.getElementById('visSection').scrollIntoView({behavior:'smooth',block:'start'});
-      toast('Analisis selesai','ok');
-    }catch(err){
-      toast('Error: '+err.message,'error');
-      console.error(err);
-    }
-    hideOv();
-  },300);
-}
-
-// ============================================================
-// COMPUTE
-// ============================================================
-function compute(r0segs,r1segs){
-  var startMin=timeToMin(document.getElementById('startTime').value||'08:00');
-  var vt={B:readVT('B'),C:readVT('C'),D:readVT('D')};
-  var adm={B:readAdm('B'),C:readAdm('C'),D:readAdm('D')};
-  var note={B:readNote('B'),C:readNote('C'),D:readNote('D')};
-
-  function calcRoute(segs,seq){
-    var totTrans=0,totCost=0,totWalk=0,totTransfer=0;
-    segs.forEach(function(s){totTrans+=s.dur;totCost+=s.cost;totWalk+=s.walk;totTransfer+=s.trans;});
-    var visitSeq=seq.slice(1,-1);
-    var totVisit=0;
-    visitSeq.forEach(function(l){totVisit+=(vt[l]||0);});
-    var totAdm=0;
-    visitSeq.forEach(function(l){totAdm+=(adm[l]||0);});
-    return{segs:segs,seq:seq,totTrans:totTrans,totCost:totCost,totWalk:totWalk,
-      totTransfer:totTransfer,totVisit:totVisit,totAdm:totAdm,
-      totTime:totTrans+totVisit,vt:vt,adm:adm,note:note};
-  }
-
-  var R0=calcRoute(r0segs,['A','B','C','D','A']);
-  var R1=calcRoute(r1segs,['A','C','B','D','A']);
-
-  // Build schedule
-  function buildSched(segs,seq,startM){
-    var sched=[],cur=startM;
-    sched.push({type:'depart',time:minToTime(cur),timeTo:null,
-      label:'Mulai dari '+locNames[seq[0]]+' ('+seq[0]+')',cost:0,
-      jalur:'',notes:[]});
-
-    segs.forEach(function(s,i){
-      var arrTime=cur+s.dur;
-      // transport segment
-      sched.push({
-        type:'transport',
-        time:minToTime(cur),timeTo:minToTime(arrTime),
-        timeRange:minToTime(cur)+'-'+minToTime(arrTime),
-        label:'Perjalanan '+locNames[s.from]+' → '+locNames[s.to],
-        cost:s.cost,mode:s.mode,walk:s.walk,trans:s.trans,
-        jalur:s.jalur,notes:[]
-      });
-      cur=arrTime;
-
-      if(i<segs.length-1){
-        var dest=s.to;
-        var visitDur=vt[dest]||0;
-        var admFee=adm[dest]||0;
-        var noteText=note[dest]||'';
-        var visitEnd=cur+visitDur;
-
-        // Check makan siang (sekitar 12:00 = 720 mnt)
-        var lunchAt=750; // 12:30
-        var lunchDur=45;
-        var lunchInserted=false;
-        var schedEntries=[];
-
-        if(cur<lunchAt&&visitEnd>lunchAt+30){
-          // split visit: sebelum makan siang
-          var dur1=lunchAt-cur;
-          var dur2=visitDur-dur1;
-          schedEntries.push({
-            type:'visit',time:minToTime(cur),timeTo:minToTime(cur+dur1),
-            timeRange:minToTime(cur)+'-'+minToTime(cur+dur1),
-            label:'Berjalan mengitari area '+locNames[dest]+', berfoto'+(dest==='C'?', berbelanja souvenir':dest==='D'?', berbelanja':'')+'.',
-            cost:0,notes:buildNotes(admFee,noteText,false,true)
-          });
-          cur+=dur1;
-          // makan
-          schedEntries.push({
-            type:'lunch',time:minToTime(cur),timeTo:minToTime(cur+lunchDur),
-            timeRange:minToTime(cur)+'-'+minToTime(cur+lunchDur),
-            label:'Makan siang di area '+locNames[dest]+(dest==='B'?' ('+locNames[dest]+' atau sekitarnya)':'')+'.',
-            cost:0,notes:[]
-          });
-          cur+=lunchDur;
-          lunchInserted=true;
-          if(dur2>0){
-            schedEntries.push({
-              type:'visit',time:minToTime(cur),timeTo:minToTime(cur+dur2),
-              timeRange:minToTime(cur)+'-'+minToTime(cur+dur2),
-              label:'Melanjutkan kunjungan di '+locNames[dest]+(dest==='D'?'. '+getDspecial():'')+'.',
-              cost:0,notes:buildNotes(0,'',false,false)
-            });
-            cur+=dur2;
-          }
+    // Worth-it analysis
+    if(costDiff>0&&costDiff<=50&&(timeDiff>10||walkDiff>5)){
+        var expensiveButBetter=(cheaper==='Rute 1')?'Rute 2':'Rute 1';
+        analysis.push({type:'worth',text:'Selisih biaya hanya \u00A5'+costDiff+' (sangat kecil). '+expensiveButBetter+' yang sedikit lebih mahal justru '+(faster===expensiveButBetter?'lebih cepat '+timeDiff+' menit':'')+(lessWalk===expensiveButBetter?(faster===expensiveButBetter?' dan ':'')+'memerlukan jalan kaki lebih sedikit '+walkDiff+' menit':'')+'.'});
+        analysis.push({type:'verdict',text:'Mengorbankan \u00A5'+costDiff+' (~Rp'+Math.round(costDiff*110)+') untuk kenyamanan dan waktu SANGAT WORTHIT.'});
+    }else if(costDiff>50&&costDiff<=200){
+        if((timeDiff>15||walkDiff>10)&&cheaper!==faster){
+            analysis.push({type:'tradeoff',text:'Selisih \u00A5'+costDiff+' perlu dipertimbangkan. '+faster+' lebih cepat '+timeDiff+' menit'+((lessWalk!==cheaper)?' dan jalan kaki lebih sedikit '+walkDiff+' menit':'')+', tapi '+cheaper+' lebih murah.'});
+            var costPerMin=timeDiff>0?Math.round(costDiff/timeDiff):0;
+            analysis.push({type:'calc',text:'Cost per menit yang dihemat: ~\u00A5'+costPerMin+'/menit. '+(costPerMin<=30?'Hemat waktu lebih bernilai daripada hemat uang.':'Perlu pertimbangan personal apakah waktu atau uang lebih penting.')});
         }else{
-          schedEntries.push({
-            type:'visit',time:minToTime(cur),timeTo:minToTime(cur+visitDur),
-            timeRange:minToTime(cur)+'-'+minToTime(cur+visitDur),
-            label:'Berjalan mengitari area '+locNames[dest]+', berfoto'+(dest==='C'?', berbelanja souvenir.':dest==='D'?', berbelanja. '+getDspecial():'.'),
-            cost:0,notes:buildNotes(admFee,noteText,cur>700,cur>700)
-          });
-          cur+=visitDur;
+            analysis.push({type:'clear',text:cheaper+' jelas lebih unggul: lebih murah \u00A5'+costDiff+(cheaper===faster?' sekaligus lebih cepat ':' ')+(cheaper===lessWalk?'dan jalan kaki lebih sedikit.':'.')});
         }
-
-        sched=sched.concat(schedEntries);
-      }else{
-        // Segment terakhir: pulang ke A
-        sched.push({
-          type:'arrive',time:minToTime(cur-s.dur),timeTo:minToTime(cur),
-          timeRange:minToTime(cur-s.dur)+'-'+minToTime(cur),
-          label:'Kembali ke '+locNames[seq[0]]+' ('+seq[0]+')',
-          cost:0,notes:[]
-        });
-      }
-    });
-    return sched;
-  }
-
-  function buildNotes(admFee,noteText,hasMakan,afterMakan){
-    var notes=[];
-    if(admFee>0)notes.push('admission fee ¥'+admFee.toLocaleString()+'.');
-    else notes.push('admission fee ¥0.');
-    if(hasMakan||afterMakan){
-      if(afterMakan)notes.push('biaya makan siang ¥1000-¥1500.');
-      else notes.push('biaya makan malam ¥1000-¥1500.');
-    }
-    if(noteText&&noteText.trim())notes.push(noteText.trim());
-    return notes;
-  }
-
-  function getDspecial(){
-    return 'Area di sekitar '+locNames['D']+' dapat dieksplorasi dengan berjalan kaki.';
-  }
-
-  var sched0=buildSched(r0segs,['A','B','C','D','A'],startMin);
-  var sched1=buildSched(r1segs,['A','C','B','D','A'],startMin);
-
-  var winCost=R0.totCost<=R1.totCost?'r0':'r1';
-  var winTime=R0.totTime<=R1.totTime?'r0':'r1';
-  var winWalk=R0.totWalk<=R1.totWalk?'r0':'r1';
-  var winTrans=R0.totTransfer<=R1.totTransfer?'r0':'r1';
-  var sc0=0,sc1=0;
-  [winCost,winTime,winWalk,winTrans].forEach(function(w){if(w==='r0')sc0++;else sc1++;});
-
-  return{R0:R0,R1:R1,sched0:sched0,sched1:sched1,
-    winCost:winCost,winTime:winTime,winWalk:winWalk,winTrans:winTrans,
-    sc0:sc0,sc1:sc1,recommended:sc0>=sc1?'r0':'r1',vt:vt,adm:adm,note:note};
-}
-
-// ============================================================
-// RENDER RESULTS (Tab Perbandingan, Langkah, Analisis)
-// ============================================================
-function renderResults(res){
-  // Stats
-  var costDiff=Math.abs(res.R0.totCost-res.R1.totCost);
-  var timeDiff=Math.abs(res.R0.totTime-res.R1.totTime);
-  document.getElementById('summaryStats').innerHTML=
-    mStat('¥'+res.R0.totCost.toLocaleString(),'Total Biaya Rute 1',res.recommended==='r0'?'hl':'')+
-    mStat('¥'+res.R1.totCost.toLocaleString(),'Total Biaya Rute 2',res.recommended==='r1'?'hl':'')+
-    mStat('¥'+costDiff.toLocaleString(),'Selisih Biaya','')+
-    mStat(timeDiff+' mnt','Selisih Waktu Total','');
-
-  // CMP Table
-  var rows=[
-    {lbl:'Urutan Rute',v0:'A-B-C-D-A',v1:'A-C-B-D-A',key:''},
-    {lbl:'Biaya Transport',v0:'¥'+res.R0.totCost.toLocaleString(),v1:'¥'+res.R1.totCost.toLocaleString(),key:'cost'},
-    {lbl:'Waktu Transport',v0:res.R0.totTrans+' mnt',v1:res.R1.totTrans+' mnt',key:'trans'},
-    {lbl:'Waktu Kunjungan',v0:res.R0.totVisit+' mnt',v1:res.R1.totVisit+' mnt',key:''},
-    {lbl:'Total Waktu',v0:res.R0.totTime+' mnt',v1:res.R1.totTime+' mnt',key:'time'},
-    {lbl:'Jalan Kaki',v0:res.R0.totWalk+' mnt',v1:res.R1.totWalk+' mnt',key:'walk'},
-    {lbl:'Jumlah Transfer',v0:res.R0.totTransfer+'x',v1:res.R1.totTransfer+'x',key:'transf'},
-  ];
-  var winMap={cost:{r0:res.R0.totCost,r1:res.R1.totCost},trans:{r0:res.R0.totTrans,r1:res.R1.totTrans},
-    time:{r0:res.R0.totTime,r1:res.R1.totTime},walk:{r0:res.R0.totWalk,r1:res.R1.totWalk},
-    transf:{r0:res.R0.totTransfer,r1:res.R1.totTransfer}};
-  var html='<thead><tr><th>Kriteria</th><th>Rute 1 (A-B-C-D-A)</th><th>Rute 2 (A-C-B-D-A)</th></tr></thead><tbody>';
-  rows.forEach(function(r){
-    var w=r.key&&winMap[r.key];
-    var w0=w&&w.r0<=w.r1;var w1=w&&w.r1<w.r0;
-    html+='<tr><td style="font-weight:500">'+r.lbl+'</td>'
-      +'<td>'+r.v0+(w0?'<span class="cmp-winner">lebih baik</span>':'')+'</td>'
-      +'<td>'+r.v1+(w1?'<span class="cmp-winner">lebih baik</span>':'')+'</td></tr>';
-  });
-  html+='<tr style="background:var(--bg)"><td style="font-weight:700;font-family:\'JetBrains Mono\',monospace">Rekomendasi</td>'
-    +'<td colspan="2" style="font-weight:700;font-family:\'JetBrains Mono\',monospace">'
-    +(res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')
-    +' — skor '+(res.recommended==='r0'?res.sc0:res.sc1)+'/4 kriteria</td></tr>';
-  html+='</tbody>';
-  document.getElementById('cmpTable').innerHTML=html;
-
-  // Rec box
-  var rName=res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)';
-  var reasons=[];
-  if(res.winCost===res.recommended)reasons.push('biaya lebih hemat (selisih ¥'+Math.abs(res.R0.totCost-res.R1.totCost).toLocaleString()+')');
-  if(res.winTime===res.recommended)reasons.push('total waktu lebih singkat (selisih '+Math.abs(res.R0.totTime-res.R1.totTime)+' menit)');
-  if(res.winTrans===res.recommended)reasons.push('jumlah transfer lebih sedikit');
-  if(res.winWalk===res.recommended)reasons.push('waktu berjalan kaki lebih pendek');
-  document.getElementById('recBox').innerHTML=
-    '<div class="rec-header">Rekomendasi</div>'
-    +'<div class="rec-winner-badge">'+rName+'</div>'
-    +'<div class="rec-content">Berdasarkan analisis empat kriteria, '
-    +'<strong style="color:var(--text)">'+rName+'</strong> lebih optimal '
-    +(reasons.length?'dengan keunggulan pada '+reasons.join(', ')+'.':'.')
-    +'</div>';
-
-  // Analisis
-  document.getElementById('analysisContent').innerHTML=buildAnalysis(res);
-}
-
-function mStat(val,lbl,cls){
-  return '<div class="stat '+(cls||'')+'"><div class="stat-val">'+val+'</div><div class="stat-lbl">'+lbl+'</div></div>';
-}
-
-function buildAnalysis(res){
-  var costDiff=Math.abs(res.R0.totCost-res.R1.totCost);
-  var timeDiff=Math.abs(res.R0.totTime-res.R1.totTime);
-  return '<div style="line-height:1.8;font-size:13px;color:var(--sub)">'
-    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Konteks</div>'
-    +'<p style="margin-bottom:14px">Perjalanan one day tour di Tokyo dengan titik start dan finish di <strong style="color:var(--text)">'+locNames.A+'</strong>. Urutan kunjungan taman (<strong style="color:var(--text)">'+locNames.B+'</strong>), landmark (<strong style="color:var(--text)">'+locNames.C+'</strong>), dan pusat perbelanjaan (<strong style="color:var(--text)">'+locNames.D+'</strong>) menentukan efisiensi rute.</p>'
-    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Biaya Transportasi</div>'
-    +'<p style="margin-bottom:14px">Rute 1: <strong style="color:var(--text)">¥'+res.R0.totCost.toLocaleString()+'</strong> | Rute 2: <strong style="color:var(--text)">¥'+res.R1.totCost.toLocaleString()+'</strong>. Selisih <strong style="color:var(--text)">¥'+costDiff.toLocaleString()+'</strong>. '+(res.winCost==='r0'?'Rute 1':'Rute 2')+' lebih hemat.</p>'
-    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Waktu</div>'
-    +'<p style="margin-bottom:14px">Total waktu Rute 1: <strong style="color:var(--text)">'+res.R0.totTime+' mnt</strong> | Rute 2: <strong style="color:var(--text)">'+res.R1.totTime+' mnt</strong>. Selisih '+timeDiff+' menit. '+(res.winTime==='r0'?'Rute 1':'Rute 2')+' lebih efisien.</p>'
-    +'<div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1.2px;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px">Kesimpulan</div>'
-    +'<p><strong style="color:var(--text)">'+(res.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)')+'</strong> direkomendasikan dengan skor '+(res.recommended==='r0'?res.sc0:res.sc1)+' dari 4 kriteria evaluasi.</p>'
-    +'</div>';
-}
-
-// ============================================================
-// RENDER OUTPUT — FORMAT MIRIP PDF TUGAS
-// ============================================================
-function renderOutput(res){
-  renderOutRoute(res,'r0',0);
-  renderOutRoute(res,'r1',1);
-}
-
-function renderOutRoute(res,rk,ri){
-  var R=ri===0?res.R0:res.R1;
-  var sched=ri===0?res.sched0:res.sched1;
-  var seq=ri===0?['A','B','C','D','A']:['A','C','B','D','A'];
-  var rName='Alternatif '+(ri+1)+' ('+(ri===0?'A-B-C-D-A':'A-C-B-D-A')+')';
-  var dateStr=formatDateID(new Date(document.getElementById('tourDate').value+'T12:00:00'));
-
-  var html='';
-
-  // Header block
-  html+='<div class="info-block" style="margin-bottom:16px">'
-    +'<div style="text-align:center;margin-bottom:14px">'
-      +'<div style="font-size:15px;font-weight:700;margin-bottom:4px">Rencana Perjalanan '+rName+'</div>'
-      +'<div style="font-size:13px;font-weight:600;margin-bottom:4px">'+dateStr+'</div>'
-    +'</div>'
-    +'<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13px;margin-bottom:14px">'
-      +'<span style="color:var(--sub)">Disusun oleh</span><span>:</span>'
-      +'<span style="color:var(--sub)">Nama</span><span>: <strong>'+(document.getElementById('studentName').value||'—')+'</strong></span>'
-      +'<span style="color:var(--sub)">Kelas</span><span>: '+(document.getElementById('studentClass').value||'—')+'</span>'
-      +'<span style="color:var(--sub)">NIM</span><span>: <span class="mono">'+(document.getElementById('nimInput').value||'—')+'</span></span>'
-    +'</div>'
-    // Tabel lokasi NIM
-    +'<table class="nim-tbl">'
-      +'<thead><tr><th>Angka NIM</th><th>Lokasi</th><th></th></tr></thead>'
-      +'<tbody>'
-      +['A','B','C','D'].map(function(l){
-        return '<tr><td>'+nimDigits[l]+'</td><td>'+l+'</td><td style="font-weight:600">'+locNames[l]+'</td></tr>';
-      }).join('')
-      +'</tbody>'
-    +'</table>'
-    +'</div>';
-
-  // OUTPUT TABLE
-  html+='<div class="output-section">'
-    +'<table class="out-table">'
-    +'<thead><tr>'
-      +'<th style="width:90px">Waktu</th>'
-      +'<th>Kegiatan</th>'
-      +'<th style="width:130px;text-align:right">Biaya Transportasi</th>'
-    +'</tr></thead>'
-    +'<tbody>';
-
-  var totalCost=0;
-
-  sched.forEach(function(s){
-    if(s.type==='depart')return; // skip depart row (sudah implisit)
-
-    var timeCell=s.timeRange||s.time||'';
-    var costCell='';
-    if(s.type==='transport'&&s.cost>0){
-      costCell='¥'+s.cost.toLocaleString();
-      totalCost+=s.cost;
-    }
-
-    var actHtml='';
-
-    if(s.type==='transport'){
-      // Judul perjalanan
-      actHtml+='<div class="out-act-title">'+s.label+'</div>';
-      // Jalur alternatif (dari input user)
-      if(s.jalur&&s.jalur.trim()){
-        actHtml+='<div class="out-act-body">Alternatif jalur:</div>';
-        actHtml+='<div class="out-jalur-dipilih">'+escHtml(s.jalur.trim())+'</div>';
-      }
-      if(s.walk){
-        actHtml+='<div style="font-size:12px;color:var(--sub);margin-top:4px">Waktu berjalan kaki: '+s.walk+' mnt</div>';
-      }
-      if(s.trans){
-        actHtml+='<div style="font-size:12px;color:var(--sub)">Jumlah transfer: '+s.trans+'x</div>';
-      }
-    } else if(s.type==='visit'){
-      actHtml+='<div class="out-act-title">'+s.label+'</div>';
-      if(s.notes&&s.notes.length){
-        actHtml+='<div class="out-catatan">Catatan:</div>';
-        s.notes.forEach(function(n){
-          actHtml+='<div class="out-catatan-item">'+escHtml(n)+'</div>';
-        });
-      }
-    } else if(s.type==='lunch'){
-      actHtml+='<div class="out-act-title">'+s.label+'</div>';
-      actHtml+='<div style="font-size:12px;color:var(--sub);margin-top:4px">Catatan: biaya makan siang ¥1000-¥1500.</div>';
-    } else if(s.type==='arrive'){
-      actHtml+='<div class="out-act-title">'+s.label+'</div>';
-    }
-
-    html+='<tr>'
-      +'<td class="out-row-time">'+timeCell+'</td>'
-      +'<td class="out-row-act">'+actHtml+'</td>'
-      +'<td class="out-row-cost">'+costCell+'</td>'
-      +'</tr>';
-  });
-
-  // Total row
-  html+='<tr class="out-total-row">'
-    +'<td class="out-row-time" colspan="2" style="text-align:right;border-left:none;padding:14px">Total Biaya:</td>'
-    +'<td class="out-row-cost" style="font-size:15px">¥'+totalCost.toLocaleString()+'</td>'
-    +'</tr>';
-
-  html+='</tbody></table></div>';
-
-  document.getElementById('outR'+ri).innerHTML=html;
-}
-
-function escHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ============================================================
-// ITER STATES
-// ============================================================
-function buildIterStates(res){
-  iterStates=[];curIter=0;
-
-  iterStates.push(mkSt('Inisialisasi — 4 Titik Perjalanan',
-    'Empat lokasi ditentukan dari digit NIM. Dua rute alternatif: A-B-C-D-A dan A-C-B-D-A.',
-    [{text:'4 lokasi',cls:''},{text:'2 rute',cls:'blue'}],[],[],-1,-1));
-
-  var r0segs=res.R0.segs,r1segs=res.R1.segs;
-
-  r0segs.forEach(function(s,i){
-    iterStates.push(mkSt(
-      'Rute 1 — Seg '+(i+1)+': '+s.from+' ke '+s.to,
-      locNames[s.from]+' → '+locNames[s.to]+' | '+s.dur+' mnt | ¥'+s.cost.toLocaleString()+(s.walk?' | jalan '+s.walk+' mnt':''),
-      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'}],
-      [i,i+1],[s.from,s.to],0,i));
-  });
-
-  iterStates.push(mkSt('Rute 1 — Selesai',
-    'Total biaya: ¥'+res.R0.totCost.toLocaleString()+' | Total waktu: '+res.R0.totTime+' mnt',
-    [{text:'¥'+res.R0.totCost.toLocaleString(),cls:'amber'},{text:res.R0.totTime+' mnt',cls:'blue'}],
-    [0,1,2,3,4],[],0,-1));
-
-  r1segs.forEach(function(s,i){
-    iterStates.push(mkSt(
-      'Rute 2 — Seg '+(i+1)+': '+s.from+' ke '+s.to,
-      locNames[s.from]+' → '+locNames[s.to]+' | '+s.dur+' mnt | ¥'+s.cost.toLocaleString()+(s.walk?' | jalan '+s.walk+' mnt':''),
-      [{text:'¥'+s.cost.toLocaleString(),cls:'amber'},{text:s.dur+' mnt',cls:'blue'}],
-      [i,i+1],[s.from,s.to],1,i));
-  });
-
-  iterStates.push(mkSt('Rute 2 — Selesai',
-    'Total biaya: ¥'+res.R1.totCost.toLocaleString()+' | Total waktu: '+res.R1.totTime+' mnt',
-    [{text:'¥'+res.R1.totCost.toLocaleString(),cls:'amber'},{text:res.R1.totTime+' mnt',cls:'blue'}],
-    [0,1,2,3,4],[],1,-1));
-
-  iterStates.push(mkSt('Perbandingan & Rekomendasi',
-    (res.recommended==='r0'?'Rute 1':'Rute 2')+' direkomendasikan — skor '+(res.recommended==='r0'?res.sc0:res.sc1)+'/4 kriteria',
-    [{text:'rekomendasi',cls:'green'}],[0,1,2,3,4],[],res.recommended==='r0'?0:1,-1));
-
-  // Build timeline
-  var tl=document.getElementById('tlWrap');
-  tl.innerHTML='';
-  iterStates.forEach(function(st,i){
-    var d=document.createElement('div');
-    d.className='tl-item'+(i===curIter?' active':'');
-    d.onclick=(function(idx){return function(){iterGo(idx);};})(i);
-    var tags=st.tags.map(function(t){return '<span class="tl-tag '+t.cls+'">'+t.text+'</span>';}).join('');
-    d.innerHTML='<div class="tl-title">'+st.title+'</div>'
-      +'<div class="tl-detail">'+st.summary+'</div>'
-      +'<div class="tl-meta">'+tags+'</div>';
-    tl.appendChild(d);
-  });
-
-  setupIterCtrl();
-  iterGo(iterStates.length-1);
-}
-
-function mkSt(title,summary,tags,activeEdge,activeNodes,activeRoute,activeSegIdx){
-  return{title:title,summary:summary,tags:tags,
-    activeEdge:activeEdge,activeNodes:activeNodes,
-    activeRoute:activeRoute,activeSegIdx:activeSegIdx};
-}
-
-// ============================================================
-// CANVAS
-// ============================================================
-function buildCanvas(r0segs,r1segs){
-  cv_el=document.getElementById('cv');
-  ctx=cv_el.getContext('2d');
-  CVW=cv_el.parentElement.offsetWidth;
-  cv_el.style.height=CVH+'px';
-
-  var cx=CVW/2,cy=CVH/2,r=Math.min(CVW,CVH)*.33;
-  var angles=[-Math.PI/2,Math.PI,0,Math.PI/2];
-  canvasNodes=[
-    {id:'A',x:cx+r*Math.cos(angles[0]),y:cy+r*Math.sin(angles[0])},
-    {id:'B',x:cx+r*Math.cos(angles[1]),y:cy+r*Math.sin(angles[1])},
-    {id:'C',x:cx+r*Math.cos(angles[2]),y:cy+r*Math.sin(angles[2])},
-    {id:'D',x:cx+r*Math.cos(angles[3]),y:cy+r*Math.sin(angles[3])}
-  ];
-  nodePos=canvasNodes.map(function(n){return{x:n.x,y:n.y};});
-
-  canvasEdges=[];
-  var seenEdges={};
-  function addEdge(s,route){
-    var key=s.from+'-'+s.to;
-    var rkey=s.to+'-'+s.from;
-    if(seenEdges[key]){seenEdges[key].route=-1;return;}
-    if(seenEdges[rkey]){seenEdges[rkey].route=-1;return;}
-    var e={from:s.from,to:s.to,dur:s.dur,cost:s.cost,mode:s.mode,route:route,segIdx:canvasEdges.length};
-    canvasEdges.push(e);seenEdges[key]=e;
-  }
-  r0segs.forEach(function(s){addEdge(s,0);});
-  r1segs.forEach(function(s){addEdge(s,1);});
-
-  setupDrag();
-  drawCanvas(-1,-1);
-}
-
-function getNodeIdx(id){return canvasNodes.findIndex(function(n){return n.id===id;});}
-
-function drawCanvas(activeRoute,activeSegIdx){
-  if(!cv_el||!ctx)return;
-  var dpr=window.devicePixelRatio||1;
-  CVW=cv_el.parentElement.offsetWidth;
-  cv_el.width=CVW*dpr;cv_el.height=CVH*dpr;
-  cv_el.style.width=CVW+'px';cv_el.style.height=CVH+'px';
-  ctx.scale(dpr*sc,dpr*sc);
-
-  var bg=getCss('--canvas-bg');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,CVW*2,CVH*2);
-
-  // Edges
-  canvasEdges.forEach(function(e,ei){
-    var fi=getNodeIdx(e.from),ti=getNodeIdx(e.to);
-    if(fi<0||ti<0)return;
-    var fp=nodePos[fi],tp=nodePos[ti];
-    var show=activeRoute===-1||(e.route===activeRoute||e.route===-1);
-    var isHl=(activeRoute>=0&&(e.route===activeRoute||e.route===-1)&&activeSegIdx>=0&&e.segIdx===activeSegIdx);
-
-    var col=e.route===0?'#2980b9':e.route===1?'#c0392b':'#888';
-    var lw=e.route===-1?2:1.8;
-    ctx.globalAlpha=show?1:.12;
-
-    if(isHl){
-      ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=12;ctx.globalAlpha=.1;
-      ctx.moveTo(fp.x,fp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
-      ctx.globalAlpha=1;lw=3.5;
-    }
-
-    ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=lw;
-    ctx.moveTo(fp.x,fp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
-
-    // Arrow
-    var mx=(fp.x+tp.x)/2,my=(fp.y+tp.y)/2;
-    var ang=Math.atan2(tp.y-fp.y,tp.x-fp.x),as=9;
-    ctx.beginPath();
-    ctx.moveTo(mx+Math.cos(ang)*as,my+Math.sin(ang)*as);
-    ctx.lineTo(mx+Math.cos(ang-2.6)*as*.65,my+Math.sin(ang-2.6)*as*.65);
-    ctx.lineTo(mx+Math.cos(ang+2.6)*as*.65,my+Math.sin(ang+2.6)*as*.65);
-    ctx.closePath();ctx.fillStyle=col;ctx.fill();
-
-    // Label biaya
-    if(show&&e.cost){
-      var lx=(fp.x+tp.x)/2,ly=(fp.y+tp.y)/2-14;
-      ctx.globalAlpha=.85;
-      ctx.fillStyle=bg;ctx.fillRect(lx-28,ly-8,56,14);
-      ctx.fillStyle=col;ctx.font='500 10px JetBrains Mono,monospace';
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText('¥'+e.cost+(e.dur?' '+e.dur+'m':''),lx,ly);
-    }
-    ctx.globalAlpha=1;
-  });
-
-  // Nodes
-  canvasNodes.forEach(function(n,ni){
-    var p=nodePos[ni];
-    var isHl=activeRoute>=0&&analysisRes&&(
-      (activeRoute===0&&['A','B','C','D'][ni]!=null)||
-      (activeRoute===1)
-    );
-    var nodeFill=getCss('--node-fill'),nodeStroke=getCss('--node-stroke'),textC=getCss('--text');
-    var nr=22;
-
-    ctx.beginPath();ctx.arc(p.x,p.y,nr,0,Math.PI*2);
-    ctx.fillStyle=nodeFill;ctx.strokeStyle=nodeStroke;ctx.lineWidth=1.5;
-    ctx.fill();ctx.stroke();
-
-    ctx.fillStyle=textC;ctx.font='700 13px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(n.id,p.x,p.y);
-
-    var name=locNames[n.id]||n.id;
-    if(name.length>14)name=name.slice(0,13)+'…';
-    ctx.fillStyle=getCss('--sub');ctx.font='400 9px DM Sans,sans-serif';
-    ctx.fillText(name,p.x,p.y+nr+10);
-  });
-
-  // Legend
-  var lx=12,ly=CVH/sc-14;
-  [{col:'#2980b9',lbl:'Rute 1'},{col:'#c0392b',lbl:'Rute 2'},{col:'#888',lbl:'Keduanya'}].forEach(function(it,i){
-    var ix=lx+i*82;
-    ctx.beginPath();ctx.moveTo(ix,ly);ctx.lineTo(ix+18,ly);
-    ctx.strokeStyle=it.col;ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle=getCss('--sub');ctx.font='400 10px DM Sans,sans-serif';
-    ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillText(it.lbl,ix+22,ly);
-  });
-
-  // Watermark
-  ctx.globalAlpha=.07;ctx.fillStyle=getCss('--sub');
-  ctx.font='700 11px JetBrains Mono,monospace';ctx.textAlign='right';ctx.textBaseline='bottom';
-  ctx.fillText('RAD STRIX',CVW/sc-10,CVH/sc-10);ctx.globalAlpha=1;
-}
-
-function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
-
-var _hlRoute=-1;
-function hlRoute(r){_hlRoute=r;drawCanvas(r,-1);}
-
-function drawCurrent(){
-  if(!iterStates.length){drawCanvas(-1,-1);return;}
-  var st=iterStates[curIter];
-  drawCanvas(st.activeRoute,st.activeSegIdx);
-}
-
-// DRAG
-function setupDrag(){
-  if(!cv_el)return;
-  cv_el.addEventListener('mousedown',sdrag);
-  cv_el.addEventListener('mousemove',mdrag);
-  cv_el.addEventListener('mouseup',edrag);
-  cv_el.addEventListener('touchstart',function(e){e.preventDefault();sdrag(e.touches[0]);},{passive:false});
-  cv_el.addEventListener('touchmove',function(e){e.preventDefault();mdrag(e.touches[0]);},{passive:false});
-  cv_el.addEventListener('touchend',edrag);
-}
-function gxy(e){var r=cv_el.getBoundingClientRect();return{x:(e.clientX-r.left)/sc,y:(e.clientY-r.top)/sc};}
-function sdrag(e){var p=gxy(e);di=-1;canvasNodes.forEach(function(n,i){var np=nodePos[i];var dx=p.x-np.x,dy=p.y-np.y;if(dx*dx+dy*dy<22*22){di=i;dOff={x:dx,y:dy};}});}
-function mdrag(e){if(di<0)return;var p=gxy(e);nodePos[di]={x:p.x-dOff.x,y:p.y-dOff.y};drawCurrent();}
-function edrag(){di=-1;}
-
-function zI(){sc=Math.min(3,sc+.15);drawCurrent();}
-function zO(){sc=Math.max(.4,sc-.15);drawCurrent();}
-function zReset(){
-  sc=1;
-  var cx=CVW/2,cy=CVH/2,r=Math.min(CVW,CVH)*.33;
-  var angles=[-Math.PI/2,Math.PI,0,Math.PI/2];
-  nodePos=canvasNodes.map(function(n,i){return{x:cx+r*Math.cos(angles[i]),y:cy+r*Math.sin(angles[i])};});
-  drawCurrent();
-}
-function savePNG(){
-  if(!cv_el){toast('Visualisasi belum tersedia','error');return;}
-  var a=document.createElement('a');a.download='tokyo-tour-map.png';a.href=cv_el.toDataURL('image/png');a.click();
-  toast('Gambar disimpan','ok');
-}
-
-// ============================================================
-// ITER CONTROL
-// ============================================================
-function setupIterCtrl(){
-  document.getElementById('iterCtrlWrap').classList.remove('hidden');
-  updateIterUI();
-}
-function iterGo(idx){
-  if(!iterStates.length)return;
-  idx=Math.max(0,Math.min(iterStates.length-1,idx));
-  curIter=idx;updateIterUI();drawCurrent();showIterChanges();
-  document.querySelectorAll('.tl-item').forEach(function(el,i){el.classList.toggle('active',i===curIter);});
-}
-function updateIterUI(){
-  var tot=iterStates.length;
-  document.getElementById('iterBadge').textContent=(curIter+1)+'/'+tot;
-  document.getElementById('iterLabel').textContent=iterStates[curIter]?iterStates[curIter].title:'';
-  document.getElementById('iBF').disabled=curIter===0;
-  document.getElementById('iBP').disabled=curIter===0;
-  document.getElementById('iBN').disabled=curIter>=tot-1;
-  document.getElementById('iBL').disabled=curIter>=tot-1;
-}
-function showIterChanges(){
-  var st=iterStates[curIter];if(!st)return;
-  document.getElementById('iterChanges').innerHTML=
-    '<strong style="font-size:12px;font-family:\'JetBrains Mono\',monospace">'+st.title+'</strong>'
-    +'<br><span style="color:var(--sub)">'+st.summary+'</span>';
-}
-function togglePlay(){
-  if(_playing){clearInterval(playInterval);playInterval=null;_playing=false;document.getElementById('playBtn').textContent='play';}
-  else{
-    if(curIter>=iterStates.length-1)curIter=0;
-    _playing=true;document.getElementById('playBtn').textContent='pause';
-    playInterval=setInterval(function(){if(curIter>=iterStates.length-1){stopPlay();return;}iterGo(curIter+1);},playSpd);
-  }
-}
-function stopPlay(){clearInterval(playInterval);playInterval=null;_playing=false;document.getElementById('playBtn').textContent='play';}
-function setSpd(v){playSpd=parseInt(v);if(_playing){stopPlay();togglePlay();}}
-
-// ============================================================
-// TAB SWITCHING
-// ============================================================
-function switchTab2(idx,btn){
-  ['inp0','inp1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('inp'+idx).classList.add('active');btn.classList.add('active');
-}
-function switchTabR(idx,btn){
-  ['rTab0','rTab1','rTab2'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('rTab'+idx).classList.add('active');btn.classList.add('active');
-}
-function switchTabO(idx,btn){
-  ['oTab0','oTab1'].forEach(function(p){document.getElementById(p).classList.remove('active');});
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('oTab'+idx).classList.add('active');btn.classList.add('active');
-}
-
-// ============================================================
-// DEMO DATA
-// ============================================================
-function fillDemo(){
-  if(!locNames.A){toast('Masukkan NIM dulu','error');return;}
-  var demoR0=[[29,208,'Kereta/Train',1,4,'Jalur yang dipilih adalah alternatif pertama (¥208, walk 4 min).'],
-               [27,286,'Subway',1,5,'Jalur yang dipilih adalah alternatif pertama (¥286, walk 5 min).'],
-               [47,545,'Subway',2,11,'Jalur yang dipilih adalah alternatif pertama (¥545, walk 11 min).'],
-               [28,481,'Kereta/Train',1,8,'Jalur yang dipilih adalah alternatif pertama (¥481, walk 8 min).']];
-  var demoR1=[[26,386,'Kereta/Train',1,7,'Jalur yang dipilih adalah alternatif kedua (¥386, walk 7 min).'],
-               [31,286,'Subway',1,12,'Jalur yang dipilih adalah alternatif kedua (¥286, walk 12 min).'],
-               [59,597,'Subway',2,13,'Jalur yang dipilih adalah alternatif pertama (¥597, walk 13 min).'],
-               [30,481,'Kereta/Train',1,11,'Jalur yang dipilih adalah alternatif pertama (¥481, walk 11 min).']];
-
-  [demoR0,demoR1].forEach(function(demo,ri){
-    demo.forEach(function(d,si){
-      var setV=function(id,v){var el=document.getElementById(id);if(el)el.value=v;};
-      setV('r'+ri+'_dur_'+si,d[0]);
-      setV('r'+ri+'_cost_'+si,d[1]);
-      setV('r'+ri+'_mode_'+si,d[2]);
-      setV('r'+ri+'_trans_'+si,d[3]);
-      setV('r'+ri+'_walk_'+si,d[4]);
-      setV('r'+ri+'_jalur_'+si,d[5]);
-    });
-  });
-  // visit times
-  var setV=function(id,v){var el=document.getElementById(id);if(el)el.value=v;};
-  setV('vt_B',121);setV('vt_C',153);setV('vt_D',276);
-  setV('adm_B',300);setV('adm_C',0);setV('adm_D',0);
-  toast('Contoh data diisi','ok');
-}
-
-function clearAll(){
-  [0,1].forEach(function(ri){
-    for(var si=0;si<4;si++){
-      ['dur','cost','trans','walk','jalur'].forEach(function(f){
-        var el=document.getElementById('r'+ri+'_'+f+'_'+si);if(el)el.value='';
-      });
-    }
-  });
-  toast('Input direset');
-}
-
-// ============================================================
-// MUSIC
-// ============================================================
-var musicOn=false;
-var ytLinks=[
-  {id:'jfKfPfyJRdk',title:'lofi hip hop radio'},
-  {id:'5qap5aO4i9A',title:'lofi girl — study beats'},
-  {id:'lTRiuFIWV54',title:'chillhop essentials'},
-];
-var curTrack=0;
-function toggleMusic(){
-  if(!musicOn){
-    var t=ytLinks[curTrack];
-    document.getElementById('ytFrame').src=
-      'https://www.youtube.com/embed/'+t.id+'?autoplay=1&loop=1&playlist='+t.id+'&controls=0&mute=0';
-    musicOn=true;
-    document.getElementById('musicDot').classList.remove('paused');
-    document.getElementById('musicBtn').textContent='stop';
-    document.getElementById('musicTitle').textContent=t.title;
-    toast('Memutar: '+t.title,'ok');
-  }else{
-    document.getElementById('ytFrame').src='';
-    musicOn=false;
-    document.getElementById('musicDot').classList.add('paused');
-    document.getElementById('musicBtn').textContent='play';
-    document.getElementById('musicTitle').textContent='lo-fi';
-  }
-}
-
-// ============================================================
-// PDF EXPORT
-// ============================================================
-async function printPDF(){
-  if(!analysisRes){toast('Jalankan analisis terlebih dahulu','error');return;}
-  showOv('Membuat PDF...');
-  try{
-    var {jsPDF}=window.jspdf;
-    var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    var pw=210,ph=297,mg=15,cw=pw-mg*2,y=mg;
-    var tC=[26,26,26],sC=[136,136,136],lC=[220,220,220];
-
-    function need(h){if(y+h>ph-mg){doc.addPage();y=mg;footer();}}
-    function footer(){
-      var pg=doc.internal.getCurrentPageInfo().pageNumber;
-      doc.setFontSize(8);doc.setTextColor(...sC);
-      doc.text('RAD STRIX — Tokyo Tour Optimizer — Hal '+pg,pw-mg,ph-7,{align:'right'});
-      doc.setTextColor(...tC);
-    }
-
-    function renderRouteOnPDF(ri){
-      var R=ri===0?analysisRes.R0:analysisRes.R1;
-      var sched=ri===0?analysisRes.sched0:analysisRes.sched1;
-      var rName='Rencana Perjalanan Alternatif '+(ri+1)+' ('+(ri===0?'A-B-C-D-A':'A-C-B-D-A')+')';
-      var dateStr=formatDateID(new Date(document.getElementById('tourDate').value+'T12:00:00'));
-
-      // Header
-      doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(...tC);
-      doc.text(rName,pw/2,y,{align:'center'});y+=7;
-      doc.setFont('helvetica','normal');doc.setFontSize(11);
-      doc.text(dateStr,pw/2,y,{align:'center'});y+=10;
-
-      // Identitas
-      doc.setFontSize(9);
-      var rows=[
-        ['Disusun oleh',':'],
-        ['Nama',': '+(document.getElementById('studentName').value||'—')],
-        ['Kelas',': '+(document.getElementById('studentClass').value||'—')],
-        ['NIM',': '+(document.getElementById('nimInput').value||'—')],
-      ];
-      rows.forEach(function(r){
-        doc.setFont('helvetica','normal');
-        doc.text(r[0],mg,y);doc.text(r[1],mg+30,y);y+=5;
-      });
-      y+=4;
-
-      // Tabel lokasi NIM
-      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
-      doc.text('Angka NIM',mg,y);doc.text('Lok.',mg+22,y);doc.text('Lokasi',mg+32,y);
-      doc.setDrawColor(...lC);doc.line(mg,y+1,mg+cw,y+1);y+=6;
-      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...tC);
-      ['A','B','C','D'].forEach(function(l){
-        doc.text(''+nimDigits[l],mg+4,y);
-        doc.text(l,mg+22,y);
-        doc.text(locNames[l],mg+32,y);
-        y+=5;
-      });
-      y+=6;
-
-      // Tabel output
-      var col={time:22,act:cw-22-28,cost:28};
-      // Header baris
-      doc.setFillColor(240,240,240);doc.rect(mg,y,cw,7,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
-      doc.text('Waktu',mg+2,y+5);
-      doc.text('Kegiatan',mg+col.time+2,y+5);
-      doc.text('Biaya',mg+col.time+col.act+2,y+5);
-      y+=7;
-
-      var totalPDF=0;
-      sched.forEach(function(s){
-        if(s.type==='depart')return;
-        var costStr=s.type==='transport'&&s.cost>0?'¥'+s.cost.toLocaleString():'';
-        if(s.type==='transport'&&s.cost>0)totalPDF+=s.cost;
-
-        // Build text lines
-        var lines=[s.label];
-        if(s.type==='transport'){
-          if(s.jalur&&s.jalur.trim()){lines.push('Alternatif jalur:');lines.push(s.jalur.trim());}
-          if(s.walk)lines.push('Waktu berjalan kaki: '+s.walk+' mnt');
-        }else if(s.type==='visit'&&s.notes&&s.notes.length){
-          lines.push('Catatan:');s.notes.forEach(function(n){lines.push('  '+n);});
-        }else if(s.type==='lunch'){
-          lines.push('Catatan: biaya makan siang ¥1000-¥1500.');
+    }else if(costDiff>200){
+        analysis.push({type:'significant',text:'Selisih biaya \u00A5'+costDiff+' cukup signifikan (~Rp'+Math.round(costDiff*110)+'). '+cheaper+' menghemat cukup banyak.'});
+        if(cheaper!==faster){
+            analysis.push({type:'tradeoff',text:'Namun '+faster+' lebih cepat '+timeDiff+' menit. Pertimbangkan apakah waktu senilai \u00A5'+Math.round(costDiff/Math.max(timeDiff,1))+'/menit worthit untuk Anda.'});
         }
-
-        // Estimate height
-        var h=lines.length*5+6;
-        need(h+4);
-
-        var rowY=y;
-        doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...tC);
-        doc.text(s.timeRange||s.time||'',mg+2,y+5);
-
-        // Act column
-        var actX=mg+col.time+2;
-        lines.forEach(function(ln,li){
-          if(li===0)doc.setFont('helvetica','bold');else doc.setFont('helvetica','normal');
-          doc.setFontSize(li===0?9:8);
-          doc.setTextColor(li===0?tC:sC);
-          // word wrap
-          var wrapped=doc.splitTextToSize(ln,col.act-4);
-          wrapped.forEach(function(wl,wi){
-            doc.text(wl,actX,y+5);y+=5;
-          });
-          if(li<lines.length-1)doc.setFont('helvetica','normal');
-        });
-
-        if(costStr){
-          doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...tC);
-          doc.text(costStr,mg+col.time+col.act+2,rowY+5);
-        }
-
-        y+=4;
-        doc.setDrawColor(...lC);doc.line(mg,y,mg+cw,y);y+=2;
-      });
-
-      // Total
-      need(12);
-      doc.setFillColor(240,240,240);doc.rect(mg,y,cw,10,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...tC);
-      doc.text('Total Biaya:',mg+col.time+col.act-20,y+7);
-      doc.text('¥'+totalPDF.toLocaleString(),mg+col.time+col.act+2,y+7);
-      y+=16;
+    }else if(costDiff===0){
+        analysis.push({type:'equal',text:'Biaya transportasi kedua rute SAMA. Keputusan murni berdasarkan waktu dan kenyamanan.'});
+        if(timeDiff>0)analysis.push({type:'tiebreak',text:faster+' lebih cepat '+timeDiff+' menit — menjadi pilihan yang jelas lebih baik.'});
     }
 
-    // Render Rute 1
-    renderRouteOnPDF(0);
-    footer();
-
-    // Render Rute 2
-    doc.addPage();y=mg;
-    renderRouteOnPDF(1);
-    footer();
-
-    // Halaman perbandingan
-    doc.addPage();y=mg;
-    doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(...tC);
-    doc.text('Perbandingan & Rekomendasi',pw/2,y,{align:'center'});y+=12;
-
-    var crows=[
-      ['Kriteria','Rute 1 (A-B-C-D-A)','Rute 2 (A-C-B-D-A)'],
-      ['Biaya Transport','¥'+analysisRes.R0.totCost.toLocaleString(),'¥'+analysisRes.R1.totCost.toLocaleString()],
-      ['Waktu Transport',analysisRes.R0.totTrans+' mnt',analysisRes.R1.totTrans+' mnt'],
-      ['Total Waktu',analysisRes.R0.totTime+' mnt',analysisRes.R1.totTime+' mnt'],
-      ['Jalan Kaki',analysisRes.R0.totWalk+' mnt',analysisRes.R1.totWalk+' mnt'],
-      ['Transfer Moda',analysisRes.R0.totTransfer+'x',analysisRes.R1.totTransfer+'x'],
-    ];
-    var cwidths=[60,50,50];
-    var cxs=[mg,mg+60,mg+110];
-
-    doc.setFillColor(240,240,240);doc.rect(mg,y,cw,7,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(80,80,80);
-    crows[0].forEach(function(h,i){doc.text(h,cxs[i]+2,y+5);});
-    y+=7;
-
-    crows.slice(1).forEach(function(r,ri){
-      need(8);
-      if(ri%2===0){doc.setFillColor(250,250,250);doc.rect(mg,y,cw,7,'F');}
-      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...tC);
-      r.forEach(function(v,i){doc.text(v,cxs[i]+2,y+5);});
-      y+=7;
-    });
-
-    y+=8;
-    need(20);
-    doc.setFillColor(26,26,26);doc.roundedRect(mg,y,cw,18,2,2,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
-    doc.text('REKOMENDASI: '+(analysisRes.recommended==='r0'?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)'),mg+6,y+8);
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(200,200,200);
-    doc.text('Skor '+(analysisRes.recommended==='r0'?analysisRes.sc0:analysisRes.sc1)+'/4 kriteria evaluasi',mg+6,y+14);
-    y+=24;
-
-    // Canvas snapshot
-    if(cv_el){
-      var img=cv_el.toDataURL('image/png');
-      var iw=cw,ih=iw*(CVH/CVW);
-      if(ih>80){ih=80;iw=ih*(CVW/CVH);}
-      need(ih+6);
-      doc.addImage(img,'PNG',mg+(cw-iw)/2,y,iw,ih);
-      y+=ih+6;
+    // Fatigue analysis
+    if(walkDiff>10){
+        analysis.push({type:'fatigue',text:lessWalk+' memerlukan jalan kaki '+walkDiff+' menit lebih sedikit. Dalam one day tour, kelelahan bisa sangat mempengaruhi pengalaman.'});
     }
 
-    footer();
-    doc.save('tugas2-tokyo-'+(document.getElementById('nimInput').value||'nim')+'.pdf');
-    toast('PDF berhasil dibuat','ok');
-  }catch(err){
-    toast('Gagal: '+err.message,'error');console.error(err);
-  }
-  hideOv();
+    return analysis;
 }
 
-// ============================================================
-// UTIL
-// ============================================================
-function timeToMin(t){var p=(t||'08:00').split(':');return parseInt(p[0])*60+parseInt(p[1]);}
-function minToTime(m){m=((m%1440)+1440)%1440;return p2(Math.floor(m/60))+':'+p2(m%60);}
-function p2(n){return(n<10?'0':'')+n;}
+// ========== ANALYSIS ENGINE ==========
+function runAnalysis(){
+    r1Data=readSegData('r1',r1Segs);r2Data=readSegData('r2',r2Segs);
+    if(r1Data.segs.every(function(s){return s.cost===0})&&r2Data.segs.every(function(s){return s.cost===0})){toast('Harap isi data transportasi','error');return}
 
-window.addEventListener('load',function(){
-  updateDateDisplay();
-  window.addEventListener('resize',function(){if(canvasNodes.length)drawCurrent();});
+    // Calculate efficiency scores
+    var s1=calcEfficiencyScore(r1Data);
+    var s2=calcEfficiencyScore(r2Data);
+    var scores=calcWeightedScore(s1,s2);
+    var worthIt=getWorthItAnalysis(s1,s2,scores);
+
+    // Determine winner by weighted score (NOT just cost)
+    var winnerLabel=scores.r1.total>=scores.r2.total?'Rute 1 (A-B-C-D-A)':'Rute 2 (A-C-B-D-A)';
+    var winnerReason=scores.r1.total>=scores.r2.total?
+        'Skor efisiensi '+scores.r1.total+' vs '+scores.r2.total+' (Biaya 40% + Waktu 35% + Kelelahan 25%)':
+        'Skor efisiensi '+scores.r2.total+' vs '+scores.r1.total+' (Biaya 40% + Waktu 35% + Kelelahan 25%)';
+
+    // Build iteration states
+    iterStates=[];var labels=['A','B','C','D'];
+    iterStates.push({title:'Inisialisasi',changes:['Memulai analisis efisiensi 2 rute','Metode: Weighted Scoring (Biaya 40% + Waktu 35% + Kelelahan 25%)','Rute 1: A-B-C-D-A | Rute 2: A-C-B-D-A','Lokasi: '+locA+', '+locB+', '+locC+', '+locD],hlEdges:[],hlNodes:[0,1,2,3],bloomEdges:[],bloomNodes:[],labels:{}});
+
+    var cumCost1=0,cumEdges1=[];
+    r1Data.segs.forEach(function(s,i){cumCost1+=s.cost;var fi='ABCD'.indexOf(s.from),ti='ABCD'.indexOf(s.to);cumEdges1.push({from:fi,to:ti});var lb={};lb[ti]=cumCost1;
+    var ndInfo=s.nextDepart&&s.nextDepart!=='-'?' | Berangkat selanjutnya: '+s.nextDepart:'';
+    iterStates.push({title:'Rute 1 - Segmen '+(i+1)+': '+s.from+' \u2192 '+s.to,changes:['Perjalanan: '+s.fromName+' \u2192 '+s.toName,'Jalur: '+s.route,'Biaya: \u00A5'+s.cost+' | Waktu: '+s.time+' menit | Walk: '+s.walk+' menit','Kumulatif: \u00A5'+cumCost1,'Tiba: '+s.arrive+' | Durasi di lokasi: '+s.stay+' menit'+ndInfo],hlEdges:cumEdges1.slice(),hlNodes:[fi,ti],bloomEdges:[{from:fi,to:ti}],bloomNodes:[ti],labels:lb})});
+
+    var cumCost2=0,cumEdges2=[];
+    r2Data.segs.forEach(function(s,i){cumCost2+=s.cost;var fi='ABCD'.indexOf(s.from),ti='ABCD'.indexOf(s.to);cumEdges2.push({from:fi,to:ti});var lb={};lb[ti]=cumCost2;
+    var ndInfo=s.nextDepart&&s.nextDepart!=='-'?' | Berangkat selanjutnya: '+s.nextDepart:'';
+    iterStates.push({title:'Rute 2 - Segmen '+(i+1)+': '+s.from+' \u2192 '+s.to,changes:['Perjalanan: '+s.fromName+' \u2192 '+s.toName,'Jalur: '+s.route,'Biaya: \u00A5'+s.cost+' | Waktu: '+s.time+' menit | Walk: '+s.walk+' menit','Kumulatif: \u00A5'+cumCost2,'Tiba: '+s.arrive+' | Durasi di lokasi: '+s.stay+' menit'+ndInfo],hlEdges:cumEdges2.slice(),hlNodes:[fi,ti],bloomEdges:[{from:fi,to:ti}],bloomNodes:[ti],labels:lb})});
+
+    // Scoring iteration
+    iterStates.push({title:'Kalkulasi Skor Efisiensi',changes:['Rute 1 — Biaya: \u00A5'+s1.totalCost+' | Waktu: '+s1.totalTime+' min | Walk: '+s1.totalWalk+' min','Rute 2 — Biaya: \u00A5'+s2.totalCost+' | Waktu: '+s2.totalTime+' min | Walk: '+s2.totalWalk+' min','Skor Rute 1: '+scores.r1.total+'/100 (Cost:'+scores.r1.cost+' Time:'+scores.r1.time+' Fatigue:'+scores.r1.fatigue+')','Skor Rute 2: '+scores.r2.total+'/100 (Cost:'+scores.r2.cost+' Time:'+scores.r2.time+' Fatigue:'+scores.r2.fatigue+')'],hlEdges:[],hlNodes:[0,1,2,3],bloomEdges:[],bloomNodes:[],labels:{}});
+
+    // Final
+    var finalChanges=['PEMENANG: '+winnerLabel,winnerReason,'Selisih biaya: \u00A5'+Math.abs(s1.totalCost-s2.totalCost),'Selisih waktu: '+Math.abs(s1.totalTime-s2.totalTime)+' menit','Selisih walk: '+Math.abs(s1.totalWalk-s2.totalWalk)+' menit'];
+    worthIt.forEach(function(w){finalChanges.push('['+w.type.toUpperCase()+'] '+w.text)});
+    iterStates.push({title:'Hasil: '+winnerLabel,changes:finalChanges,hlEdges:[],hlNodes:[0,1,2,3],bloomEdges:scores.r1.total>=scores.r2.total?cumEdges1:cumEdges2,bloomNodes:[0,1,2,3],labels:{}});
+
+    var diff=Math.abs(r1Data.total-r2Data.total);
+    res={r1:r1Data,r2:r2Data,diff:diff,winner:winnerLabel,s1:s1,s2:s2,scores:scores,worthIt:worthIt};
+
+    document.getElementById('secVis').style.display='block';
+    document.getElementById('secResults').style.display='block';
+    setupIterCtrl();iterGo(0);buildStats();buildEfficiency();buildComparison();buildRecommendation();buildTimeline();buildTable();buildOutput();buildAllIterations();buildAnalysis();buildWinnerBanner();
+    toast('Analisis efisiensi selesai','success');
+    document.getElementById('secVis').scrollIntoView({behavior:'smooth'});
+}
+
+// ========== ITERATION CONTROLS ==========
+function setupIterCtrl(){if(iterStates.length>0){document.getElementById('iterCtrl').style.display='flex';document.getElementById('playCtrl').style.display='flex'}else{document.getElementById('iterCtrl').style.display='none';document.getElementById('playCtrl').style.display='none'}}
+function iterGo(idx){if(idx<0)idx=0;if(idx>=iterStates.length)idx=iterStates.length-1;curIter=idx;var st=iterStates[idx];drawGraph(st.hlEdges,st.hlNodes,st.bloomEdges,st.bloomNodes,st.labels);updateIterUI();showIterChanges();showIterDetail()}
+function updateIterUI(){document.getElementById('iterBadge').textContent=(curIter+1)+'/'+iterStates.length;document.getElementById('iterFirst').disabled=curIter===0;document.getElementById('iterPrev').disabled=curIter===0;document.getElementById('iterNext').disabled=curIter>=iterStates.length-1;document.getElementById('iterLast').disabled=curIter>=iterStates.length-1;document.querySelectorAll('.tl-item').forEach(function(el,i){el.classList.toggle('active',i===curIter)})}
+function showIterChanges(){var st=iterStates[curIter],el=document.getElementById('iterChanges');el.innerHTML='';st.changes.forEach(function(c){el.innerHTML+='<li>'+c+'</li>'})}
+function showIterDetail(){var st=iterStates[curIter],el=document.getElementById('iterDetail');el.className='iter-detail show';el.innerHTML='<div style="font-weight:700;margin-bottom:6px">'+st.title+'</div>';st.changes.forEach(function(c){el.innerHTML+='<div style="font-size:11px;color:var(--text2);margin:2px 0">'+c+'</div>'})}
+function togglePlayback(){if(playInterval){stopPlayback()}else{document.getElementById('playBtn').textContent='Stop';playInterval=setInterval(function(){if(curIter>=iterStates.length-1){stopPlayback();return}iterGo(curIter+1)},playSpeed)}}
+function stopPlayback(){if(playInterval){clearInterval(playInterval);playInterval=null}document.getElementById('playBtn').textContent='Play'}
+
+// ========== RESULTS BUILDERS ==========
+function buildWinnerBanner(){
+    var el=document.getElementById('winnerBanner');
+    var sc=res.scores;var w=sc.r1.total>=sc.r2.total?1:2;
+    var winScore=w===1?sc.r1.total:sc.r2.total;
+    el.innerHTML='<div class="winner-banner"><h3>\uD83C\uDFC6 '+res.winner+'</h3><p>Skor Efisiensi: <strong>'+winScore+'/100</strong> — Rute paling efisien berdasarkan weighted analysis (Biaya 40% + Waktu 35% + Kelelahan 25%)</p></div>';
+}
+
+function buildStats(){
+    var el=document.getElementById('statsRow');
+    var t1=res.s1.totalTime,t2r=res.s2.totalTime;
+    var w1=res.s1.totalWalk,w2=res.s2.totalWalk;
+    var sc=res.scores;
+    var r1win=sc.r1.total>=sc.r2.total;
+    el.innerHTML='<div class="stat-card'+(r1win?' winner':'')+'"><div class="sv">\u00A5'+r1Data.total+'</div><div class="sl">Rute 1 Biaya</div></div>'
+    +'<div class="stat-card'+(!r1win?' winner':'')+'"><div class="sv">\u00A5'+r2Data.total+'</div><div class="sl">Rute 2 Biaya</div></div>'
+    +'<div class="stat-card"><div class="sv">\u00A5'+res.diff+'</div><div class="sl">Selisih</div></div>'
+    +'<div class="stat-card"><div class="sv">'+t1+'/'+t2r+'</div><div class="sl">Waktu (min)</div></div>'
+    +'<div class="stat-card"><div class="sv">'+w1+'/'+w2+'</div><div class="sl">Walk (min)</div></div>'
+    +'<div class="stat-card'+(r1win?' winner':'')+'"><div class="sv">'+sc.r1.total+'</div><div class="sl">Skor R1</div></div>'
+    +'<div class="stat-card'+(!r1win?' winner':'')+'"><div class="sv">'+sc.r2.total+'</div><div class="sl">Skor R2</div></div>';
+}
+
+function buildEfficiency(){
+    var el=document.getElementById('efficiencySection');
+    var sc=res.scores;
+    function bar(label,v1,v2,unit){
+        var max=Math.max(v1,v2)||1;
+        var c1=v1>=v2?'var(--green)':'var(--red)';
+        var c2=v2>=v1?'var(--green)':'var(--red)';
+        return '<div style="margin:8px 0"><div style="font-size:11px;font-weight:600;margin-bottom:4px">'+label+'</div>'
+        +'<div class="efficiency-meter"><span style="font-size:10px;min-width:30px">R1</span><div class="efficiency-bar"><div class="efficiency-bar-inner" style="width:'+v1+'%;background:'+c1+'"></div></div><span class="efficiency-label" style="color:'+c1+'">'+v1+unit+'</span></div>'
+        +'<div class="efficiency-meter"><span style="font-size:10px;min-width:30px">R2</span><div class="efficiency-bar"><div class="efficiency-bar-inner" style="width:'+v2+'%;background:'+c2+'"></div></div><span class="efficiency-label" style="color:'+c2+'">'+v2+unit+'</span></div></div>';
+    }
+
+    var h='<div style="margin:16px 0"><div class="s-title" style="margin-bottom:12px">Skor Efisiensi (Weighted Analysis)</div>';
+    h+='<div class="score-breakdown"><div class="score-item"><div class="sc-val" style="color:var(--blue)">40%</div><div class="sc-label">Bobot Biaya</div><div class="sc-raw">R1:'+sc.r1.cost+' R2:'+sc.r2.cost+'</div></div><div class="score-item"><div class="sc-val" style="color:var(--amber)">35%</div><div class="sc-label">Bobot Waktu</div><div class="sc-raw">R1:'+sc.r1.time+' R2:'+sc.r2.time+'</div></div><div class="score-item"><div class="sc-val" style="color:var(--red)">25%</div><div class="sc-label">Bobot Kelelahan</div><div class="sc-raw">R1:'+sc.r1.fatigue+' R2:'+sc.r2.fatigue+'</div></div></div>';
+    h+=bar('Skor Total',sc.r1.total,sc.r2.total,'');
+    h+=bar('Skor Biaya',sc.r1.cost,sc.r2.cost,'');
+    h+=bar('Skor Waktu',sc.r1.time,sc.r2.time,'');
+    h+=bar('Skor Kelelahan',sc.r1.fatigue,sc.r2.fatigue,'');
+
+    // Worth-it analysis box
+    if(res.worthIt.length>0){
+        h+='<div class="ai-suggest-box" style="margin-top:12px"><div class="ai-s-title">\uD83E\uDDE0 Analisis Worth-It</div>';
+        res.worthIt.forEach(function(w){
+            var icon=w.type==='worth'?'\u2705':w.type==='verdict'?'\uD83D\uDCAF':w.type==='tradeoff'?'\u2696\uFE0F':w.type==='fatigue'?'\uD83E\uDDB6':w.type==='clear'?'\u2B50':w.type==='significant'?'\uD83D\uDCB0':w.type==='equal'?'\uD83E\uDD1D':'\uD83D\uDCA1';
+            h+='<div class="ai-s-item">'+icon+' '+w.text+'</div>';
+        });
+        h+='</div>';
+    }
+    h+='</div>';
+    el.innerHTML=h;
+}
+
+function buildComparison(){var el=document.getElementById('cmpGrid');var h1='',h2='';
+r1Data.segs.forEach(function(s){
+    var ndHTML=s.nextDepart&&s.nextDepart!=='-'?'<div style="font-size:9px;color:var(--amber);margin-top:2px">\u23F0 Next: '+s.nextDepart+'</div>':'';
+    h1+='<div class="itinerary-row"><div class="itin-time">'+s.depart+'-'+s.arrive+'</div><div class="itin-act">'+s.fromName+' \u2192 '+s.toName+'<br><span style="color:var(--text3);font-size:10px">'+s.route+' | Walk '+s.walk+'min</span>'+ndHTML+'</div><div class="itin-cost">\u00A5'+s.cost+'</div></div>';
 });
+r2Data.segs.forEach(function(s){
+    var ndHTML=s.nextDepart&&s.nextDepart!=='-'?'<div style="font-size:9px;color:var(--amber);margin-top:2px">\u23F0 Next: '+s.nextDepart+'</div>':'';
+    h2+='<div class="itinerary-row"><div class="itin-time">'+s.depart+'-'+s.arrive+'</div><div class="itin-act">'+s.fromName+' \u2192 '+s.toName+'<br><span style="color:var(--text3);font-size:10px">'+s.route+' | Walk '+s.walk+'min</span>'+ndHTML+'</div><div class="itin-cost">\u00A5'+s.cost+'</div></div>';
+});
+el.innerHTML='<div class="cmp-col"><h4>Rute 1: A-B-C-D-A '+(res.scores.r1.total>=res.scores.r2.total?'\uD83C\uDFC6':'')+'</h4>'+h1+'<div style="text-align:right;font-weight:700;padding-top:8px;border-top:2px solid var(--border);margin-top:8px;font-family:JetBrains Mono,monospace;font-size:12px">Total: \u00A5'+r1Data.total+' | Skor: '+res.scores.r1.total+'</div></div><div class="cmp-col"><h4>Rute 2: A-C-B-D-A '+(res.scores.r2.total>res.scores.r1.total?'\uD83C\uDFC6':'')+'</h4>'+h2+'<div style="text-align:right;font-weight:700;padding-top:8px;border-top:2px solid var(--border);margin-top:8px;font-family:JetBrains Mono,monospace;font-size:12px">Total: \u00A5'+r2Data.total+' | Skor: '+res.scores.r2.total+'</div></div>'}
+
+function buildRecommendation(){var el=document.getElementById('recBox');el.style.display='block';
+var reasons=[];
+var sc=res.scores;
+if(sc.r1.total>=sc.r2.total){
+    if(sc.r1.cost>=sc.r2.cost)reasons.push('Biaya transportasi lebih hemat atau setara');
+    if(sc.r1.time>=sc.r2.time)reasons.push('Waktu tempuh lebih singkat atau setara');
+    if(sc.r1.fatigue>=sc.r2.fatigue)reasons.push('Tingkat kelelahan (jalan kaki) lebih rendah atau setara');
+}else{
+    if(sc.r2.cost>=sc.r1.cost)reasons.push('Biaya transportasi lebih hemat atau setara');
+    if(sc.r2.time>=sc.r1.time)reasons.push('Waktu tempuh lebih singkat atau setara');
+    if(sc.r2.fatigue>=sc.r1.fatigue)reasons.push('Tingkat kelelahan (jalan kaki) lebih rendah atau setara');
+}
+reasons.push('Skor efisiensi keseluruhan lebih tinggi berdasarkan weighted analysis');
+var rl='';reasons.forEach(function(r){rl+='<li>'+r+'</li>'});
+var worthItHTML='';
+if(res.worthIt.length>0){
+    worthItHTML='<h4>Analisis Worth-It</h4>';
+    res.worthIt.forEach(function(w){worthItHTML+='<p><strong>['+w.type.toUpperCase()+']</strong> '+w.text+'</p>'});
+}
+el.innerHTML='<div class="ai-box"><h4>Rekomendasi AI-Enhanced</h4><p>Berdasarkan analisis <strong>weighted efficiency scoring</strong> (bukan hanya biaya termurah), <strong>'+res.winner+'</strong> direkomendasikan:</p><ul style="margin:8px 0;padding-left:18px;list-style:disc">'+rl+'</ul><p>Selisih biaya transportasi: <strong>\u00A5'+res.diff+'</strong></p><p>Metode: Biaya (40%) + Waktu Tempuh (35%) + Kelelahan/Walk (25%)</p>'+worthItHTML+'</div>'}
+
+function buildTimeline(){var el=document.getElementById('timeline');el.innerHTML='';iterStates.forEach(function(st,i){var cls='tl-item'+(i===curIter?' active':'');el.innerHTML+='<div class="'+cls+'" onclick="iterGo('+i+')"><div class="tl-title">'+(i===iterStates.length-1?'\uD83C\uDFC6 FINAL: ':'')+st.title+'</div><div class="tl-desc">'+st.changes[0]+'</div></div>'})}
+
+function buildTable(){var el=document.getElementById('tblWrap');var h='<table class="rt"><tr><th>#</th><th>Rute</th><th>Segmen</th><th>Biaya</th><th>Waktu</th><th>Walk</th><th>Jalur</th><th>Next Depart</th></tr>';
+r1Data.segs.forEach(function(s,i){h+='<tr><td>'+(i+1)+'</td><td>Rute 1</td><td>'+s.from+' \u2192 '+s.to+'</td><td>\u00A5'+s.cost+'</td><td>'+s.time+' min</td><td>'+s.walk+' min</td><td>'+s.route+'</td><td>'+s.nextDepart+'</td></tr>'});
+h+='<tr style="font-weight:700"><td></td><td></td><td>Total Rute 1</td><td>\u00A5'+r1Data.total+'</td><td>'+res.s1.totalTime+' min</td><td>'+res.s1.totalWalk+' min</td><td></td><td></td></tr>';
+r2Data.segs.forEach(function(s,i){h+='<tr><td>'+(i+1)+'</td><td>Rute 2</td><td>'+s.from+' \u2192 '+s.to+'</td><td>\u00A5'+s.cost+'</td><td>'+s.time+' min</td><td>'+s.walk+' min</td><td>'+s.route+'</td><td>'+s.nextDepart+'</td></tr>'});
+h+='<tr style="font-weight:700"><td></td><td></td><td>Total Rute 2</td><td>\u00A5'+r2Data.total+'</td><td>'+res.s2.totalTime+' min</td><td>'+res.s2.totalWalk+' min</td><td></td><td></td></tr></table>';
+el.innerHTML=h}
+
+function buildOutput(){var el=document.getElementById('outputWrap');var nama=document.getElementById('inpNama').value||'-';var kelas=document.getElementById('inpKelas').value||'-';var nim=document.getElementById('inpNIM').value||'-';
+function buildItin(rd,title){var h='<div class="output-section"><div class="output-title">'+title+'</div><div style="font-size:11px;margin-bottom:10px;color:var(--text2)">Minggu, 1 Maret 2026 | '+nama+' ('+nim+') | '+kelas+'</div>';
+h+='<div style="margin-bottom:10px"><div style="display:grid;grid-template-columns:80px 1fr 90px;font-weight:700;font-size:10px;padding:6px 0;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.5px;color:var(--text2)"><div>Waktu</div><div>Kegiatan</div><div style="text-align:right">Biaya</div></div>';
+var totalAdm=0,totalMeal=0;
+rd.segs.forEach(function(s,i){
+    h+='<div class="itinerary-row"><div class="itin-time">'+s.depart+'-'+s.arrive+'</div><div class="itin-act"><strong>'+s.fromName+' \u2192 '+s.toName+'</strong><br>Jalur: '+s.route+' (walk '+s.walk+' min)</div><div class="itin-cost">\u00A5'+s.cost+'</div></div>';
+    if(i<rd.segs.length-1){
+        var nextSeg=rd.segs[i+1];
+        var ndStr=s.nextDepart&&s.nextDepart!=='-'?s.nextDepart:nextSeg.depart;
+        h+='<div class="itinerary-row"><div class="itin-time">'+s.arrive+'-'+ndStr+'</div><div class="itin-act">'+s.activity+' di '+s.toName+(s.admission>0?'<br>Admission: \u00A5'+s.admission:'')+(s.meal>0?'<br>Makan: \u00A5'+s.meal:'')+'<br><span style="color:var(--amber);font-size:10px">\u23F0 Berangkat selanjutnya: '+ndStr+'</span></div><div class="itin-cost">'+(s.admission>0?'\u00A5'+s.admission:'')+'</div></div>';
+        totalAdm+=s.admission;totalMeal+=s.meal;
+    }
+});
+h+='</div><div style="text-align:right;font-weight:700;font-family:JetBrains Mono,monospace;font-size:13px;padding-top:8px;border-top:2px solid var(--border)">Total Transportasi: \u00A5'+rd.total+'</div>';
+if(totalAdm>0||totalMeal>0)h+='<div style="text-align:right;font-size:11px;color:var(--text2);margin-top:4px">Admission: \u00A5'+totalAdm+' | Makan: ~\u00A5'+totalMeal+'</div>';
+h+='</div>';return h}
+
+el.innerHTML=buildItin(r1Data,'Rencana Perjalanan Alternatif 1 (A-B-C-D-A)')+buildItin(r2Data,'Rencana Perjalanan Alternatif 2 (A-C-B-D-A)')+'<div class="output-section"><div class="output-title">Perbandingan Efisiensi & Kesimpulan</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0"><div style="text-align:center;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm)'+(res.scores.r1.total>=res.scores.r2.total?';border-color:var(--green);border-width:2px':'')+'"><div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:700">\u00A5'+r1Data.total+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px">RUTE 1 | Skor: '+res.scores.r1.total+'</div></div><div style="text-align:center;padding:12px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm)'+(res.scores.r2.total>res.scores.r1.total?';border-color:var(--green);border-width:2px':'')+'"><div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:700">\u00A5'+r2Data.total+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px">RUTE 2 | Skor: '+res.scores.r2.total+'</div></div></div><p style="font-size:12px;margin-top:10px">Selisih biaya: <strong>\u00A5'+res.diff+'</strong></p><p style="font-size:12px;margin-top:6px">Rekomendasi (Weighted Efficiency): <strong>'+res.winner+'</strong></p></div>'}
+
+function buildAllIterations(){var el=document.getElementById('allIter');el.innerHTML='';iterStates.forEach(function(st,i){var ch='';st.changes.forEach(function(c){ch+='<div style="font-size:11px;color:var(--text2);margin:2px 0;padding-left:10px;border-left:2px solid var(--border)">'+c+'</div>'});el.innerHTML+='<div style="background:var(--highlight-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:6px 0;cursor:pointer" onclick="iterGo('+i+')"><div style="font-weight:700;font-size:12px;margin-bottom:6px">'+(i+1)+'. '+st.title+'</div>'+ch+'</div>'})}
+
+function buildAnalysis(){var el=document.getElementById('aiBox');
+var s1=res.s1,s2=res.s2,sc=res.scores;
+var h='<h4>Analisis Efisiensi Rencana Perjalanan (AI-Enhanced)</h4>';
+h+='<p>Analisis dilakukan terhadap dua alternatif rute one day tour di Tokyo menggunakan <strong>weighted efficiency scoring</strong>, bukan hanya perbandingan biaya.</p>';
+h+='<h4>Metodologi</h4>';
+h+='<p>Skor efisiensi dihitung dengan bobot: <strong>Biaya (40%)</strong> + <strong>Waktu Tempuh (35%)</strong> + <strong>Kelelahan/Walk (25%)</strong>. Pendekatan ini lebih realistis karena mempertimbangkan bahwa wisatawan tidak hanya peduli biaya, tetapi juga kenyamanan dan waktu.</p>';
+h+='<h4>Lokasi yang Dikunjungi</h4>';
+h+='<p>A (Start/End): '+locA+'</p><p>B (Taman): '+locB+'</p><p>C (Landmark): '+locC+'</p><p>D (Perbelanjaan): '+locD+'</p>';
+h+='<h4>Rute 1: A-B-C-D-A</h4>';
+r1Data.segs.forEach(function(s,i){h+='<p>Segmen '+(i+1)+': '+s.fromName+' \u2192 '+s.toName+' | \u00A5'+s.cost+' | '+s.time+' min | Walk '+s.walk+' min | Jalur: '+s.route+(s.nextDepart&&s.nextDepart!=='-'?' | Next: '+s.nextDepart:'')+'</p>'});
+h+='<p>Total: <strong>\u00A5'+s1.totalCost+'</strong> | Waktu: '+s1.totalTime+' min | Walk: '+s1.totalWalk+' min | Skor: <strong>'+sc.r1.total+'/100</strong></p>';
+h+='<h4>Rute 2: A-C-B-D-A</h4>';
+r2Data.segs.forEach(function(s,i){h+='<p>Segmen '+(i+1)+': '+s.fromName+' \u2192 '+s.toName+' | \u00A5'+s.cost+' | '+s.time+' min | Walk '+s.walk+' min | Jalur: '+s.route+(s.nextDepart&&s.nextDepart!=='-'?' | Next: '+s.nextDepart:'')+'</p>'});
+h+='<p>Total: <strong>\u00A5'+s2.totalCost+'</strong> | Waktu: '+s2.totalTime+' min | Walk: '+s2.totalWalk+' min | Skor: <strong>'+sc.r2.total+'/100</strong></p>';
+h+='<h4>Perbandingan Multidimensi</h4>';
+h+='<p>Selisih biaya: \u00A5'+res.diff+'</p>';
+h+='<p>Selisih waktu: '+Math.abs(s1.totalTime-s2.totalTime)+' menit</p>';
+h+='<p>Selisih walk: '+Math.abs(s1.totalWalk-s2.totalWalk)+' menit</p>';
+h+='<h4>Analisis Worth-It</h4>';
+if(res.worthIt.length>0){
+    res.worthIt.forEach(function(w){h+='<p><strong>['+w.type.toUpperCase()+']</strong> '+w.text+'</p>'});
+}else{
+    h+='<p>Kedua rute memiliki profil yang sangat mirip.</p>';
+}
+h+='<h4>Kesimpulan</h4>';
+h+='<p><strong>'+res.winner+'</strong> direkomendasikan dengan skor efisiensi '+(sc.r1.total>=sc.r2.total?sc.r1.total:sc.r2.total)+'/100. ';
+h+='Keputusan ini mempertimbangkan tidak hanya biaya, tetapi juga waktu tempuh dan tingkat kelelahan wisatawan. ';
+if(res.diff<=50&&res.diff>0){
+    h+='Selisih biaya yang sangat kecil (\u00A5'+res.diff+') menunjukkan bahwa faktor waktu dan kenyamanan lebih menentukan dalam pemilihan rute optimal.';
+}else if(res.diff>200){
+    h+='Selisih biaya yang signifikan (\u00A5'+res.diff+') menjadi faktor penting, namun tetap diseimbangkan dengan faktor kenyamanan.';
+}else{
+    h+='Analisis weighted scoring memberikan keputusan yang lebih seimbang dibandingkan hanya melihat biaya terendah.';
+}
+h+='</p>';
+el.innerHTML=h}
+
+// ========== RESET ==========
+function resetAll(){nimData=null;locA='';locB='';locC='';locD='';res=null;curIter=0;iterStates=[];stopPlayback();r1Data={segs:[],total:0};r2Data={segs:[],total:0};document.getElementById('inpNIM').value='';document.getElementById('inpNama').value='';document.getElementById('inpKelas').value='';document.getElementById('nimResult').style.display='none';document.getElementById('locConfirm').style.display='none';document.getElementById('secRoute').style.display='none';document.getElementById('secVis').style.display='none';document.getElementById('secResults').style.display='none';document.getElementById('iterCtrl').style.display='none';document.getElementById('playCtrl').style.display='none';document.getElementById('iterDetail').className='iter-detail';document.getElementById('winnerBanner').innerHTML='';document.getElementById('efficiencySection').innerHTML='';toast('Reset complete','info')}
+
+// ========== SHARE / EXPORT ==========
+function openShare(){var d={nama:document.getElementById('inpNama').value,kelas:document.getElementById('inpKelas').value,nim:document.getElementById('inpNIM').value,kampus:document.getElementById('inpKampus').value};try{var enc=btoa(JSON.stringify(d));var url=location.origin+location.pathname+'?d='+enc;document.getElementById('shareLink').value=url}catch(e){}document.getElementById('shareModal').classList.add('show')}
+function expJSON(){var d={nama:document.getElementById('inpNama').value,kelas:document.getElementById('inpKelas').value,nim:document.getElementById('inpNIM').value,kampus:document.getElementById('inpKampus').value,r1:r1Data,r2:r2Data,scores:res?res.scores:null,author:'RAD STRIX'};var b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tokyo-planner-'+Date.now()+'.json';a.click()}
+function impJSON(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(d.nim){document.getElementById('inpNama').value=d.nama||'';document.getElementById('inpKelas').value=d.kelas||'';document.getElementById('inpNIM').value=d.nim;if(d.kampus)document.getElementById('inpKampus').value=d.kampus;parseNIM();toast('Data imported','success')}else{toast('Invalid format','error')}}catch(ex){toast('Parse error','error')}};r.readAsText(f)}
+function screenShot(){var c=document.getElementById('cv');var d=c.toDataURL('image/png');var a=document.createElement('a');a.href=d;a.download='tokyo-route-'+Date.now()+'.png';a.click();toast('Screenshot saved','success')}
+
+// ========== PDF GENERATION ==========
+async function printPDF(){if(!res){toast('Run analysis first','error');return}var ov=document.getElementById('ov');ov.classList.add('show');document.getElementById('ovText').textContent='Generating PDF...';var bar=document.getElementById('ovBar');bar.style.width='10%';var pdf=new jspdf.jsPDF('p','mm','a4');var mg=15,pw=210-mg*2,y=mg;
+function foot(){pdf.setFontSize(7);pdf.setTextColor(150);pdf.text('RAD STRIX | Tokyo Travel Planner | Weighted Efficiency Analysis',mg,290);pdf.text('Page '+pdf.internal.getNumberOfPages(),195,290,{align:'right'})}
+function np(){foot();pdf.addPage();y=mg}
+function need(h){if(y+h>275){np()}}
+pdf.setFillColor(30,30,30);pdf.rect(0,0,210,40,'F');pdf.setTextColor(255);pdf.setFontSize(18);pdf.setFont(undefined,'bold');pdf.text('Tokyo One Day Tour',mg,22);pdf.setFontSize(10);pdf.setFont(undefined,'normal');pdf.text('Weighted Efficiency Analysis Report',mg,30);y=50;
+bar.style.width='15%';
+pdf.setTextColor(50);pdf.setFontSize(9);var nama=document.getElementById('inpNama').value||'-';var kelas=document.getElementById('inpKelas').value||'-';var nim=document.getElementById('inpNIM').value||'-';
+pdf.text('Nama: '+nama,mg,y);y+=5;pdf.text('NIM: '+nim,mg,y);y+=5;pdf.text('Kelas: '+kelas,mg,y);y+=5;pdf.text('Tanggal: Minggu, 1 Maret 2026',mg,y);y+=10;
+bar.style.width='20%';
+pdf.setFontSize(8);pdf.text('Lokasi A: '+locA,mg,y);y+=4;pdf.text('Lokasi B: '+locB,mg,y);y+=4;pdf.text('Lokasi C: '+locC,mg,y);y+=4;pdf.text('Lokasi D: '+locD,mg,y);y+=8;
+pdf.text('Metode: Weighted Scoring (Biaya 40% + Waktu 35% + Kelelahan 25%)',mg,y);y+=4;
+pdf.setFont(undefined,'bold');pdf.text('Rekomendasi: '+res.winner+' (Skor: '+(res.scores.r1.total>=res.scores.r2.total?res.scores.r1.total:res.scores.r2.total)+'/100)',mg,y);y+=10;
+bar.style.width='30%';
+function writeRoute(rd,title,score){need(15);pdf.setFontSize(12);pdf.setFont(undefined,'bold');pdf.setTextColor(30);pdf.text(title+' | Skor: '+score,mg,y);y+=8;pdf.setFontSize(8);pdf.setFont(undefined,'normal');pdf.setTextColor(80);rd.segs.forEach(function(s){need(20);pdf.text(s.depart+'-'+s.arrive+' '+s.fromName+' > '+s.toName,mg,y);y+=4;pdf.text('Jalur: '+s.route+' | Y'+s.cost+' | '+s.time+'min | Walk '+s.walk+'min'+(s.nextDepart&&s.nextDepart!=='-'?' | Next: '+s.nextDepart:''),mg+5,y);y+=6});need(8);pdf.setFont(undefined,'bold');pdf.text('Total: Y'+rd.total,mg,y);y+=10}
+writeRoute(r1Data,'Rute 1 (A-B-C-D-A)',res.scores.r1.total);bar.style.width='50%';
+writeRoute(r2Data,'Rute 2 (A-C-B-D-A)',res.scores.r2.total);bar.style.width='70%';
+need(40);pdf.setFontSize(12);pdf.setFont(undefined,'bold');pdf.text('Perbandingan Efisiensi',mg,y);y+=8;pdf.setFontSize(9);pdf.setFont(undefined,'normal');
+pdf.text('Rute 1: Y'+r1Data.total+' | '+res.s1.totalTime+'min | Walk '+res.s1.totalWalk+'min | Skor: '+res.scores.r1.total,mg,y);y+=5;
+pdf.text('Rute 2: Y'+r2Data.total+' | '+res.s2.totalTime+'min | Walk '+res.s2.totalWalk+'min | Skor: '+res.scores.r2.total,mg,y);y+=5;
+pdf.text('Selisih biaya: Y'+res.diff,mg,y);y+=5;
+if(res.worthIt.length>0){need(20);pdf.setFont(undefined,'bold');pdf.text('Worth-It Analysis:',mg,y);y+=5;pdf.setFont(undefined,'normal');res.worthIt.forEach(function(w){need(10);var lines=pdf.splitTextToSize('['+w.type.toUpperCase()+'] '+w.text,pw);pdf.text(lines,mg,y);y+=lines.length*4+2})}
+bar.style.width='85%';
+try{iterGo(iterStates.length-1);await new Promise(function(r){setTimeout(r,300)});var imgData=document.getElementById('cv').toDataURL('image/png');need(80);pdf.addImage(imgData,'PNG',mg,y,pw,pw*500/800);y+=pw*500/800+5}catch(e){}
+bar.style.width='95%';foot();pdf.save('tokyo-planner-'+Date.now()+'.pdf');bar.style.width='100%';setTimeout(function(){ov.classList.remove('show');bar.style.width='0%';toast('PDF saved','success')},500)}
+
+// ========== URL PARAM LOAD ==========
+(function(){var p=new URLSearchParams(location.search);var d=p.get('d');if(d){try{var obj=JSON.parse(atob(d));setTimeout(function(){if(obj.nim){document.getElementById('inpNama').value=obj.nama||'';document.getElementById('inpKelas').value=obj.kelas||'';document.getElementById('inpNIM').value=obj.nim;if(obj.kampus)document.getElementById('inpKampus').value=obj.kampus;parseNIM()}},1500);history.replaceState(null,'',location.pathname)}catch(e){}}})();
+
+// ========== KEYBOARD SHORTCUTS ==========
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.key==='ArrowRight')iterGo(curIter+1);else if(e.key==='ArrowLeft')iterGo(curIter-1);else if(e.key==='Home')iterGo(0);else if(e.key==='End')iterGo(iterStates.length-1);else if(e.key===' '){e.preventDefault();togglePlayback()}else if(e.key==='?')document.getElementById('shortcutsPanel').classList.toggle('show');else if(e.key==='d'||e.key==='D')toggleDark()});
 </script>
 </body>
 </html>
